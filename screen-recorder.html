@@ -168,10 +168,10 @@
     .control-dock {
       position: absolute;
       left: 50%;
-      bottom: 32px;
+      bottom: 104px;
       transform: translateX(-50%);
       z-index: 10;
-      width: min(760px, calc(100vw - 42px));
+      width: min(700px, calc(100vw - 42px));
       min-height: 70px;
       padding: 8px;
       border-radius: 24px;
@@ -216,7 +216,7 @@
       display: flex;
       align-items: center;
       gap: 9px;
-      padding: 0 10px;
+      padding: 0 11px;
       transition:
         transform 0.18s ease,
         background 0.18s ease,
@@ -255,19 +255,11 @@
 
     .chip-text strong {
       display: block;
-      font-size: 11px;
+      font-size: 11.5px;
       font-weight: 850;
       color: var(--black-text);
       white-space: nowrap;
-    }
-
-    .chip-text span {
-      display: block;
-      margin-top: 3px;
-      font-size: 9px;
-      color: var(--grey-text);
-      font-weight: 720;
-      white-space: nowrap;
+      letter-spacing: -0.15px;
     }
 
     .switch {
@@ -418,7 +410,7 @@
     .toast {
       position: absolute;
       left: 50%;
-      bottom: 120px;
+      bottom: 190px;
       transform: translateX(-50%) translateY(12px);
       z-index: 12;
       background: rgba(30,30,32,0.84);
@@ -454,6 +446,7 @@
         flex-wrap: wrap;
         border-radius: 24px;
         padding: 10px;
+        bottom: 92px;
       }
 
       .record-btn {
@@ -463,6 +456,10 @@
 
       .timer-chip {
         min-width: 104px;
+      }
+
+      .toast {
+        bottom: 220px;
       }
     }
 
@@ -487,7 +484,7 @@
       }
 
       .control-dock {
-        bottom: 18px;
+        bottom: 86px;
       }
     }
   </style>
@@ -525,7 +522,6 @@
 
         <div class="chip-text">
           <strong>Desktop Audio</strong>
-          <span>System sound</span>
         </div>
 
         <label class="switch">
@@ -545,7 +541,6 @@
 
         <div class="chip-text">
           <strong>Microphone</strong>
-          <span>Voice input</span>
         </div>
 
         <label class="switch">
