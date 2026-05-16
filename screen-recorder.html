@@ -12,7 +12,6 @@
     }
 
     :root {
-      --bg: #000000;
       --text: #ffffff;
       --muted: rgba(255,255,255,0.48);
       --dock: rgba(244, 244, 246, 0.94);
@@ -57,6 +56,7 @@
       object-fit: contain;
       background: #000;
       z-index: 1;
+      display: none;
     }
 
     .idle-overlay {
@@ -69,6 +69,10 @@
       text-align: center;
       pointer-events: none;
       padding: 40px;
+      background:
+        radial-gradient(circle at 50% 32%, rgba(255,255,255,0.09), transparent 22%),
+        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.035), transparent 32%),
+        #000;
     }
 
     .idle-content {
@@ -92,6 +96,62 @@
       font-size: clamp(15px, 1.5vw, 20px);
       line-height: 1.45;
       font-weight: 520;
+    }
+
+    .recording-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 32%, rgba(255,69,58,0.11), transparent 20%),
+        #000;
+      pointer-events: none;
+    }
+
+    .recording-card {
+      transform: translateY(-60px);
+    }
+
+    .recording-dot-large {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: var(--red);
+      margin: 0 auto 22px;
+      box-shadow: 0 0 0 12px rgba(255,69,58,0.14);
+      animation: livePulse 1.25s infinite;
+    }
+
+    .recording-card h2 {
+      margin: 0;
+      color: #fff;
+      font-size: clamp(42px, 4.6vw, 68px);
+      font-weight: 820;
+      letter-spacing: -2.7px;
+      line-height: 0.96;
+    }
+
+    .recording-card p {
+      margin: 18px 0 0;
+      color: rgba(255,255,255,0.50);
+      font-size: clamp(14px, 1.4vw, 18px);
+      font-weight: 520;
+    }
+
+    @keyframes livePulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255,69,58,0.32);
+      }
+      70% {
+        box-shadow: 0 0 0 18px rgba(255,69,58,0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255,69,58,0);
+      }
     }
 
     @keyframes fadeUp {
@@ -288,13 +348,6 @@
       animation: recordPulse 1.3s infinite;
     }
 
-    .record-btn.recording:hover {
-      background: linear-gradient(180deg, #ff736b 0%, var(--red) 100%);
-      box-shadow:
-        0 16px 42px rgba(255,69,58,0.50),
-        inset 0 1px 0 rgba(255,255,255,0.28);
-    }
-
     @keyframes recordPulse {
       0% {
         box-shadow:
@@ -330,7 +383,7 @@
       border-radius: 16px;
       border: 1px solid rgba(0,0,0,0.12);
       background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
-      color: var(--download);
+      color: #1d1d1f;
       display: grid;
       place-items: center;
       cursor: pointer;
@@ -414,12 +467,14 @@
     }
 
     @media (max-width: 560px) {
-      .idle-content h1 {
+      .idle-content h1,
+      .recording-card h2 {
         font-size: 38px;
         letter-spacing: -1.8px;
       }
 
-      .idle-content p {
+      .idle-content p,
+      .recording-card p {
         font-size: 14px;
       }
 
@@ -445,7 +500,15 @@
     <div class="idle-overlay" id="idleOverlay">
       <div class="idle-content">
         <h1>Screen Recorder</h1>
-        <p>Choose your screen and start recording.</p>
+        <p>Choose another window or entire screen to avoid mirror loop.</p>
+      </div>
+    </div>
+
+    <div class="recording-overlay" id="recordingOverlay">
+      <div class="recording-card">
+        <div class="recording-dot-large"></div>
+        <h2>Recording</h2>
+        <p>Your screen is being captured.</p>
       </div>
     </div>
 
@@ -516,6 +579,7 @@
     let audioContext = null;
     let audioDestination = null;
     let finalBlobUrl = null;
+    let lastBlob = null;
 
     let timerInterval = null;
     let recordingStartTime = 0;
@@ -524,6 +588,7 @@
 
     const preview = document.getElementById("preview");
     const idleOverlay = document.getElementById("idleOverlay");
+    const recordingOverlay = document.getElementById("recordingOverlay");
 
     const recordBtn = document.getElementById("recordBtn");
     const downloadBtn = document.getElementById("downloadBtn");
@@ -545,7 +610,9 @@
       }
     });
 
-    downloadBtn.addEventListener("click", downloadRecording);
+    downloadBtn.addEventListener("click", () => {
+      downloadRecording(false);
+    });
 
     async function startRecording() {
       try {
@@ -554,7 +621,7 @@
         const wantDesktopAudio = desktopAudioToggle.checked;
         const wantMic = micToggle.checked;
 
-        showToast("Choose your screen to record");
+        showToast("Choose window or screen");
 
         screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: {
@@ -615,10 +682,14 @@
 
         combinedStream = new MediaStream(finalTracks);
 
-        preview.srcObject = combinedStream;
-        preview.muted = true;
+        preview.srcObject = null;
+        preview.removeAttribute("src");
         preview.controls = false;
+        preview.muted = true;
+        preview.style.display = "none";
+
         idleOverlay.style.display = "none";
+        recordingOverlay.style.display = "flex";
 
         recordedChunks = [];
 
@@ -633,24 +704,31 @@
 
         mediaRecorder.onstop = function() {
           const mimeType = mediaRecorder.mimeType || "video/webm";
-          const blob = new Blob(recordedChunks, { type: mimeType });
+          lastBlob = new Blob(recordedChunks, { type: mimeType });
 
           if (finalBlobUrl) {
             URL.revokeObjectURL(finalBlobUrl);
           }
 
-          finalBlobUrl = URL.createObjectURL(blob);
+          finalBlobUrl = URL.createObjectURL(lastBlob);
 
+          preview.pause();
+          preview.removeAttribute("src");
           preview.srcObject = null;
-          preview.src = finalBlobUrl;
-          preview.muted = false;
-          preview.controls = true;
+          preview.controls = false;
+          preview.muted = true;
+          preview.style.display = "none";
+          preview.load();
+
+          idleOverlay.style.display = "flex";
+          recordingOverlay.style.display = "none";
 
           downloadBtn.disabled = false;
           setRecordingUI(false);
           setTogglesDisabled(false);
 
-          showToast("Recording saved");
+          showToast("Recording saved. Downloading...");
+          downloadRecording(true);
         };
 
         videoTrack.onended = function() {
@@ -666,11 +744,17 @@
         startTimer();
 
         showToast("Recording started");
+
       } catch (error) {
         console.error(error);
 
         stopTimer(false);
         cleanupAllStreams();
+
+        preview.style.display = "none";
+        idleOverlay.style.display = "flex";
+        recordingOverlay.style.display = "none";
+
         setRecordingUI(false);
         setTogglesDisabled(false);
 
@@ -744,7 +828,7 @@
       cleanupAllStreams();
     }
 
-    function downloadRecording() {
+    function downloadRecording(isAutoDownload) {
       if (!finalBlobUrl) return;
 
       const now = new Date();
@@ -755,7 +839,8 @@
         String(now.getMonth() + 1).padStart(2, "0") + "-" +
         String(now.getDate()).padStart(2, "0") + "-" +
         String(now.getHours()).padStart(2, "0") + "-" +
-        String(now.getMinutes()).padStart(2, "0") +
+        String(now.getMinutes()).padStart(2, "0") + "-" +
+        String(now.getSeconds()).padStart(2, "0") +
         ".webm";
 
       const link = document.createElement("a");
@@ -765,7 +850,9 @@
       link.click();
       document.body.removeChild(link);
 
-      showToast("Download started");
+      if (!isAutoDownload) {
+        showToast("Download started");
+      }
     }
 
     function setRecordingUI(recording) {
@@ -844,6 +931,7 @@
         finalBlobUrl = null;
       }
 
+      lastBlob = null;
       recordedChunks = [];
 
       preview.pause();
@@ -851,9 +939,11 @@
       preview.srcObject = null;
       preview.controls = false;
       preview.muted = true;
+      preview.style.display = "none";
       preview.load();
 
       idleOverlay.style.display = "flex";
+      recordingOverlay.style.display = "none";
       downloadBtn.disabled = true;
 
       stopTimer(false);
