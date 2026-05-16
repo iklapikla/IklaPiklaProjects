@@ -185,21 +185,21 @@ body {
   }
 }
 
-/* Premium smooth center-out blue dotted voice flow */
+/* Premium smooth blue voice flow - always visible while listening */
 .voice-meter {
   position: absolute;
   left: 50%;
   bottom: 190px;
   transform: translateX(-50%);
   z-index: 9;
-  width: min(380px, calc(100vw - 60px));
+  width: min(390px, calc(100vw - 60px));
   height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.28s ease;
+  transition: opacity 0.25s ease;
 }
 
 .voice-meter.active {
@@ -208,11 +208,11 @@ body {
 
 .voice-meter-track {
   width: 100%;
-  height: 26px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 7px;
 }
 
 .voice-dot {
@@ -220,22 +220,22 @@ body {
   height: 5px;
   border-radius: 999px;
   background: linear-gradient(180deg, #4d8ef7 0%, #3478f6 100%);
+  opacity: 0.28;
+  transform: scale(0.75);
   box-shadow:
-    0 0 10px rgba(52,120,246,0.50),
-    0 0 22px rgba(52,120,246,0.18);
-  opacity: 0;
-  transform: scale(0.35);
+    0 0 8px rgba(52,120,246,0.18),
+    0 0 18px rgba(52,120,246,0.08);
   transition:
-    opacity 0.14s ease,
-    transform 0.14s ease,
-    width 0.14s ease,
-    height 0.14s ease,
-    box-shadow 0.14s ease;
+    width 0.16s ease,
+    height 0.16s ease,
+    opacity 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
 }
 
 .voice-dot.center-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 
 .control-dock {
@@ -756,6 +756,8 @@ let meterAnalyser = null;
 let meterDataArray = null;
 let meterAnimationFrame = null;
 
+window.smoothVoiceLevel = 0;
+
 if (!SpeechRecognition) {
   toggleBtn.disabled = true;
   toggleBtn.textContent = "Chrome Required";
@@ -1090,13 +1092,14 @@ async function startVoiceMeter() {
     meterAnalyser = meterAudioContext.createAnalyser();
 
     meterAnalyser.fftSize = 256;
-    meterAnalyser.smoothingTimeConstant = 0.58;
+    meterAnalyser.smoothingTimeConstant = 0.72;
 
     const source = meterAudioContext.createMediaStreamSource(meterStream);
     source.connect(meterAnalyser);
 
     meterDataArray = new Uint8Array(meterAnalyser.frequencyBinCount);
 
+    window.smoothVoiceLevel = 0;
     voiceMeter.classList.add("active");
     animateVoiceMeter();
   } catch (error) {
@@ -1117,67 +1120,60 @@ function animateVoiceMeter() {
   }
 
   const rms = Math.sqrt(sum / meterDataArray.length);
-  const threshold = 4.8;
-  const normalized = Math.max(0, Math.min(1, (rms - threshold) / 30));
+
+  const threshold = 3.8;
+  const rawLevel = Math.max(0, Math.min(1, (rms - threshold) / 26));
+
+  window.smoothVoiceLevel += (rawLevel - window.smoothVoiceLevel) * 0.16;
+
+  const level = window.smoothVoiceLevel;
+  const now = Date.now();
 
   const totalDots = voiceDots.length;
-  const centerLeft = Math.floor(totalDots / 2) - 1;
-  const centerRight = Math.floor(totalDots / 2);
-
-  if (normalized <= 0.012) {
-    voiceDots.forEach((dot) => {
-      dot.style.opacity = "0";
-      dot.style.transform = "scale(0.35)";
-      dot.style.width = "5px";
-      dot.style.height = "5px";
-      dot.style.boxShadow =
-        "0 0 10px rgba(52,120,246,0), 0 0 22px rgba(52,120,246,0)";
-    });
-
-    meterAnimationFrame = requestAnimationFrame(animateVoiceMeter);
-    return;
-  }
-
-  const now = Date.now();
-  const maxVisibleSide = Math.ceil(normalized * (totalDots / 2));
-  const softPower = 0.35 + normalized * 0.85;
+  const center = (totalDots - 1) / 2;
 
   voiceDots.forEach((dot, index) => {
-    const sideDistance =
-      index <= centerLeft
-        ? centerLeft - index
-        : index - centerRight;
+    const distance = Math.abs(index - center);
+    const distanceRatio = distance / center;
 
-    const isVisible = sideDistance < maxVisibleSide;
+    const centerPower = Math.max(0.18, 1 - distanceRatio * 0.75);
 
-    if (!isVisible) {
-      dot.style.opacity = "0";
-      dot.style.transform = "scale(0.35)";
-      dot.style.width = "5px";
-      dot.style.height = "5px";
-      dot.style.boxShadow =
-        "0 0 10px rgba(52,120,246,0), 0 0 22px rgba(52,120,246,0)";
-      return;
-    }
+    const idleWave =
+      0.5 +
+      Math.sin(now / 520 + index * 0.45) * 0.12;
 
-    const distanceFactor = Math.max(0.22, 1 - sideDistance / (totalDots / 2));
+    const activeWave =
+      0.75 +
+      Math.sin(now / 170 - distance * 0.55) * 0.18 +
+      Math.cos(now / 260 + index * 0.28) * 0.10;
 
-    const softFlow =
-      0.86 +
-      Math.sin(now / 220 - sideDistance * 0.55) * 0.10 +
-      Math.cos(now / 360 + index * 0.21) * 0.05;
+    const finalWave = idleWave * (1 - level) + activeWave * level;
 
-    const dotSize = 5 + normalized * 8 * distanceFactor * softFlow;
-    const dotScale = 0.72 + softPower * distanceFactor * softFlow;
-    const dotOpacity = Math.min(1, 0.18 + normalized * 1.1 * distanceFactor);
+    const size =
+      4.5 +
+      centerPower * 1.5 +
+      level * centerPower * finalWave * 10;
 
-    dot.style.opacity = String(dotOpacity);
-    dot.style.transform = "scale(" + dotScale + ")";
-    dot.style.width = dotSize + "px";
-    dot.style.height = dotSize + "px";
+    const opacity =
+      0.22 +
+      centerPower * 0.18 +
+      level * centerPower * 0.62;
+
+    const scale =
+      0.72 +
+      centerPower * 0.12 +
+      level * centerPower * finalWave * 0.58;
+
+    const glowOne = 0.12 + level * centerPower * 0.48;
+    const glowTwo = 0.06 + level * centerPower * 0.22;
+
+    dot.style.width = size + "px";
+    dot.style.height = size + "px";
+    dot.style.opacity = String(Math.min(1, opacity));
+    dot.style.transform = "scale(" + scale + ")";
     dot.style.boxShadow =
-      "0 0 12px rgba(52,120,246," + (0.28 + normalized * 0.35) + "), " +
-      "0 0 28px rgba(52,120,246," + (0.12 + normalized * 0.18) + ")";
+      "0 0 10px rgba(52,120,246," + glowOne + "), " +
+      "0 0 24px rgba(52,120,246," + glowTwo + ")";
   });
 
   meterAnimationFrame = requestAnimationFrame(animateVoiceMeter);
@@ -1205,13 +1201,15 @@ function stopVoiceMeter() {
   voiceMeter.classList.remove("active");
 
   voiceDots.forEach((dot) => {
-    dot.style.opacity = "0";
-    dot.style.transform = "scale(0.35)";
+    dot.style.opacity = "0.28";
+    dot.style.transform = "scale(0.75)";
     dot.style.width = "5px";
     dot.style.height = "5px";
     dot.style.boxShadow =
-      "0 0 10px rgba(52,120,246,0), 0 0 22px rgba(52,120,246,0)";
+      "0 0 8px rgba(52,120,246,0.18), 0 0 18px rgba(52,120,246,0.08)";
   });
+
+  window.smoothVoiceLevel = 0;
 }
 
 copyBtn.addEventListener("click", async () => {
