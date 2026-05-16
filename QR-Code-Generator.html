@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QR Code Generator</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+:root {
+  --text: #ffffff;
+  --muted: rgba(255,255,255,0.48);
+  --dock: rgba(244, 244, 246, 0.94);
+  --dock-border: rgba(255,255,255,0.75);
+  --chip: rgba(255,255,255,0.92);
+  --chip-hover: #ffffff;
+  --chip-border: rgba(0,0,0,0.08);
+  --black-text: #1d1d1f;
+  --grey-text: #7a7a80;
+  --blue: #3b82f6;
+  --blue-dark: #2563eb;
+  --green: #34c759;
+  --red: #ff453a;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+body {
+  color: var(--text);
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255,255,255,0.09), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.035), transparent 32%),
+    #000;
+  overflow: hidden;
+}
+
+.center-area {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 70px 220px;
+  pointer-events: none;
+}
+
+.idle-content {
+  transform: translateY(-60px);
+  animation: fadeUp 0.7s ease both;
+}
+
+.idle-content h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(46px, 5vw, 76px);
+  font-weight: 820;
+  letter-spacing: -3px;
+  line-height: 0.96;
+  text-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  user-select: none;
+}
+
+.idle-content p {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: clamp(15px, 1.5vw, 20px);
+  line-height: 1.45;
+  font-weight: 520;
+  user-select: none;
+}
+
+.qr-stage {
+  transform: translateY(-60px);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeUp 0.7s ease both;
+}
+
+.app.has-qr .idle-content {
+  display: none;
+}
+
+.app.has-qr .qr-stage {
+  display: flex;
+}
+
+.qr-card {
+  width: 320px;
+  height: 320px;
+  border-radius: 34px;
+  background: rgba(255,255,255,0.96);
+  border: 1px solid rgba(255,255,255,0.9);
+  box-shadow:
+    0 34px 90px rgba(0,0,0,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 26px;
+  pointer-events: auto;
+  transition: 0.25s ease;
+}
+
+.qr-card:hover {
+  transform: scale(1.035);
+  box-shadow:
+    0 44px 110px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+}
+
+#qrBox {
+  width: 250px;
+  height: 250px;
+  display: grid;
+  place-items: center;
+}
+
+#qrBox canvas,
+#qrBox img {
+  width: 250px !important;
+  height: 250px !important;
+  display: block;
+}
+
+.qr-title {
+  margin-top: 22px;
+  color: #ffffff;
+  font-size: clamp(22px, 2.4vw, 34px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  max-width: min(860px, calc(100vw - 80px));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 10px 32px rgba(0,0,0,0.42);
+}
+
+.qr-subtitle {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 520;
+  max-width: min(760px, calc(100vw - 80px));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(-32px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-60px) scale(1);
+  }
+}
+
+.control-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 104px;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: min(920px, calc(100vw - 42px));
+  min-height: 70px;
+  padding: 8px;
+  border-radius: 24px;
+  background: var(--dock);
+  border: 1px solid var(--dock-border);
+  box-shadow:
+    0 24px 70px rgba(0,0,0,0.38),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+  backdrop-filter: blur(28px) saturate(1.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: dockIn 0.65s cubic-bezier(.2,.9,.2,1) both;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.control-dock:hover {
+  transform: translateX(-50%) scale(1.012);
+  box-shadow:
+    0 30px 84px rgba(0,0,0,0.46),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+}
+
+@keyframes dockIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.link-chip {
+  height: 54px;
+  min-width: 360px;
+  flex: 1;
+  border-radius: 18px;
+  background: var(--chip);
+  border: 1px solid var(--chip-border);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.link-chip:hover {
+  transform: scale(1.018);
+  background: var(--chip-hover);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.13);
+}
+
+.chip-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #68686f;
+  flex: 0 0 auto;
+}
+
+#linkInput {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--black-text);
+  font-size: 14px;
+  font-weight: 720;
+  letter-spacing: -0.15px;
+}
+
+#linkInput::placeholder {
+  color: #8b8b91;
+}
+
+.main-btn {
+  height: 54px;
+  min-width: 142px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #4d8ef7 0%, #3478f6 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 850;
+  padding: 0 22px;
+  cursor: pointer;
+  box-shadow:
+    0 12px 30px rgba(59,130,246,0.34),
+    inset 0 1px 0 rgba(255,255,255,0.32);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.main-btn:hover {
+  transform: scale(1.045);
+  background: linear-gradient(180deg, #5a97f7 0%, var(--blue-dark) 100%);
+  box-shadow:
+    0 15px 38px rgba(59,130,246,0.48),
+    inset 0 1px 0 rgba(255,255,255,0.32);
+}
+
+.icon-btn {
+  width: 52px;
+  height: 50px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+  color: #1d1d1f;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover:not(:disabled) {
+  transform: scale(1.07);
+  background: linear-gradient(180deg, #ffffff 0%, #eeeeef 100%);
+  color: #000;
+  box-shadow:
+    0 14px 32px rgba(0,0,0,0.16),
+    inset 0 1px 0 rgba(255,255,255,1);
+}
+
+.icon-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 190px;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 12;
+  background: rgba(30,30,32,0.84);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 720;
+  padding: 10px 14px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+  max-width: calc(100vw - 40px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  backdrop-filter: blur(18px);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+@media (max-width: 900px) {
+  .control-dock {
+    width: min(560px, calc(100vw - 28px));
+    flex-wrap: wrap;
+    border-radius: 24px;
+    padding: 10px;
+    bottom: 92px;
+  }
+
+  .link-chip {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  .main-btn {
+    order: 2;
+    width: 100%;
+  }
+
+  .toast {
+    bottom: 240px;
+  }
+
+  .qr-card {
+    width: 280px;
+    height: 280px;
+  }
+
+  #qrBox,
+  #qrBox canvas,
+  #qrBox img {
+    width: 220px !important;
+    height: 220px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .idle-content h1 {
+    font-size: 38px;
+    letter-spacing: -1.8px;
+  }
+
+  .idle-content p {
+    font-size: 14px;
+  }
+
+  .center-area {
+    padding: 32px 24px 260px;
+  }
+
+  .qr-title {
+    font-size: 22px;
+  }
+
+  .qr-subtitle {
+    font-size: 13px;
+  }
+
+  .control-dock {
+    bottom: 86px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="app" id="app">
+
+  <main class="center-area">
+    <div class="idle-content" id="idleContent">
+      <h1>QR Code Generator</h1>
+      <p>Paste any link below and generate a clean QR code instantly.</p>
+    </div>
+
+    <div class="qr-stage" id="qrStage">
+      <div class="qr-card">
+        <div id="qrBox"></div>
+      </div>
+      <div class="qr-title" id="qrTitle">QR Code Ready</div>
+      <div class="qr-subtitle" id="qrSubtitle"></div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast">Ready</div>
+
+  <section class="control-dock">
+    <div class="link-chip">
+      <div class="chip-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M10 13a5 5 0 0 0 7.1 0l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14 11a5 5 0 0 0-7.1 0l-2 2a5 5 0 0 0 7.1 7.1l1.1-1.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <input id="linkInput" type="url" placeholder="Paste link here..." autocomplete="off" />
+    </div>
+
+    <button class="main-btn" id="generateBtn">Generate</button>
+
+    <button class="icon-btn" id="copyBtn" disabled title="Copy QR Image">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+        <path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <button class="icon-btn" id="downloadBtn" disabled title="Download QR Image">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 4v10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M8 11l4 4 4-4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5 20h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <button class="icon-btn" id="clearBtn" title="Clear">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 7V4h6v3" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </section>
+</div>
+
+<script>
+const app = document.getElementById("app");
+const linkInput = document.getElementById("linkInput");
+const generateBtn = document.getElementById("generateBtn");
+const copyBtn = document.getElementById("copyBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const clearBtn = document.getElementById("clearBtn");
+const qrBox = document.getElementById("qrBox");
+const qrTitle = document.getElementById("qrTitle");
+const qrSubtitle = document.getElementById("qrSubtitle");
+const toast = document.getElementById("toast");
+
+let currentQRUrl = "";
+let currentQRCode = null;
+
+generateBtn.addEventListener("click", generateQR);
+
+linkInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    generateQR();
+  }
+});
+
+copyBtn.addEventListener("click", copyQRImage);
+downloadBtn.addEventListener("click", downloadQRImage);
+clearBtn.addEventListener("click", clearQR);
+
+function generateQR() {
+  const rawValue = linkInput.value.trim();
+
+  if (!rawValue) {
+    showToast("Paste a link first");
+    linkInput.focus();
+    return;
+  }
+
+  const link = normalizeLink(rawValue);
+
+  qrBox.innerHTML = "";
+
+  currentQRCode = new QRCode(qrBox, {
+    text: link,
+    width: 250,
+    height: 250,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+
+  currentQRUrl = link;
+
+  app.classList.add("has-qr");
+  qrTitle.textContent = "QR Code Ready";
+  qrSubtitle.textContent = link;
+
+  copyBtn.disabled = false;
+  downloadBtn.disabled = false;
+
+  showToast("QR generated");
+}
+
+function normalizeLink(value) {
+  const hasProtocol = /^https?:\/\//i.test(value);
+  const isMailOrTel = /^(mailto:|tel:|sms:)/i.test(value);
+
+  if (hasProtocol || isMailOrTel) {
+    return value;
+  }
+
+  return "https://" + value;
+}
+
+async function copyQRImage() {
+  const canvas = getQRCanvas();
+
+  if (!canvas) {
+    showToast("Generate QR first");
+    return;
+  }
+
+  try {
+    const blob = await canvasToBlob(canvas);
+
+    if (!navigator.clipboard || !window.ClipboardItem) {
+      showToast("Image copy not supported in this browser");
+      return;
+    }
+
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        "image/png": blob
+      })
+    ]);
+
+    showToast("QR image copied");
+  } catch (error) {
+    console.error(error);
+    showToast("Copy failed");
+  }
+}
+
+function downloadQRImage() {
+  const canvas = getQRCanvas();
+
+  if (!canvas) {
+    showToast("Generate QR first");
+    return;
+  }
+
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = makeFileName(currentQRUrl);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast("Download started");
+}
+
+function clearQR() {
+  linkInput.value = "";
+  qrBox.innerHTML = "";
+  currentQRUrl = "";
+  currentQRCode = null;
+
+  app.classList.remove("has-qr");
+  qrTitle.textContent = "QR Code Ready";
+  qrSubtitle.textContent = "";
+
+  copyBtn.disabled = true;
+  downloadBtn.disabled = true;
+
+  linkInput.focus();
+  showToast("Cleared");
+}
+
+function getQRCanvas() {
+  return qrBox.querySelector("canvas");
+}
+
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) {
+        resolve(blob);
+      } else {
+        reject(new Error("Could not create image"));
+      }
+    }, "image/png");
+  });
+}
+
+function makeFileName(url) {
+  let clean = url
+    .replace(/^https?:\/\//i, "")
+    .replace(/[^\w.-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 60);
+
+  if (!clean) {
+    clean = "qr-code";
+  }
+
+  return clean + ".png";
+}
+
+let toastTimer = null;
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  if (toastTimer) {
+    clearTimeout(toastTimer);
+  }
+
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1800);
+}
+</script>
+</body>
+</html>
