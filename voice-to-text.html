@@ -37,6 +37,10 @@ body {
   background: #000;
 }
 
+body {
+  color: var(--text);
+}
+
 .app {
   width: 100vw;
   height: 100vh;
@@ -48,7 +52,8 @@ body {
   overflow: hidden;
 }
 
-.voice-area {
+/* Same title position as Screen Recorder */
+.idle-overlay {
   position: absolute;
   inset: 0;
   z-index: 2;
@@ -56,58 +61,88 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 70px 220px;
+  pointer-events: none;
+  padding: 40px;
   background:
     radial-gradient(circle at 50% 32%, rgba(255,255,255,0.09), transparent 22%),
     radial-gradient(circle at 50% 100%, rgba(255,255,255,0.035), transparent 32%),
-    #000;
+    transparent;
+  transition: opacity 0.28s ease, transform 0.28s ease;
 }
 
-.voice-content {
+.idle-content {
   transform: translateY(-60px);
   animation: fadeUp 0.7s ease both;
-  width: min(1150px, 100%);
+}
+
+.idle-content h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(46px, 5vw, 76px);
+  font-weight: 820;
+  letter-spacing: -3px;
+  line-height: 0.96;
+  text-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  user-select: none;
+}
+
+.idle-content p {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: clamp(15px, 1.5vw, 20px);
+  line-height: 1.45;
+  font-weight: 520;
+  user-select: none;
+}
+
+/* When text exists, heading hides and text starts from top */
+.app.has-text .idle-overlay {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+}
+
+.transcript-wrap {
+  position: absolute;
+  left: 50%;
+  top: 138px;
+  transform: translateX(-50%);
+  width: min(1050px, calc(100vw - 110px));
+  height: calc(100vh - 330px);
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.app.has-text .transcript-wrap {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
 }
 
 #output {
   width: 100%;
-  min-height: 120px;
-  max-height: calc(100vh - 330px);
+  height: 100%;
   overflow-y: auto;
   outline: none;
   border: none;
   background: transparent;
   color: #ffffff;
-  font-size: clamp(46px, 5vw, 76px);
-  font-weight: 820;
-  letter-spacing: -3px;
-  line-height: 0.96;
-  text-align: center;
-  caret-color: #ffffff;
+  font-size: clamp(18px, 1.35vw, 24px);
+  line-height: 1.65;
+  font-weight: 560;
+  letter-spacing: -0.25px;
+  text-align: left;
+  caret-color: transparent;
   white-space: pre-wrap;
   word-break: break-word;
-  text-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  text-shadow: 0 10px 28px rgba(0,0,0,0.32);
+  padding: 4px 10px 90px;
 }
 
-#output:empty::before {
-  content: "Voice to Text";
-  color: #ffffff;
-}
-
-.sub-heading {
-  margin: 20px auto 0;
-  color: var(--muted);
-  font-size: clamp(15px, 1.5vw, 20px);
-  line-height: 1.45;
-  font-weight: 520;
-  max-width: 760px;
-  transition: 0.25s ease;
-}
-
-#output:not(:empty) + .sub-heading {
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
+#output:focus {
+  outline: none;
 }
 
 #output::-webkit-scrollbar {
@@ -163,6 +198,7 @@ body {
   }
 }
 
+/* Same dock style as Screen Recorder */
 .control-dock {
   position: absolute;
   left: 50%;
@@ -364,6 +400,7 @@ body {
     inset 0 1px 0 rgba(255,255,255,1);
 }
 
+/* Direct device selector popover */
 .device-popover {
   position: absolute;
   left: 50%;
@@ -464,14 +501,15 @@ svg {
 }
 
 @media (max-width: 860px) {
-  .voice-area {
-    padding: 50px 28px 260px;
+  .transcript-wrap {
+    top: 96px;
+    width: calc(100vw - 56px);
+    height: calc(100vh - 330px);
   }
 
   #output {
-    font-size: clamp(38px, 9vw, 58px);
-    letter-spacing: -2px;
-    max-height: calc(100vh - 370px);
+    font-size: 18px;
+    line-height: 1.6;
   }
 
   .control-dock {
@@ -494,12 +532,12 @@ svg {
 }
 
 @media (max-width: 560px) {
-  #output {
+  .idle-content h1 {
     font-size: 38px;
     letter-spacing: -1.8px;
   }
 
-  .sub-heading {
+  .idle-content p {
     font-size: 14px;
   }
 
@@ -514,21 +552,28 @@ svg {
   .control-dock {
     bottom: 86px;
   }
+
+  .transcript-wrap {
+    top: 76px;
+    height: calc(100vh - 300px);
+  }
 }
 </style>
 </head>
 
 <body>
-<div class="app">
+<div class="app" id="app">
   <div class="listening-glow" id="listeningGlow"></div>
 
-  <main class="voice-area">
-    <div class="voice-content">
-      <div id="output" contenteditable="true" spellcheck="false"></div>
-      <p class="sub-heading">
-        Speak in Hindi, English, or Hinglish — it will type in Roman text.
-      </p>
+  <div class="idle-overlay" id="idleOverlay">
+    <div class="idle-content">
+      <h1>Voice to Text</h1>
+      <p>Speak in Hindi, English, or Hinglish — it will type in Roman text.</p>
     </div>
+  </div>
+
+  <main class="transcript-wrap">
+    <div id="output" contenteditable="true" spellcheck="false"></div>
   </main>
 
   <div class="device-popover" id="devicePopover">
@@ -546,7 +591,7 @@ svg {
     </select>
 
     <div class="popover-hint">
-      Chrome may still use the system default mic for speech recognition.
+      Select your input device. Chrome may still follow system default for speech recognition.
     </div>
   </div>
 
@@ -601,6 +646,7 @@ svg {
 <script>
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+const app = document.getElementById("app");
 const toggleBtn = document.getElementById("toggleBtn");
 const copyBtn = document.getElementById("copyBtn");
 const clearBtn = document.getElementById("clearBtn");
@@ -633,6 +679,12 @@ function getPlainText() {
 
 function setPlainText(text) {
   output.innerText = text;
+  updateTextState();
+}
+
+function updateTextState() {
+  const hasText = getPlainText().trim().length > 0;
+  app.classList.toggle("has-text", hasText);
 }
 
 function placeCursorAtTextIndex(element, index) {
@@ -699,6 +751,7 @@ function syncFromManualEdit() {
   committedText = getPlainText();
   renderedText = committedText;
   insertIndex = getCursorTextIndex(output);
+  updateTextState();
 }
 
 output.addEventListener("input", syncFromManualEdit);
@@ -740,11 +793,12 @@ micDeviceSelect.addEventListener("change", () => {
 });
 
 async function openMicSelector() {
-  devicePopover.classList.toggle("show");
+  devicePopover.classList.add("show");
 
   try {
     await requestMicPermission();
     await loadMicrophoneDevices();
+    micDeviceSelect.focus();
   } catch (error) {
     console.error(error);
     showToast("Allow microphone permission");
@@ -797,7 +851,7 @@ function createRecognition() {
     isListening = true;
     committedText = getPlainText();
     renderedText = committedText;
-    insertIndex = getCursorTextIndex(output);
+    insertIndex = getPlainText().length;
 
     toggleBtn.textContent = "Stop Listening";
     toggleBtn.classList.add("listening");
@@ -813,7 +867,7 @@ function createRecognition() {
     if (currentOutput !== renderedText) {
       committedText = currentOutput;
       renderedText = currentOutput;
-      insertIndex = getCursorTextIndex(output);
+      insertIndex = getPlainText().length;
     }
 
     let interimText = "";
@@ -837,6 +891,7 @@ function createRecognition() {
 
     const cursorPosition = insertIndex + interimText.length;
     placeCursorAtTextIndex(output, cursorPosition);
+    output.scrollTop = output.scrollHeight;
   };
 
   recognition.onerror = (event) => {
@@ -850,7 +905,7 @@ function createRecognition() {
   recognition.onend = () => {
     committedText = getPlainText();
     renderedText = committedText;
-    insertIndex = getCursorTextIndex(output);
+    insertIndex = getPlainText().length;
 
     if (isListening) {
       setTimeout(() => {
@@ -881,7 +936,7 @@ toggleBtn.addEventListener("click", () => {
 async function startListening() {
   committedText = getPlainText();
   renderedText = committedText;
-  insertIndex = getCursorTextIndex(output);
+  insertIndex = getPlainText().length;
 
   devicePopover.classList.remove("show");
 
@@ -905,7 +960,7 @@ function stopListening() {
   isListening = false;
   committedText = getPlainText();
   renderedText = committedText;
-  insertIndex = getCursorTextIndex(output);
+  insertIndex = getPlainText().length;
 
   try {
     recognition.stop();
@@ -932,6 +987,7 @@ clearBtn.addEventListener("click", () => {
   insertIndex = 0;
   setPlainText("");
   output.focus();
+  updateTextState();
   showToast("Cleared");
 });
 
@@ -1095,6 +1151,8 @@ function showToast(message) {
     toast.classList.remove("show");
   }, 1800);
 }
+
+updateTextState();
 </script>
 </body>
 </html>
