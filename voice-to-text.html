@@ -185,21 +185,21 @@ body {
   }
 }
 
-/* Center-out blue dotted voice meter */
+/* Premium smooth center-out blue dotted voice flow */
 .voice-meter {
   position: absolute;
   left: 50%;
   bottom: 190px;
   transform: translateX(-50%);
   z-index: 9;
-  width: min(360px, calc(100vw - 60px));
-  height: 44px;
+  width: min(380px, calc(100vw - 60px));
+  height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.18s ease;
+  transition: opacity 0.28s ease;
 }
 
 .voice-meter.active {
@@ -208,11 +208,11 @@ body {
 
 .voice-meter-track {
   width: 100%;
-  height: 14px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .voice-dot {
@@ -221,15 +221,16 @@ body {
   border-radius: 999px;
   background: linear-gradient(180deg, #4d8ef7 0%, #3478f6 100%);
   box-shadow:
-    0 0 10px rgba(52,120,246,0.55),
+    0 0 10px rgba(52,120,246,0.50),
     0 0 22px rgba(52,120,246,0.18);
   opacity: 0;
-  transform: scale(0.3);
+  transform: scale(0.35);
   transition:
-    opacity 0.07s linear,
-    transform 0.07s linear,
-    width 0.07s linear,
-    height 0.07s linear;
+    opacity 0.14s ease,
+    transform 0.14s ease,
+    width 0.14s ease,
+    height 0.14s ease,
+    box-shadow 0.14s ease;
 }
 
 .voice-dot.center-dot {
@@ -1116,28 +1117,30 @@ function animateVoiceMeter() {
   }
 
   const rms = Math.sqrt(sum / meterDataArray.length);
-  const threshold = 5.5;
-  const normalized = Math.max(0, Math.min(1, (rms - threshold) / 28));
+  const threshold = 4.8;
+  const normalized = Math.max(0, Math.min(1, (rms - threshold) / 30));
 
   const totalDots = voiceDots.length;
   const centerLeft = Math.floor(totalDots / 2) - 1;
   const centerRight = Math.floor(totalDots / 2);
 
-  if (normalized <= 0.015) {
+  if (normalized <= 0.012) {
     voiceDots.forEach((dot) => {
       dot.style.opacity = "0";
-      dot.style.transform = "scale(0.25)";
+      dot.style.transform = "scale(0.35)";
       dot.style.width = "5px";
       dot.style.height = "5px";
+      dot.style.boxShadow =
+        "0 0 10px rgba(52,120,246,0), 0 0 22px rgba(52,120,246,0)";
     });
 
     meterAnimationFrame = requestAnimationFrame(animateVoiceMeter);
     return;
   }
 
+  const now = Date.now();
   const maxVisibleSide = Math.ceil(normalized * (totalDots / 2));
-  const dotScale = 0.65 + normalized * 0.9;
-  const centerSize = 7 + normalized * 5;
+  const softPower = 0.35 + normalized * 0.85;
 
   voiceDots.forEach((dot, index) => {
     const sideDistance =
@@ -1146,22 +1149,35 @@ function animateVoiceMeter() {
         : index - centerRight;
 
     const isVisible = sideDistance < maxVisibleSide;
-    const distancePower = Math.max(0.25, 1 - sideDistance / (totalDots / 2));
 
-    if (isVisible) {
-      const opacity = Math.min(1, 0.25 + normalized * 0.85 * distancePower);
-      const size = Math.max(5, centerSize * distancePower);
-
-      dot.style.opacity = String(opacity);
-      dot.style.transform = "scale(" + dotScale * distancePower + ")";
-      dot.style.width = size + "px";
-      dot.style.height = size + "px";
-    } else {
+    if (!isVisible) {
       dot.style.opacity = "0";
-      dot.style.transform = "scale(0.25)";
+      dot.style.transform = "scale(0.35)";
       dot.style.width = "5px";
       dot.style.height = "5px";
+      dot.style.boxShadow =
+        "0 0 10px rgba(52,120,246,0), 0 0 22px rgba(52,120,246,0)";
+      return;
     }
+
+    const distanceFactor = Math.max(0.22, 1 - sideDistance / (totalDots / 2));
+
+    const softFlow =
+      0.86 +
+      Math.sin(now / 220 - sideDistance * 0.55) * 0.10 +
+      Math.cos(now / 360 + index * 0.21) * 0.05;
+
+    const dotSize = 5 + normalized * 8 * distanceFactor * softFlow;
+    const dotScale = 0.72 + softPower * distanceFactor * softFlow;
+    const dotOpacity = Math.min(1, 0.18 + normalized * 1.1 * distanceFactor);
+
+    dot.style.opacity = String(dotOpacity);
+    dot.style.transform = "scale(" + dotScale + ")";
+    dot.style.width = dotSize + "px";
+    dot.style.height = dotSize + "px";
+    dot.style.boxShadow =
+      "0 0 12px rgba(52,120,246," + (0.28 + normalized * 0.35) + "), " +
+      "0 0 28px rgba(52,120,246," + (0.12 + normalized * 0.18) + ")";
   });
 
   meterAnimationFrame = requestAnimationFrame(animateVoiceMeter);
@@ -1190,9 +1206,11 @@ function stopVoiceMeter() {
 
   voiceDots.forEach((dot) => {
     dot.style.opacity = "0";
-    dot.style.transform = "scale(0.25)";
+    dot.style.transform = "scale(0.35)";
     dot.style.width = "5px";
     dot.style.height = "5px";
+    dot.style.boxShadow =
+      "0 0 10px rgba(52,120,246,0), 0 0 22px rgba(52,120,246,0)";
   });
 }
 
