@@ -185,7 +185,7 @@ body {
   }
 }
 
-/* Blue voice meter just above dock */
+/* Center-out blue dotted voice meter */
 .voice-meter {
   position: absolute;
   left: 50%;
@@ -197,32 +197,44 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0;
+  transition: opacity 0.18s ease;
 }
 
 .voice-meter.active {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 
-.voice-bar {
+.voice-meter-track {
+  width: 100%;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.voice-dot {
   width: 5px;
-  height: 8px;
+  height: 5px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #6fb1ff 0%, #3478f6 100%);
+  background: linear-gradient(180deg, #4d8ef7 0%, #3478f6 100%);
   box-shadow:
-    0 0 12px rgba(59,130,246,0.45),
-    0 0 24px rgba(59,130,246,0.18);
-  transform-origin: center;
-  transition: height 0.08s linear, opacity 0.08s linear;
-  opacity: 0.55;
+    0 0 10px rgba(52,120,246,0.55),
+    0 0 22px rgba(52,120,246,0.18);
+  opacity: 0;
+  transform: scale(0.3);
+  transition:
+    opacity 0.07s linear,
+    transform 0.07s linear,
+    width 0.07s linear,
+    height 0.07s linear;
 }
 
-.voice-meter.active .voice-bar {
-  opacity: 1;
+.voice-dot.center-dot {
+  width: 7px;
+  height: 7px;
 }
 
 .control-dock {
@@ -641,26 +653,28 @@ svg {
   <div class="toast" id="toast">Ready</div>
 
   <div class="voice-meter" id="voiceMeter" aria-hidden="true">
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
-    <span class="voice-bar"></span>
+    <div class="voice-meter-track" id="voiceMeterTrack">
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot center-dot"></span>
+      <span class="voice-dot center-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+      <span class="voice-dot"></span>
+    </div>
   </div>
 
   <section class="control-dock">
@@ -724,7 +738,7 @@ const listeningGlow = document.getElementById("listeningGlow");
 const devicePopover = document.getElementById("devicePopover");
 const micDeviceSelect = document.getElementById("micDeviceSelect");
 const voiceMeter = document.getElementById("voiceMeter");
-const voiceBars = Array.from(document.querySelectorAll(".voice-bar"));
+const voiceDots = Array.from(document.querySelectorAll(".voice-dot"));
 
 let recognition;
 let isListening = false;
@@ -1075,7 +1089,7 @@ async function startVoiceMeter() {
     meterAnalyser = meterAudioContext.createAnalyser();
 
     meterAnalyser.fftSize = 256;
-    meterAnalyser.smoothingTimeConstant = 0.62;
+    meterAnalyser.smoothingTimeConstant = 0.58;
 
     const source = meterAudioContext.createMediaStreamSource(meterStream);
     source.connect(meterAnalyser);
@@ -1092,31 +1106,62 @@ async function startVoiceMeter() {
 function animateVoiceMeter() {
   if (!meterAnalyser || !meterDataArray) return;
 
-  meterAnalyser.getByteFrequencyData(meterDataArray);
+  meterAnalyser.getByteTimeDomainData(meterDataArray);
 
   let sum = 0;
+
   for (let i = 0; i < meterDataArray.length; i++) {
-    sum += meterDataArray[i];
+    const value = meterDataArray[i] - 128;
+    sum += value * value;
   }
 
-  const average = sum / meterDataArray.length;
-  const normalized = Math.min(1, average / 72);
+  const rms = Math.sqrt(sum / meterDataArray.length);
+  const threshold = 5.5;
+  const normalized = Math.max(0, Math.min(1, (rms - threshold) / 28));
 
-  const center = (voiceBars.length - 1) / 2;
+  const totalDots = voiceDots.length;
+  const centerLeft = Math.floor(totalDots / 2) - 1;
+  const centerRight = Math.floor(totalDots / 2);
 
-  voiceBars.forEach((bar, index) => {
-    const distance = Math.abs(index - center);
-    const distanceFactor = Math.max(0.28, 1 - distance / center);
+  if (normalized <= 0.015) {
+    voiceDots.forEach((dot) => {
+      dot.style.opacity = "0";
+      dot.style.transform = "scale(0.25)";
+      dot.style.width = "5px";
+      dot.style.height = "5px";
+    });
 
-    const wave =
-      0.42 +
-      Math.sin(Date.now() / 115 + index * 0.52) * 0.28 +
-      Math.cos(Date.now() / 180 + index * 0.33) * 0.18;
+    meterAnimationFrame = requestAnimationFrame(animateVoiceMeter);
+    return;
+  }
 
-    const height = 8 + normalized * distanceFactor * wave * 48;
+  const maxVisibleSide = Math.ceil(normalized * (totalDots / 2));
+  const dotScale = 0.65 + normalized * 0.9;
+  const centerSize = 7 + normalized * 5;
 
-    bar.style.height = Math.max(6, Math.min(56, height)) + "px";
-    bar.style.opacity = String(0.45 + normalized * 0.55);
+  voiceDots.forEach((dot, index) => {
+    const sideDistance =
+      index <= centerLeft
+        ? centerLeft - index
+        : index - centerRight;
+
+    const isVisible = sideDistance < maxVisibleSide;
+    const distancePower = Math.max(0.25, 1 - sideDistance / (totalDots / 2));
+
+    if (isVisible) {
+      const opacity = Math.min(1, 0.25 + normalized * 0.85 * distancePower);
+      const size = Math.max(5, centerSize * distancePower);
+
+      dot.style.opacity = String(opacity);
+      dot.style.transform = "scale(" + dotScale * distancePower + ")";
+      dot.style.width = size + "px";
+      dot.style.height = size + "px";
+    } else {
+      dot.style.opacity = "0";
+      dot.style.transform = "scale(0.25)";
+      dot.style.width = "5px";
+      dot.style.height = "5px";
+    }
   });
 
   meterAnimationFrame = requestAnimationFrame(animateVoiceMeter);
@@ -1143,9 +1188,11 @@ function stopVoiceMeter() {
 
   voiceMeter.classList.remove("active");
 
-  voiceBars.forEach((bar) => {
-    bar.style.height = "8px";
-    bar.style.opacity = "0.55";
+  voiceDots.forEach((dot) => {
+    dot.style.opacity = "0";
+    dot.style.transform = "scale(0.25)";
+    dot.style.width = "5px";
+    dot.style.height = "5px";
   });
 }
 
