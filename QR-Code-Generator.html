@@ -27,6 +27,7 @@
   --blue-dark: #2563eb;
   --green: #34c759;
   --red: #ff453a;
+  --download: #1d1d1f;
 }
 
 html,
@@ -53,6 +54,7 @@ body {
   overflow: hidden;
 }
 
+/* Same heading/content position as Voice to Text */
 .center-area {
   position: absolute;
   inset: 0;
@@ -61,8 +63,12 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 70px 220px;
   pointer-events: none;
+  padding: 40px;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255,255,255,0.09), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.035), transparent 32%),
+    transparent;
 }
 
 .idle-content {
@@ -97,6 +103,7 @@ body {
   align-items: center;
   justify-content: center;
   animation: fadeUp 0.7s ease both;
+  pointer-events: auto;
 }
 
 .app.has-qr .idle-content {
@@ -120,7 +127,6 @@ body {
   align-items: center;
   justify-content: center;
   padding: 34px;
-  pointer-events: auto;
   transition: 0.25s ease;
 }
 
@@ -180,13 +186,14 @@ body {
   }
 }
 
+/* Same bottom floating dock position as Voice to Text */
 .control-dock {
   position: absolute;
   left: 50%;
   bottom: 104px;
   transform: translateX(-50%);
   z-index: 10;
-  width: min(920px, calc(100vw - 42px));
+  width: min(700px, calc(100vw - 42px));
   min-height: 70px;
   padding: 8px;
   border-radius: 24px;
@@ -223,17 +230,17 @@ body {
 }
 
 .link-chip {
-  height: 54px;
-  min-width: 360px;
+  height: 50px;
+  min-width: 0;
   flex: 1;
-  border-radius: 18px;
+  border-radius: 16px;
   background: var(--chip);
   border: 1px solid var(--chip-border);
   box-shadow: 0 8px 22px rgba(0,0,0,0.06);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 14px;
+  gap: 9px;
+  padding: 0 11px;
   transition:
     transform 0.18s ease,
     background 0.18s ease,
@@ -263,9 +270,10 @@ body {
   outline: none;
   background: transparent;
   color: var(--black-text);
-  font-size: 14px;
-  font-weight: 720;
+  font-size: 12.5px;
+  font-weight: 780;
   letter-spacing: -0.15px;
+  min-width: 0;
 }
 
 #linkInput::placeholder {
@@ -274,7 +282,7 @@ body {
 
 .main-btn {
   height: 54px;
-  min-width: 142px;
+  min-width: 132px;
   border: none;
   border-radius: 18px;
   background: linear-gradient(180deg, #4d8ef7 0%, #3478f6 100%);
@@ -374,9 +382,9 @@ svg {
   height: 22px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 860px) {
   .control-dock {
-    width: min(560px, calc(100vw - 28px));
+    width: min(520px, calc(100vw - 28px));
     flex-wrap: wrap;
     border-radius: 24px;
     padding: 10px;
@@ -389,12 +397,12 @@ svg {
   }
 
   .main-btn {
-    order: 2;
+    order: 3;
     width: 100%;
   }
 
   .toast {
-    bottom: 240px;
+    bottom: 220px;
   }
 
   .qr-card {
@@ -421,16 +429,8 @@ svg {
     font-size: 14px;
   }
 
-  .center-area {
-    padding: 32px 24px 260px;
-  }
-
-  .qr-title {
-    font-size: 22px;
-  }
-
-  .qr-subtitle {
-    font-size: 13px;
+  .chip-icon {
+    display: none;
   }
 
   .control-dock {
