@@ -52,7 +52,6 @@ body {
   overflow: hidden;
 }
 
-/* Same title position as Screen Recorder */
 .idle-overlay {
   position: absolute;
   inset: 0;
@@ -95,7 +94,6 @@ body {
   user-select: none;
 }
 
-/* When text exists, heading hides and text starts from top */
 .app.has-text .idle-overlay {
   opacity: 0;
   transform: translateY(-12px);
@@ -139,23 +137,19 @@ body {
   word-break: break-word;
   text-shadow: 0 10px 28px rgba(0,0,0,0.32);
   padding: 4px 10px 90px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#output::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 #output:focus {
   outline: none;
-}
-
-#output::-webkit-scrollbar {
-  width: 8px;
-}
-
-#output::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-#output::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.20);
-  border-radius: 999px;
 }
 
 .listening-glow {
@@ -198,7 +192,6 @@ body {
   }
 }
 
-/* Same dock style as Screen Recorder */
 .control-dock {
   position: absolute;
   left: 50%;
@@ -400,7 +393,6 @@ body {
     inset 0 1px 0 rgba(255,255,255,1);
 }
 
-/* Direct device selector popover */
 .device-popover {
   position: absolute;
   left: 50%;
