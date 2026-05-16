@@ -76,8 +76,43 @@
     }
 
     .idle-content {
+      position: relative;
       transform: translateY(-60px);
       animation: fadeUp 0.7s ease both;
+      isolation: isolate;
+    }
+
+    .idle-content::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 44%;
+      width: min(720px, 86vw);
+      height: 360px;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18), rgba(255,255,255,0.08) 26%, rgba(255,255,255,0.025) 52%, transparent 72%);
+      filter: blur(18px);
+      opacity: 0.9;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .idle-content::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 44%;
+      width: min(420px, 70vw);
+      height: 180px;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(255,255,255,0.16), transparent 68%);
+      filter: blur(26px);
+      opacity: 0.8;
+      z-index: -1;
+      pointer-events: none;
     }
 
     .idle-content h1 {
@@ -87,7 +122,9 @@
       font-weight: 820;
       letter-spacing: -3px;
       line-height: 0.96;
-      text-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      text-shadow:
+        0 8px 30px rgba(0,0,0,0.4),
+        0 0 36px rgba(255,255,255,0.16);
     }
 
     .idle-content p {
@@ -113,7 +150,26 @@
     }
 
     .recording-card {
+      position: relative;
       transform: translateY(-60px);
+      isolation: isolate;
+    }
+
+    .recording-card::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 45%;
+      width: min(680px, 84vw);
+      height: 340px;
+      transform: translate(-50%, -50%);
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255,69,58,0.22), rgba(255,69,58,0.10) 28%, rgba(255,255,255,0.035) 52%, transparent 74%);
+      filter: blur(20px);
+      opacity: 0.95;
+      z-index: -1;
+      pointer-events: none;
     }
 
     .recording-dot-large {
@@ -133,6 +189,9 @@
       font-weight: 820;
       letter-spacing: -2.7px;
       line-height: 0.96;
+      text-shadow:
+        0 8px 30px rgba(0,0,0,0.4),
+        0 0 36px rgba(255,69,58,0.18);
     }
 
     .recording-card p {
@@ -485,6 +544,12 @@
 
       .control-dock {
         bottom: 86px;
+      }
+
+      .idle-content::before,
+      .recording-card::before {
+        width: 360px;
+        height: 230px;
       }
     }
   </style>
