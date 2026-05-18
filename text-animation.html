@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Animation Effects</title>
+
+  <style>
+    :root {
+      --bg: #000000;
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel-2: rgba(255, 255, 255, 0.12);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.58);
+      --blue: #4f8cff;
+      --green: #35c759;
+      --radius: 22px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79, 140, 255, 0.11), transparent 28%),
+        linear-gradient(180deg, #000000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20, 20, 20, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79, 140, 255, 0.22);
+      border-color: rgba(79, 140, 255, 0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 680px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-bottom: 70px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+    }
+
+    .text {
+      font-size: 30px;
+      line-height: 1;
+      letter-spacing: -0.055em;
+      font-weight: 950;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Text Animations */
+    .fade-in {
+      animation: fadeIn 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0.18; }
+      to { opacity: 1; }
+    }
+
+    .fade-up {
+      animation: fadeUp 2.1s ease-in-out infinite;
+    }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(24px); }
+      45%, 70% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-12px); }
+    }
+
+    .fade-down {
+      animation: fadeDown 2.1s ease-in-out infinite;
+    }
+
+    @keyframes fadeDown {
+      0% { opacity: 0; transform: translateY(-24px); }
+      45%, 70% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(12px); }
+    }
+
+    .slide-left {
+      animation: slideLeft 2.2s ease-in-out infinite;
+    }
+
+    @keyframes slideLeft {
+      0% { opacity: 0; transform: translateX(42px); }
+      45%, 70% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(-28px); }
+    }
+
+    .slide-right {
+      animation: slideRight 2.2s ease-in-out infinite;
+    }
+
+    @keyframes slideRight {
+      0% { opacity: 0; transform: translateX(-42px); }
+      45%, 70% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(28px); }
+    }
+
+    .zoom-in {
+      animation: zoomIn 2s ease-in-out infinite;
+    }
+
+    @keyframes zoomIn {
+      0% { opacity: 0; transform: scale(0.72); }
+      45%, 70% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.15); }
+    }
+
+    .pop-in {
+      animation: popIn 1.7s cubic-bezier(.17,.67,.29,1.35) infinite;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.55); }
+      45%, 75% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.9); }
+    }
+
+    .bounce-text {
+      animation: bounceText 1.7s ease-in-out infinite;
+    }
+
+    @keyframes bounceText {
+      0%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-18px); }
+      60% { transform: translateY(4px); }
+    }
+
+    .pulse-text {
+      animation: pulseText 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulseText {
+      0%, 100% { transform: scale(1); opacity: 0.75; }
+      50% { transform: scale(1.09); opacity: 1; }
+    }
+
+    .shine-text {
+      background: linear-gradient(90deg, #fff 0%, #fff 34%, #80b2ff 50%, #fff 66%, #fff 100%);
+      background-size: 260% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shineText 2.2s linear infinite;
+    }
+
+    @keyframes shineText {
+      to { background-position: -260% center; }
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #ffffff, #65a2ff, #b986ff, #ffffff);
+      background-size: 260%;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: gradientText 3s ease-in-out infinite;
+    }
+
+    @keyframes gradientText {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+
+    .neon-text {
+      color: white;
+      text-shadow:
+        0 0 8px rgba(79,140,255,.9),
+        0 0 22px rgba(79,140,255,.75),
+        0 0 45px rgba(79,140,255,.45);
+      animation: neonText 1.9s ease-in-out infinite;
+    }
+
+    @keyframes neonText {
+      0%, 100% { opacity: 1; filter: brightness(1); }
+      45% { opacity: .72; filter: brightness(.85); }
+      50% { opacity: 1; filter: brightness(1.25); }
+    }
+
+    .soft-glow {
+      animation: softGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes softGlow {
+      0%, 100% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+      50% { text-shadow: 0 0 28px rgba(255,255,255,0.65); }
+    }
+
+    .rainbow-text {
+      background: linear-gradient(90deg, #ff5f57, #ffbd2e, #28c840, #4f8cff, #b986ff, #ff5f57);
+      background-size: 300%;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: rainbowMove 3s linear infinite;
+    }
+
+    @keyframes rainbowMove {
+      to { background-position: 300% center; }
+    }
+
+    .glitch-text {
+      text-shadow: 2px 0 #ff453a, -2px 0 #4f8cff;
+      animation: glitchText 1.2s infinite;
+    }
+
+    @keyframes glitchText {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-2px, 1px); }
+      40% { transform: translate(2px, -1px); }
+      60% { transform: translate(-1px, -1px); }
+      80% { transform: translate(1px, 2px); }
+    }
+
+    .blur-reveal {
+      animation: blurReveal 2.2s ease-in-out infinite;
+    }
+
+    @keyframes blurReveal {
+      0% { opacity: 0; filter: blur(18px); transform: scale(.95); }
+      45%, 70% { opacity: 1; filter: blur(0); transform: scale(1); }
+      100% { opacity: 0; filter: blur(12px); transform: scale(1.03); }
+    }
+
+    .letter-space {
+      animation: letterSpace 2.2s ease-in-out infinite;
+    }
+
+    @keyframes letterSpace {
+      0%, 100% { letter-spacing: -0.055em; opacity: .65; }
+      50% { letter-spacing: .15em; opacity: 1; }
+    }
+
+    .wave-text span {
+      display: inline-block;
+      animation: waveLetter 1.4s ease-in-out infinite;
+    }
+
+    .wave-text span:nth-child(2) { animation-delay: .06s; }
+    .wave-text span:nth-child(3) { animation-delay: .12s; }
+    .wave-text span:nth-child(4) { animation-delay: .18s; }
+
+    @keyframes waveLetter {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-14px); }
+    }
+
+    .flip-text {
+      animation: flipText 2s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+
+    @keyframes flipText {
+      0%, 100% { transform: rotateX(0); }
+      50% { transform: rotateX(360deg); }
+    }
+
+    .mask-reveal {
+      clip-path: inset(0 100% 0 0);
+      animation: maskReveal 2.2s ease-in-out infinite;
+    }
+
+    @keyframes maskReveal {
+      0% { clip-path: inset(0 100% 0 0); }
+      45%, 70% { clip-path: inset(0 0 0 0); }
+      100% { clip-path: inset(0 0 0 100%); }
+    }
+
+    .typewriter {
+      width: 9ch;
+      overflow: hidden;
+      border-right: 3px solid white;
+      animation: typing 2.4s steps(9) infinite, cursorBlink .7s step-end infinite;
+    }
+
+    @keyframes typing {
+      0% { width: 0; }
+      55%, 75% { width: 9ch; }
+      100% { width: 0; }
+    }
+
+    @keyframes cursorBlink {
+      50% { border-color: transparent; }
+    }
+
+    .float-text {
+      animation: floatText 2.6s ease-in-out infinite;
+    }
+
+    @keyframes floatText {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-13px); }
+    }
+
+    .shake-text {
+      animation: shakeText .55s ease-in-out infinite;
+    }
+
+    @keyframes shakeText {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-4px); }
+      40% { transform: translateX(4px); }
+      60% { transform: translateX(-3px); }
+      80% { transform: translateX(3px); }
+    }
+
+    .rubber-text {
+      animation: rubberText 1.8s ease-in-out infinite;
+    }
+
+    @keyframes rubberText {
+      0%, 100% { transform: scale(1); }
+      35% { transform: scaleX(1.25) scaleY(.75); }
+      55% { transform: scaleX(.85) scaleY(1.15); }
+      75% { transform: scaleX(1.05) scaleY(.95); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .search-box {
+        width: 100%;
+      }
+
+      .menu {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .content-header {
+        display: block;
+      }
+
+      .count-pill {
+        display: inline-block;
+        margin-top: 12px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .page {
+        padding: 12px;
+      }
+
+      .topbar {
+        top: 10px;
+        border-radius: 20px;
+      }
+
+      .menu a {
+        height: 42px;
+        padding: 0 13px;
+        font-size: 13px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .text {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu">
+        <a class="active" href="text-animation.html">Text</a>
+        <a href="button-animation.html">Button</a>
+        <a href="hover-effects.html">Hover</a>
+        <a href="card-effects.html">Card</a>
+        <a href="ui-motion.html">UI Motion</a>
+        <a href="loader-effects.html">Loader</a>
+        <a href="input-focus-effects.html">Input</a>
+        <a href="cursor-effects.html">Cursor</a>
+        <a href="background-effects.html">Background</a>
+      </nav>
+    </header>
+
+    <main class="content">
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Text Animation</h1>
+          <p>Live text animation effects with effect name, short usage note, and copy-code button.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">24 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty hidden">
+        No effect found. Try searching “shine”, “glow”, “typewriter”, “gradient”, or “fade”.
+      </div>
+
+      <section id="grid" class="grid">
+
+        <div class="card" data-search="fade in text opacity simple">
+          <div class="preview">
+            <div class="text fade-in">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Fade In Text</h3>
+              <button class="copy-btn" onclick="copyCode('fadeIn')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Simple opacity animation for headings, labels, and intro text.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="fade up text bottom reveal">
+          <div class="preview">
+            <div class="text fade-up">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Fade Up Text</h3>
+              <button class="copy-btn" onclick="copyCode('fadeUp')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Text enters from bottom with smooth reveal motion.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="fade down text top reveal">
+          <div class="preview">
+            <div class="text fade-down">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Fade Down Text</h3>
+              <button class="copy-btn" onclick="copyCode('fadeDown')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Text enters from top and fades softly.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="slide left text horizontal">
+          <div class="preview">
+            <div class="text slide-left">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Slide Left Text</h3>
+              <button class="copy-btn" onclick="copyCode('slideLeft')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Horizontal slide movement from right to left.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="slide right text horizontal">
+          <div class="preview">
+            <div class="text slide-right">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Slide Right Text</h3>
+              <button class="copy-btn" onclick="copyCode('slideRight')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Horizontal slide movement from left to right.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="zoom in text scale">
+          <div class="preview">
+            <div class="text zoom-in">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Zoom In Text</h3>
+              <button class="copy-btn" onclick="copyCode('zoomIn')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Scale-based reveal for hero headings and banners.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="pop in text elastic">
+          <div class="preview">
+            <div class="text pop-in">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Pop In Text</h3>
+              <button class="copy-btn" onclick="copyCode('popIn')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Playful pop animation with elastic feeling.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="bounce text motion">
+          <div class="preview">
+            <div class="text bounce-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Bounce Text</h3>
+              <button class="copy-btn" onclick="copyCode('bounceText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Good for fun labels, stickers, and attention text.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="pulse text scale attention">
+          <div class="preview">
+            <div class="text pulse-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Pulse Text</h3>
+              <button class="copy-btn" onclick="copyCode('pulseText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Soft scale pulse for important words and CTA text.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="shining shine text premium">
+          <div class="preview">
+            <div class="text shine-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Shining Text</h3>
+              <button class="copy-btn" onclick="copyCode('shineText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Premium shine sweep for titles, names, and hero text.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="gradient text animated">
+          <div class="preview">
+            <div class="text gradient-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Animated Gradient Text</h3>
+              <button class="copy-btn" onclick="copyCode('gradientText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Moving gradient text for modern app headings.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="neon text glow blue">
+          <div class="preview">
+            <div class="text neon-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Neon Text</h3>
+              <button class="copy-btn" onclick="copyCode('neonText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Blue neon glow with slight flicker effect.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="soft glow text white">
+          <div class="preview">
+            <div class="text soft-glow">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Soft Glow Text</h3>
+              <button class="copy-btn" onclick="copyCode('softGlow')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Clean white glow for dark premium interfaces.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="rainbow text color gradient">
+          <div class="preview">
+            <div class="text rainbow-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Rainbow Text</h3>
+              <button class="copy-btn" onclick="copyCode('rainbowText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Colorful moving text for creative sections.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="glitch text cyber gaming">
+          <div class="preview">
+            <div class="text glitch-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Glitch Text</h3>
+              <button class="copy-btn" onclick="copyCode('glitchText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Cyber glitch effect for gaming and tech UI.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="blur reveal text focus">
+          <div class="preview">
+            <div class="text blur-reveal">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Blur Reveal Text</h3>
+              <button class="copy-btn" onclick="copyCode('blurReveal')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Text appears from blur and becomes sharp.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="letter spacing text expand">
+          <div class="preview">
+            <div class="text letter-space">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Letter Spacing Text</h3>
+              <button class="copy-btn" onclick="copyCode('letterSpace')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Letter spacing expands and contracts smoothly.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="wave text letter motion">
+          <div class="preview">
+            <div class="text wave-text">
+              <span>W</span><span>a</span><span>v</span><span>e</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Wave Letter Text</h3>
+              <button class="copy-btn" onclick="copyCode('waveText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Each letter moves one-by-one like a smooth wave.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="flip text 3d rotate">
+          <div class="preview">
+            <div class="text flip-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Flip Text</h3>
+              <button class="copy-btn" onclick="copyCode('flipText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>3D flip movement for text transitions.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="mask reveal text clip">
+          <div class="preview">
+            <div class="text mask-reveal">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Mask Reveal Text</h3>
+              <button class="copy-btn" onclick="copyCode('maskReveal')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Text reveals using a clean clipping mask.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="typewriter text typing cursor">
+          <div class="preview">
+            <div class="text typewriter">Typing...</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Typewriter Text</h3>
+              <button class="copy-btn" onclick="copyCode('typewriter')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Typing effect with blinking cursor.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="floating text smooth">
+          <div class="preview">
+            <div class="text float-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Floating Text</h3>
+              <button class="copy-btn" onclick="copyCode('floatText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Soft floating motion for calm premium UI.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="shake text error warning">
+          <div class="preview">
+            <div class="text shake-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Shake Text</h3>
+              <button class="copy-btn" onclick="copyCode('shakeText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Quick shake effect for error and warning text.</p>
+          </div>
+        </div>
+
+        <div class="card" data-search="rubber band text elastic">
+          <div class="preview">
+            <div class="text rubber-text">Text</div>
+          </div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>Rubber Band Text</h3>
+              <button class="copy-btn" onclick="copyCode('rubberText')" title="Copy code">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                  <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                </svg>
+              </button>
+            </div>
+            <p>Elastic stretching text animation.</p>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const snippets = {
+      fadeIn: `<div class="fade-in">Text</div>
+
+<style>
+.fade-in {
+  animation: fadeIn 2s ease-in-out infinite alternate;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0.18; }
+  to { opacity: 1; }
+}
+</style>`,
+
+      fadeUp: `<div class="fade-up">Text</div>
+
+<style>
+.fade-up {
+  animation: fadeUp 2.1s ease-in-out infinite;
+}
+
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(24px); }
+  45%, 70% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-12px); }
+}
+</style>`,
+
+      fadeDown: `<div class="fade-down">Text</div>
+
+<style>
+.fade-down {
+  animation: fadeDown 2.1s ease-in-out infinite;
+}
+
+@keyframes fadeDown {
+  0% { opacity: 0; transform: translateY(-24px); }
+  45%, 70% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(12px); }
+}
+</style>`,
+
+      slideLeft: `<div class="slide-left">Text</div>
+
+<style>
+.slide-left {
+  animation: slideLeft 2.2s ease-in-out infinite;
+}
+
+@keyframes slideLeft {
+  0% { opacity: 0; transform: translateX(42px); }
+  45%, 70% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-28px); }
+}
+</style>`,
+
+      slideRight: `<div class="slide-right">Text</div>
+
+<style>
+.slide-right {
+  animation: slideRight 2.2s ease-in-out infinite;
+}
+
+@keyframes slideRight {
+  0% { opacity: 0; transform: translateX(-42px); }
+  45%, 70% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(28px); }
+}
+</style>`,
+
+      zoomIn: `<div class="zoom-in">Text</div>
+
+<style>
+.zoom-in {
+  animation: zoomIn 2s ease-in-out infinite;
+}
+
+@keyframes zoomIn {
+  0% { opacity: 0; transform: scale(0.72); }
+  45%, 70% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.15); }
+}
+</style>`,
+
+      popIn: `<div class="pop-in">Text</div>
+
+<style>
+.pop-in {
+  animation: popIn 1.7s cubic-bezier(.17,.67,.29,1.35) infinite;
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.55); }
+  45%, 75% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.9); }
+}
+</style>`,
+
+      bounceText: `<div class="bounce-text">Text</div>
+
+<style>
+.bounce-text {
+  animation: bounceText 1.7s ease-in-out infinite;
+}
+
+@keyframes bounceText {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-18px); }
+  60% { transform: translateY(4px); }
+}
+</style>`,
+
+      pulseText: `<div class="pulse-text">Text</div>
+
+<style>
+.pulse-text {
+  animation: pulseText 1.6s ease-in-out infinite;
+}
+
+@keyframes pulseText {
+  0%, 100% { transform: scale(1); opacity: 0.75; }
+  50% { transform: scale(1.09); opacity: 1; }
+}
+</style>`,
+
+      shineText: `<div class="shine-text">Text</div>
+
+<style>
+.shine-text {
+  background: linear-gradient(90deg, #fff 0%, #fff 34%, #80b2ff 50%, #fff 66%, #fff 100%);
+  background-size: 260% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shineText 2.2s linear infinite;
+}
+
+@keyframes shineText {
+  to { background-position: -260% center; }
+}
+</style>`,
+
+      gradientText: `<div class="gradient-text">Text</div>
+
+<style>
+.gradient-text {
+  background: linear-gradient(90deg, #ffffff, #65a2ff, #b986ff, #ffffff);
+  background-size: 260%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: gradientText 3s ease-in-out infinite;
+}
+
+@keyframes gradientText {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}
+</style>`,
+
+      neonText: `<div class="neon-text">Text</div>
+
+<style>
+.neon-text {
+  color: white;
+  text-shadow:
+    0 0 8px rgba(79,140,255,.9),
+    0 0 22px rgba(79,140,255,.75),
+    0 0 45px rgba(79,140,255,.45);
+  animation: neonText 1.9s ease-in-out infinite;
+}
+
+@keyframes neonText {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  45% { opacity: .72; filter: brightness(.85); }
+  50% { opacity: 1; filter: brightness(1.25); }
+}
+</style>`,
+
+      softGlow: `<div class="soft-glow">Text</div>
+
+<style>
+.soft-glow {
+  animation: softGlow 2s ease-in-out infinite;
+}
+
+@keyframes softGlow {
+  0%, 100% { text-shadow: 0 0 0 rgba(255,255,255,0); }
+  50% { text-shadow: 0 0 28px rgba(255,255,255,0.65); }
+}
+</style>`,
+
+      rainbowText: `<div class="rainbow-text">Text</div>
+
+<style>
+.rainbow-text {
+  background: linear-gradient(90deg, #ff5f57, #ffbd2e, #28c840, #4f8cff, #b986ff, #ff5f57);
+  background-size: 300%;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: rainbowMove 3s linear infinite;
+}
+
+@keyframes rainbowMove {
+  to { background-position: 300% center; }
+}
+</style>`,
+
+      glitchText: `<div class="glitch-text">Text</div>
+
+<style>
+.glitch-text {
+  text-shadow: 2px 0 #ff453a, -2px 0 #4f8cff;
+  animation: glitchText 1.2s infinite;
+}
+
+@keyframes glitchText {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 2px); }
+}
+</style>`,
+
+      blurReveal: `<div class="blur-reveal">Text</div>
+
+<style>
+.blur-reveal {
+  animation: blurReveal 2.2s ease-in-out infinite;
+}
+
+@keyframes blurReveal {
+  0% { opacity: 0; filter: blur(18px); transform: scale(.95); }
+  45%, 70% { opacity: 1; filter: blur(0); transform: scale(1); }
+  100% { opacity: 0; filter: blur(12px); transform: scale(1.03); }
+}
+</style>`,
+
+      letterSpace: `<div class="letter-space">Text</div>
+
+<style>
+.letter-space {
+  animation: letterSpace 2.2s ease-in-out infinite;
+}
+
+@keyframes letterSpace {
+  0%, 100% { letter-spacing: -0.055em; opacity: .65; }
+  50% { letter-spacing: .15em; opacity: 1; }
+}
+</style>`,
+
+      waveText: `<div class="wave-text">
+  <span>W</span><span>a</span><span>v</span><span>e</span>
+</div>
+
+<style>
+.wave-text span {
+  display: inline-block;
+  animation: waveLetter 1.4s ease-in-out infinite;
+}
+
+.wave-text span:nth-child(2) { animation-delay: .06s; }
+.wave-text span:nth-child(3) { animation-delay: .12s; }
+.wave-text span:nth-child(4) { animation-delay: .18s; }
+
+@keyframes waveLetter {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+</style>`,
+
+      flipText: `<div class="flip-text">Text</div>
+
+<style>
+.flip-text {
+  animation: flipText 2s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+
+@keyframes flipText {
+  0%, 100% { transform: rotateX(0); }
+  50% { transform: rotateX(360deg); }
+}
+</style>`,
+
+      maskReveal: `<div class="mask-reveal">Text</div>
+
+<style>
+.mask-reveal {
+  clip-path: inset(0 100% 0 0);
+  animation: maskReveal 2.2s ease-in-out infinite;
+}
+
+@keyframes maskReveal {
+  0% { clip-path: inset(0 100% 0 0); }
+  45%, 70% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 0 100%); }
+}
+</style>`,
+
+      typewriter: `<div class="typewriter">Typing...</div>
+
+<style>
+.typewriter {
+  width: 9ch;
+  overflow: hidden;
+  border-right: 3px solid white;
+  animation: typing 2.4s steps(9) infinite, cursorBlink .7s step-end infinite;
+}
+
+@keyframes typing {
+  0% { width: 0; }
+  55%, 75% { width: 9ch; }
+  100% { width: 0; }
+}
+
+@keyframes cursorBlink {
+  50% { border-color: transparent; }
+}
+</style>`,
+
+      floatText: `<div class="float-text">Text</div>
+
+<style>
+.float-text {
+  animation: floatText 2.6s ease-in-out infinite;
+}
+
+@keyframes floatText {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-13px); }
+}
+</style>`,
+
+      shakeText: `<div class="shake-text">Text</div>
+
+<style>
+.shake-text {
+  animation: shakeText .55s ease-in-out infinite;
+}
+
+@keyframes shakeText {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+</style>`,
+
+      rubberText: `<div class="rubber-text">Text</div>
+
+<style>
+.rubber-text {
+  animation: rubberText 1.8s ease-in-out infinite;
+}
+
+@keyframes rubberText {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scaleX(1.25) scaleY(.75); }
+  55% { transform: scaleX(.85) scaleY(1.15); }
+  75% { transform: scaleX(1.05) scaleY(.95); }
+}
+</style>`
+    };
+
+    const searchInput = document.getElementById("searchInput");
+    const cards = Array.from(document.querySelectorAll(".card"));
+    const emptyState = document.getElementById("emptyState");
+    const countPill = document.getElementById("countPill");
+
+    searchInput.addEventListener("input", updateSearch);
+
+    function updateSearch() {
+      const value = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+
+      cards.forEach(card => {
+        const text = (card.innerText + " " + card.dataset.search).toLowerCase();
+        const match = text.includes(value);
+
+        card.classList.toggle("hidden", !match);
+        if (match) visible++;
+      });
+
+      emptyState.classList.toggle("hidden", visible !== 0);
+      countPill.textContent = visible + " Effects";
+    }
+
+    function copyCode(key) {
+      const code = snippets[key];
+
+      navigator.clipboard.writeText(code).then(() => {
+        showToast("Code copied");
+      }).catch(() => {
+        showToast("Copy failed");
+      });
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
