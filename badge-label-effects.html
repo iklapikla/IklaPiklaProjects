@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Badge / Label Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 680px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-bottom: 70px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Badge Base */
+    .badge-demo {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.16);
+      color: white;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing: 0.02em;
+      overflow: hidden;
+      transition: 260ms ease;
+      isolation: isolate;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+    }
+
+    .badge-demo span {
+      position: relative;
+      z-index: 3;
+    }
+
+    /* Badge Effects */
+    .badge-pulse {
+      animation: badgePulse 1.4s ease-in-out infinite;
+    }
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .badge-glow {
+      background: rgba(79,140,255,.18);
+      border-color: rgba(79,140,255,.45);
+      animation: badgeGlow 1.8s ease-in-out infinite;
+    }
+    @keyframes badgeGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(79,140,255,0); }
+      50% { box-shadow: 0 0 28px rgba(79,140,255,.72); }
+    }
+
+    .badge-neon {
+      border-color: rgba(79,140,255,.9);
+      text-shadow: 0 0 14px rgba(255,255,255,.85);
+      box-shadow: 0 0 18px rgba(79,140,255,.45), inset 0 0 14px rgba(79,140,255,.15);
+      animation: badgeNeon 1.5s ease-in-out infinite;
+    }
+    @keyframes badgeNeon {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.35); }
+    }
+
+    .badge-shimmer {
+      background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(79,140,255,.42), rgba(255,255,255,.12));
+      background-size: 220%;
+      animation: badgeShimmer 1.7s linear infinite;
+    }
+    @keyframes badgeShimmer {
+      to { background-position: -220% center; }
+    }
+
+    .badge-shine::after {
+      content: "";
+      position: absolute;
+      top: -80%;
+      left: -45%;
+      width: 34%;
+      height: 260%;
+      background: rgba(255,255,255,.6);
+      transform: rotate(25deg);
+      animation: badgeShine 2.1s linear infinite;
+      z-index: 2;
+    }
+    @keyframes badgeShine {
+      0% { left: -45%; }
+      55%, 100% { left: 130%; }
+    }
+
+    .badge-bounce {
+      animation: badgeBounce 1.5s ease-in-out infinite;
+    }
+    @keyframes badgeBounce {
+      0%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(3px); }
+    }
+
+    .badge-float {
+      animation: badgeFloat 2.4s ease-in-out infinite;
+    }
+    @keyframes badgeFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .badge-blink {
+      background: rgba(255,95,87,.22);
+      border-color: rgba(255,95,87,.55);
+      animation: badgeBlink 1s ease-in-out infinite;
+    }
+    @keyframes badgeBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .45; }
+    }
+
+    .badge-live {
+      background: rgba(255,95,87,.18);
+      border-color: rgba(255,95,87,.45);
+    }
+    .badge-live::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red);
+      box-shadow: 0 0 0 0 rgba(255,95,87,.65);
+      animation: livePing 1.4s infinite;
+      z-index: 3;
+    }
+    @keyframes livePing {
+      0% { box-shadow: 0 0 0 0 rgba(255,95,87,.65); }
+      70% { box-shadow: 0 0 0 10px rgba(255,95,87,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,95,87,0); }
+    }
+
+    .badge-recording {
+      background: rgba(255,95,87,.14);
+      border-color: rgba(255,95,87,.45);
+      animation: recordingPulse 1.4s ease-in-out infinite;
+    }
+    .badge-recording::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+    @keyframes recordingPulse {
+      0%, 100% { box-shadow: 0 0 0 rgba(255,95,87,0); }
+      50% { box-shadow: 0 0 24px rgba(255,95,87,.7); }
+    }
+
+    .badge-verified {
+      background: rgba(79,140,255,.18);
+      border-color: rgba(79,140,255,.48);
+    }
+    .badge-verified::before {
+      content: "✓";
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--blue);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      animation: verifiedPop 1.6s ease-in-out infinite;
+    }
+    @keyframes verifiedPop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+
+    .badge-premium {
+      background: linear-gradient(90deg, rgba(255,189,46,.18), rgba(255,159,10,.32));
+      border-color: rgba(255,189,46,.55);
+      color: #fff7df;
+      animation: premiumGlow 1.8s ease-in-out infinite;
+    }
+    @keyframes premiumGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(255,189,46,0); }
+      50% { box-shadow: 0 0 26px rgba(255,189,46,.6); }
+    }
+
+    .badge-hot {
+      background: rgba(255,95,87,.18);
+      border-color: rgba(255,95,87,.48);
+      animation: hotShake 1.2s ease-in-out infinite;
+    }
+    @keyframes hotShake {
+      0%, 100% { transform: rotate(0); }
+      25% { transform: rotate(-4deg); }
+      75% { transform: rotate(4deg); }
+    }
+
+    .badge-new {
+      background: rgba(53,199,89,.18);
+      border-color: rgba(53,199,89,.48);
+    }
+    .badge-new::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle, rgba(53,199,89,.38), transparent 58%);
+      animation: newGlow 1.6s ease-in-out infinite;
+      z-index: 1;
+    }
+    @keyframes newGlow {
+      0%, 100% { opacity: .15; transform: scale(.8); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+
+    .badge-count {
+      min-width: 42px;
+      height: 42px;
+      padding: 0;
+      border-radius: 50%;
+      background: rgba(255,95,87,.9);
+      animation: countPop 1.6s ease-in-out infinite;
+    }
+    @keyframes countPop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.22); }
+    }
+
+    .badge-ribbon {
+      border-radius: 10px;
+      background: rgba(79,140,255,.22);
+      border-color: rgba(79,140,255,.45);
+    }
+    .badge-ribbon::before,
+    .badge-ribbon::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      border-top: 10px solid rgba(79,140,255,.55);
+      z-index: 1;
+    }
+    .badge-ribbon::before {
+      left: 8px;
+      border-right: 10px solid transparent;
+    }
+    .badge-ribbon::after {
+      right: 8px;
+      border-left: 10px solid transparent;
+    }
+
+    .badge-corner {
+      border-radius: 12px 999px 999px 12px;
+      animation: cornerSlide 1.8s ease-in-out infinite;
+    }
+    @keyframes cornerSlide {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(10px); }
+    }
+
+    .badge-gradient {
+      background: linear-gradient(90deg, var(--blue), var(--purple), var(--blue));
+      background-size: 220%;
+      border: 0;
+      animation: gradientBadge 2.3s ease-in-out infinite;
+    }
+    @keyframes gradientBadge {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+
+    .badge-holo {
+      background: linear-gradient(120deg, rgba(255,255,255,.22), rgba(135,247,255,.32), rgba(255,158,231,.28), rgba(255,255,255,.22));
+      background-size: 260%;
+      border-color: rgba(255,255,255,.26);
+      animation: holoBadge 2.4s ease-in-out infinite;
+    }
+    @keyframes holoBadge {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+
+    .badge-rotating-border::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: conic-gradient(from 0deg, transparent, var(--blue), transparent, var(--purple), transparent);
+      animation: rotateBorder 2s linear infinite;
+      z-index: 1;
+    }
+    .badge-rotating-border::after {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: inherit;
+      background: #111;
+      z-index: 2;
+    }
+    @keyframes rotateBorder {
+      to { transform: rotate(360deg); }
+    }
+
+    .badge-fire {
+      background: linear-gradient(90deg, rgba(255,95,87,.28), rgba(255,159,10,.35), rgba(255,95,87,.28));
+      background-size: 220%;
+      border-color: rgba(255,159,10,.5);
+      animation: fireBadge 1.2s ease-in-out infinite;
+    }
+    @keyframes fireBadge {
+      0%, 100% { background-position: 0% center; transform: scale(1); }
+      50% { background-position: 100% center; transform: scale(1.08); }
+    }
+
+    .badge-sparkle::before,
+    .badge-sparkle::after {
+      content: "✦";
+      position: absolute;
+      color: white;
+      font-size: 12px;
+      opacity: 0;
+      animation: sparkleBadge 1.6s ease-in-out infinite;
+      z-index: 4;
+    }
+    .badge-sparkle::before {
+      left: 8px;
+      top: 5px;
+    }
+    .badge-sparkle::after {
+      right: 8px;
+      bottom: 5px;
+      animation-delay: .4s;
+    }
+    @keyframes sparkleBadge {
+      0%, 100% { opacity: 0; transform: scale(.4) rotate(0); }
+      50% { opacity: 1; transform: scale(1.2) rotate(90deg); }
+    }
+
+    .badge-level {
+      background: rgba(141,107,255,.18);
+      border-color: rgba(141,107,255,.48);
+    }
+    .badge-level::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      height: 3px;
+      width: 100%;
+      background: var(--purple);
+      transform-origin: left;
+      animation: levelFill 1.8s ease-in-out infinite;
+      z-index: 3;
+    }
+    @keyframes levelFill {
+      0%, 100% { transform: scaleX(.2); }
+      50% { transform: scaleX(1); }
+    }
+
+    .badge-token {
+      background: rgba(255,189,46,.16);
+      border-color: rgba(255,189,46,.45);
+    }
+    .badge-token::before {
+      content: "●";
+      color: var(--yellow);
+      animation: tokenSpin 1.6s linear infinite;
+    }
+    @keyframes tokenSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .badge-slide {
+      animation: badgeSlide 1.8s ease-in-out infinite;
+    }
+    @keyframes badgeSlide {
+      0% { opacity: 0; transform: translateX(-34px); }
+      35%, 75% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(34px); }
+    }
+
+    .badge-scale-hover:hover {
+      transform: scale(1.15);
+      background: rgba(79,140,255,.32);
+      border-color: rgba(79,140,255,.65);
+    }
+
+    .badge-border-draw::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: borderDraw 1.7s linear infinite;
+      z-index: 4;
+    }
+    @keyframes borderDraw {
+      to { filter: hue-rotate(360deg); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu">
+        <a href="text-animation.html">Text</a>
+        <a href="button-animation.html">Button</a>
+        <a href="hover-effects.html">Hover</a>
+        <a href="card-effects.html">Card</a>
+        <a href="ui-motion.html">UI Motion</a>
+        <a class="active" href="badge-label-effects.html">Badge</a>
+        <a href="loader-effects.html">Loader</a>
+        <a href="input-focus-effects.html">Input</a>
+        <a href="cursor-effects.html">Cursor</a>
+        <a href="background-effects.html">Background</a>
+      </nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Badge / Label Effects</h1>
+          <p>Live badge, label, live, verified, premium, count, token, ribbon, and status effects.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “live”, “verified”, “premium”, “glow”, or “token”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+    </main>
+  </div>
+
+  <script>
+    const effects = [
+      {
+        name: "Pulse Badge",
+        about: "Badge gently scales up and down.",
+        className: "badge-pulse",
+        html: '<div class="badge-demo badge-pulse"><span>NEW</span></div>',
+        css: `.badge-pulse { animation: badgePulse 1.4s ease-in-out infinite; }
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}`
+      },
+      {
+        name: "Glow Badge",
+        about: "Badge glows with blue light.",
+        className: "badge-glow",
+        html: '<div class="badge-demo badge-glow"><span>PRO</span></div>',
+        css: `.badge-glow {
+  background: rgba(79,140,255,.18);
+  border-color: rgba(79,140,255,.45);
+  animation: badgeGlow 1.8s ease-in-out infinite;
+}
+@keyframes badgeGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(79,140,255,0); }
+  50% { box-shadow: 0 0 28px rgba(79,140,255,.72); }
+}`
+      },
+      {
+        name: "Neon Badge",
+        about: "Neon border and brightness pulse.",
+        className: "badge-neon",
+        html: '<div class="badge-demo badge-neon"><span>NEON</span></div>',
+        css: `.badge-neon {
+  border-color: rgba(79,140,255,.9);
+  text-shadow: 0 0 14px rgba(255,255,255,.85);
+  box-shadow: 0 0 18px rgba(79,140,255,.45), inset 0 0 14px rgba(79,140,255,.15);
+  animation: badgeNeon 1.5s ease-in-out infinite;
+}
+@keyframes badgeNeon {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.35); }
+}`
+      },
+      {
+        name: "Shimmer Badge",
+        about: "Gradient shimmer moves across the badge.",
+        className: "badge-shimmer",
+        html: '<div class="badge-demo badge-shimmer"><span>SHIMMER</span></div>',
+        css: `.badge-shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,.12), rgba(79,140,255,.42), rgba(255,255,255,.12));
+  background-size: 220%;
+  animation: badgeShimmer 1.7s linear infinite;
+}
+@keyframes badgeShimmer {
+  to { background-position: -220% center; }
+}`
+      },
+      {
+        name: "Shine Badge",
+        about: "White shine sweep passes over the badge.",
+        className: "badge-shine",
+        html: '<div class="badge-demo badge-shine"><span>SHINE</span></div>',
+        css: `.badge-shine {
+  position: relative;
+  overflow: hidden;
+}
+.badge-shine::after {
+  content: "";
+  position: absolute;
+  top: -80%;
+  left: -45%;
+  width: 34%;
+  height: 260%;
+  background: rgba(255,255,255,.6);
+  transform: rotate(25deg);
+  animation: badgeShine 2.1s linear infinite;
+}
+@keyframes badgeShine {
+  0% { left: -45%; }
+  55%, 100% { left: 130%; }
+}`
+      },
+      {
+        name: "Bounce Badge",
+        about: "Badge bounces up and down.",
+        className: "badge-bounce",
+        html: '<div class="badge-demo badge-bounce"><span>HOT</span></div>',
+        css: `.badge-bounce { animation: badgeBounce 1.5s ease-in-out infinite; }
+@keyframes badgeBounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(3px); }
+}`
+      },
+      {
+        name: "Floating Badge",
+        about: "Badge floats softly like a small pill.",
+        className: "badge-float",
+        html: '<div class="badge-demo badge-float"><span>FLOAT</span></div>',
+        css: `.badge-float { animation: badgeFloat 2.4s ease-in-out infinite; }
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}`
+      },
+      {
+        name: "Blink Badge",
+        about: "Badge blinks for urgent labels.",
+        className: "badge-blink",
+        html: '<div class="badge-demo badge-blink"><span>ALERT</span></div>',
+        css: `.badge-blink {
+  background: rgba(255,95,87,.22);
+  border-color: rgba(255,95,87,.55);
+  animation: badgeBlink 1s ease-in-out infinite;
+}
+@keyframes badgeBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .45; }
+}`
+      },
+      {
+        name: "Live Dot Badge",
+        about: "Live red dot with ping animation.",
+        className: "badge-live",
+        html: '<div class="badge-demo badge-live"><span>LIVE</span></div>',
+        css: `.badge-live {
+  background: rgba(255,95,87,.18);
+  border-color: rgba(255,95,87,.45);
+}
+.badge-live::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: 0 0 0 0 rgba(255,95,87,.65);
+  animation: livePing 1.4s infinite;
+}
+@keyframes livePing {
+  0% { box-shadow: 0 0 0 0 rgba(255,95,87,.65); }
+  70% { box-shadow: 0 0 0 10px rgba(255,95,87,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,95,87,0); }
+}`
+      },
+      {
+        name: "Recording Badge",
+        about: "Recording badge pulses with red glow.",
+        className: "badge-recording",
+        html: '<div class="badge-demo badge-recording"><span>REC</span></div>',
+        css: `.badge-recording {
+  background: rgba(255,95,87,.14);
+  border-color: rgba(255,95,87,.45);
+  animation: recordingPulse 1.4s ease-in-out infinite;
+}
+.badge-recording::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff5f57;
+}
+@keyframes recordingPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(255,95,87,0); }
+  50% { box-shadow: 0 0 24px rgba(255,95,87,.7); }
+}`
+      },
+      {
+        name: "Verified Badge",
+        about: "Verified tick pops inside the badge.",
+        className: "badge-verified",
+        html: '<div class="badge-demo badge-verified"><span>VERIFIED</span></div>',
+        css: `.badge-verified {
+  background: rgba(79,140,255,.18);
+  border-color: rgba(79,140,255,.48);
+}
+.badge-verified::before {
+  content: "✓";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4f8cff;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  animation: verifiedPop 1.6s ease-in-out infinite;
+}
+@keyframes verifiedPop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}`
+      },
+      {
+        name: "Premium Badge",
+        about: "Gold premium glow badge.",
+        className: "badge-premium",
+        html: '<div class="badge-demo badge-premium"><span>PREMIUM</span></div>',
+        css: `.badge-premium {
+  background: linear-gradient(90deg, rgba(255,189,46,.18), rgba(255,159,10,.32));
+  border-color: rgba(255,189,46,.55);
+  color: #fff7df;
+  animation: premiumGlow 1.8s ease-in-out infinite;
+}
+@keyframes premiumGlow {
+  0%, 100% { box-shadow: 0 0 0 rgba(255,189,46,0); }
+  50% { box-shadow: 0 0 26px rgba(255,189,46,.6); }
+}`
+      },
+      {
+        name: "Hot Badge",
+        about: "Hot badge shakes slightly.",
+        className: "badge-hot",
+        html: '<div class="badge-demo badge-hot"><span>HOT</span></div>',
+        css: `.badge-hot {
+  background: rgba(255,95,87,.18);
+  border-color: rgba(255,95,87,.48);
+  animation: hotShake 1.2s ease-in-out infinite;
+}
+@keyframes hotShake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}`
+      },
+      {
+        name: "New Badge",
+        about: "New badge gets soft green radial glow.",
+        className: "badge-new",
+        html: '<div class="badge-demo badge-new"><span>NEW</span></div>',
+        css: `.badge-new {
+  position: relative;
+  background: rgba(53,199,89,.18);
+  border-color: rgba(53,199,89,.48);
+}
+.badge-new::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(53,199,89,.38), transparent 58%);
+  animation: newGlow 1.6s ease-in-out infinite;
+}
+@keyframes newGlow {
+  0%, 100% { opacity: .15; transform: scale(.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}`
+      },
+      {
+        name: "Count Badge",
+        about: "Circular count badge pops like notification count.",
+        className: "badge-count",
+        html: '<div class="badge-demo badge-count"><span>9</span></div>',
+        css: `.badge-count {
+  min-width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(255,95,87,.9);
+  animation: countPop 1.6s ease-in-out infinite;
+}
+@keyframes countPop {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+}`
+      },
+      {
+        name: "Ribbon Badge",
+        about: "Ribbon-style badge with bottom tails.",
+        className: "badge-ribbon",
+        html: '<div class="badge-demo badge-ribbon"><span>RANK</span></div>',
+        css: `.badge-ribbon {
+  position: relative;
+  border-radius: 10px;
+  background: rgba(79,140,255,.22);
+  border-color: rgba(79,140,255,.45);
+}
+.badge-ribbon::before,
+.badge-ribbon::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  border-top: 10px solid rgba(79,140,255,.55);
+}
+.badge-ribbon::before {
+  left: 8px;
+  border-right: 10px solid transparent;
+}
+.badge-ribbon::after {
+  right: 8px;
+  border-left: 10px solid transparent;
+}`
+      },
+      {
+        name: "Corner Badge",
+        about: "Badge slides horizontally like a corner label.",
+        className: "badge-corner",
+        html: '<div class="badge-demo badge-corner"><span>SALE</span></div>',
+        css: `.badge-corner {
+  border-radius: 12px 999px 999px 12px;
+  animation: cornerSlide 1.8s ease-in-out infinite;
+}
+@keyframes cornerSlide {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(10px); }
+}`
+      },
+      {
+        name: "Gradient Badge",
+        about: "Animated gradient badge.",
+        className: "badge-gradient",
+        html: '<div class="badge-demo badge-gradient"><span>PLUS</span></div>',
+        css: `.badge-gradient {
+  background: linear-gradient(90deg, #4f8cff, #8d6bff, #4f8cff);
+  background-size: 220%;
+  border: 0;
+  animation: gradientBadge 2.3s ease-in-out infinite;
+}
+@keyframes gradientBadge {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}`
+      },
+      {
+        name: "Holographic Badge",
+        about: "Pastel holographic moving badge.",
+        className: "badge-holo",
+        html: '<div class="badge-demo badge-holo"><span>HOLO</span></div>',
+        css: `.badge-holo {
+  background: linear-gradient(120deg, rgba(255,255,255,.22), rgba(135,247,255,.32), rgba(255,158,231,.28), rgba(255,255,255,.22));
+  background-size: 260%;
+  border-color: rgba(255,255,255,.26);
+  animation: holoBadge 2.4s ease-in-out infinite;
+}
+@keyframes holoBadge {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}`
+      },
+      {
+        name: "Rotating Border Badge",
+        about: "Conic gradient border rotates around badge.",
+        className: "badge-rotating-border",
+        html: '<div class="badge-demo badge-rotating-border"><span>VIP</span></div>',
+        css: `.badge-rotating-border {
+  position: relative;
+  overflow: hidden;
+}
+.badge-rotating-border::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: conic-gradient(from 0deg, transparent, #4f8cff, transparent, #8d6bff, transparent);
+  animation: rotateBorder 2s linear infinite;
+}
+.badge-rotating-border::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: #111;
+}
+.badge-rotating-border span {
+  position: relative;
+  z-index: 3;
+}
+@keyframes rotateBorder {
+  to { transform: rotate(360deg); }
+}`
+      },
+      {
+        name: "Fire Badge",
+        about: "Warm fire-like animated badge.",
+        className: "badge-fire",
+        html: '<div class="badge-demo badge-fire"><span>FIRE</span></div>',
+        css: `.badge-fire {
+  background: linear-gradient(90deg, rgba(255,95,87,.28), rgba(255,159,10,.35), rgba(255,95,87,.28));
+  background-size: 220%;
+  border-color: rgba(255,159,10,.5);
+  animation: fireBadge 1.2s ease-in-out infinite;
+}
+@keyframes fireBadge {
+  0%, 100% { background-position: 0% center; transform: scale(1); }
+  50% { background-position: 100% center; transform: scale(1.08); }
+}`
+      },
+      {
+        name: "Sparkle Badge",
+        about: "Small sparkles animate around the badge.",
+        className: "badge-sparkle",
+        html: '<div class="badge-demo badge-sparkle"><span>STAR</span></div>',
+        css: `.badge-sparkle {
+  position: relative;
+}
+.badge-sparkle::before,
+.badge-sparkle::after {
+  content: "✦";
+  position: absolute;
+  color: white;
+  font-size: 12px;
+  opacity: 0;
+  animation: sparkleBadge 1.6s ease-in-out infinite;
+}
+.badge-sparkle::before {
+  left: 8px;
+  top: 5px;
+}
+.badge-sparkle::after {
+  right: 8px;
+  bottom: 5px;
+  animation-delay: .4s;
+}
+@keyframes sparkleBadge {
+  0%, 100% { opacity: 0; transform: scale(.4) rotate(0); }
+  50% { opacity: 1; transform: scale(1.2) rotate(90deg); }
+}`
+      },
+      {
+        name: "Level Badge",
+        about: "Badge has animated bottom progress line.",
+        className: "badge-level",
+        html: '<div class="badge-demo badge-level"><span>LEVEL</span></div>',
+        css: `.badge-level {
+  position: relative;
+  background: rgba(141,107,255,.18);
+  border-color: rgba(141,107,255,.48);
+}
+.badge-level::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: #8d6bff;
+  transform-origin: left;
+  animation: levelFill 1.8s ease-in-out infinite;
+}
+@keyframes levelFill {
+  0%, 100% { transform: scaleX(.2); }
+  50% { transform: scaleX(1); }
+}`
+      },
+      {
+        name: "Token Badge",
+        about: "Token dot spins inside the badge.",
+        className: "badge-token",
+        html: '<div class="badge-demo badge-token"><span>TOKEN</span></div>',
+        css: `.badge-token {
+  background: rgba(255,189,46,.16);
+  border-color: rgba(255,189,46,.45);
+}
+.badge-token::before {
+  content: "●";
+  color: #ffbd2e;
+  animation: tokenSpin 1.6s linear infinite;
+}
+@keyframes tokenSpin {
+  to { transform: rotate(360deg); }
+}`
+      },
+      {
+        name: "Slide Badge",
+        about: "Badge slides in and out horizontally.",
+        className: "badge-slide",
+        html: '<div class="badge-demo badge-slide"><span>LABEL</span></div>',
+        css: `.badge-slide {
+  animation: badgeSlide 1.8s ease-in-out infinite;
+}
+@keyframes badgeSlide {
+  0% { opacity: 0; transform: translateX(-34px); }
+  35%, 75% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(34px); }
+}`
+      },
+      {
+        name: "Scale Hover Badge",
+        about: "Badge scales on hover.",
+        className: "badge-scale-hover",
+        html: '<div class="badge-demo badge-scale-hover"><span>HOVER</span></div>',
+        css: `.badge-scale-hover {
+  transition: 260ms ease;
+}
+.badge-scale-hover:hover {
+  transform: scale(1.15);
+  background: rgba(79,140,255,.32);
+  border-color: rgba(79,140,255,.65);
+}`
+      },
+      {
+        name: "Border Draw Badge",
+        about: "Moving line draws around the badge border.",
+        className: "badge-border-draw",
+        html: '<div class="badge-demo badge-border-draw"><span>BORDER</span></div>',
+        css: `.badge-border-draw {
+  position: relative;
+}
+.badge-border-draw::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(90deg, transparent, #4f8cff, transparent);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderDraw 1.7s linear infinite;
+}
+@keyframes borderDraw {
+  to { filter: hue-rotate(360deg); }
+}`
+      }
+    ];
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+
+    effects.forEach((effect, index) => {
+      effect.id = String(index);
+    });
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards(list) {
+      grid.innerHTML = "";
+
+      list.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      countPill.textContent = list.length + " Effects";
+      emptyState.style.display = list.length ? "none" : "block";
+    }
+
+    function baseCSS() {
+      return `.badge-demo {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.16);
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  transition: 260ms ease;
+  isolation: isolate;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+}
+.badge-demo span {
+  position: relative;
+  z-index: 3;
+}`;
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseCSS()}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.trim().toLowerCase();
+
+      const filtered = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value)
+        );
+      });
+
+      renderCards(filtered);
+    });
+
+    renderCards(effects);
+  </script>
+</body>
+</html>
