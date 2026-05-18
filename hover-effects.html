@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hover Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --card: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 680px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-bottom: 70px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Demo Base */
+    .hover-demo-box {
+      width: 115px;
+      height: 76px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.16);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 900;
+      transition: 260ms ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hover-demo-card {
+      width: 122px;
+      height: 82px;
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07));
+      border: 1px solid rgba(255,255,255,0.16);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 900;
+      transition: 260ms ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hover-demo-image {
+      width: 122px;
+      height: 82px;
+      border-radius: 20px;
+      background:
+        linear-gradient(135deg, rgba(79,140,255,.95), rgba(141,107,255,.95)),
+        radial-gradient(circle at 30% 30%, white, transparent 25%);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 900;
+      overflow: hidden;
+      transition: 260ms ease;
+      position: relative;
+    }
+
+    .hover-demo-link {
+      position: relative;
+      color: white;
+      font-size: 22px;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      transition: 240ms ease;
+      padding: 8px 4px;
+    }
+
+    /* Hover Effects */
+    .hover-lift:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 22px 48px rgba(0,0,0,.42);
+    }
+
+    .hover-scale:hover {
+      transform: scale(1.12);
+      background: rgba(79,140,255,.95);
+    }
+
+    .hover-glow:hover {
+      box-shadow: 0 0 35px rgba(79,140,255,.72);
+      border-color: rgba(79,140,255,.9);
+    }
+
+    .hover-border-glow:hover {
+      border-color: rgba(79,140,255,1);
+      box-shadow: inset 0 0 0 1px rgba(79,140,255,.5), 0 0 22px rgba(79,140,255,.45);
+    }
+
+    .hover-tilt:hover {
+      transform: perspective(500px) rotateX(10deg) rotateY(-14deg);
+    }
+
+    .hover-rotate:hover {
+      transform: rotate(-4deg) scale(1.06);
+      background: rgba(79,140,255,.78);
+    }
+
+    .hover-blur:hover {
+      filter: blur(2px);
+      transform: scale(1.05);
+    }
+
+    .hover-grayscale {
+      filter: grayscale(1);
+    }
+    .hover-grayscale:hover {
+      filter: grayscale(0);
+      transform: scale(1.06);
+    }
+
+    .hover-image-zoom:hover {
+      transform: scale(1.14);
+    }
+
+    .hover-image-pan {
+      background-size: 140%;
+      background-position: left center;
+    }
+    .hover-image-pan:hover {
+      background-position: right center;
+    }
+
+    .hover-overlay::after {
+      content: "View";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,.58);
+      transform: translateY(100%);
+      transition: .28s ease;
+    }
+    .hover-overlay:hover::after {
+      transform: translateY(0);
+    }
+
+    .hover-shine::after {
+      content: "";
+      position: absolute;
+      top: -60%;
+      left: -45%;
+      width: 35%;
+      height: 220%;
+      background: rgba(255,255,255,.55);
+      transform: rotate(25deg);
+      transition: .35s ease;
+    }
+    .hover-shine:hover::after {
+      left: 130%;
+    }
+
+    .hover-underline::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 3px;
+      border-radius: 999px;
+      background: var(--blue);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s ease;
+    }
+    .hover-underline:hover::after {
+      transform: scaleX(1);
+    }
+
+    .hover-highlight {
+      border-radius: 12px;
+      background: linear-gradient(90deg, transparent 50%, rgba(79,140,255,.35) 50%);
+      background-size: 220%;
+      background-position: 0%;
+    }
+    .hover-highlight:hover {
+      background-position: -100%;
+    }
+
+    .hover-text-glow:hover {
+      color: white;
+      text-shadow: 0 0 18px rgba(79,140,255,.95), 0 0 40px rgba(79,140,255,.55);
+    }
+
+    .hover-text-lift:hover {
+      transform: translateY(-8px);
+      color: var(--blue);
+    }
+
+    .hover-ripple::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(79,140,255,.55);
+      transform: scale(0);
+      opacity: 1;
+      transition: .45s ease;
+    }
+    .hover-ripple:hover::after {
+      transform: scale(8);
+      opacity: 0;
+    }
+
+    .hover-spotlight::before {
+      content: "";
+      position: absolute;
+      inset: -40%;
+      background: radial-gradient(circle, rgba(255,255,255,.35), transparent 36%);
+      transform: translate(-45%, -45%);
+      transition: .35s ease;
+    }
+    .hover-spotlight:hover::before {
+      transform: translate(25%, 20%);
+    }
+
+    .hover-glass:hover {
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(18px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 24px 46px rgba(0,0,0,.38);
+    }
+
+    .hover-gradient-border::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--purple), var(--blue));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: .25s ease;
+    }
+    .hover-gradient-border:hover::before {
+      opacity: 1;
+    }
+
+    .hover-flip {
+      transform-style: preserve-3d;
+    }
+    .hover-flip:hover {
+      transform: rotateY(180deg);
+    }
+
+    .hover-content-reveal::after {
+      content: "More info";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      padding: 7px 8px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.16);
+      transform: translateY(130%);
+      transition: .25s ease;
+      font-size: 12px;
+    }
+    .hover-content-reveal:hover::after {
+      transform: translateY(0);
+    }
+
+    .hover-circle-reveal::before {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--blue);
+      transform: scale(0);
+      transition: .35s ease;
+      z-index: -1;
+    }
+    .hover-circle-reveal {
+      z-index: 1;
+    }
+    .hover-circle-reveal:hover::before {
+      transform: scale(8);
+    }
+
+    .hover-shadow-expand:hover {
+      box-shadow: 0 16px 0 rgba(255,255,255,.07), 0 32px 65px rgba(0,0,0,.45);
+      transform: translateY(-7px);
+    }
+
+    .hover-skew:hover {
+      transform: skewX(-8deg) scale(1.06);
+      background: rgba(79,140,255,.85);
+    }
+
+    .hover-magnetic:hover {
+      animation: magneticHover .8s ease-in-out infinite;
+      background: rgba(79,140,255,.72);
+    }
+    @keyframes magneticHover {
+      0%, 100% { transform: translate(0,0); }
+      25% { transform: translate(5px,-4px); }
+      50% { transform: translate(-4px,5px); }
+      75% { transform: translate(4px,3px); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu">
+        <a href="text-animation.html">Text</a>
+        <a href="button-animation.html">Button</a>
+        <a class="active" href="hover-effects.html">Hover</a>
+        <a href="card-effects.html">Card</a>
+        <a href="ui-motion.html">UI Motion</a>
+        <a href="loader-effects.html">Loader</a>
+        <a href="input-focus-effects.html">Input</a>
+        <a href="cursor-effects.html">Cursor</a>
+        <a href="background-effects.html">Background</a>
+      </nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Hover Effects</h1>
+          <p>Live hover effects for cards, images, links, text, boxes, and premium UI components.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “glow”, “image”, “underline”, “shine”, or “tilt”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+    </main>
+  </div>
+
+  <script>
+    const effects = [
+      {
+        name: "Lift Hover",
+        about: "Element lifts upward with soft shadow.",
+        type: "box",
+        className: "hover-lift",
+        html: '<div class="hover-demo-box hover-lift">Hover</div>',
+        css: `.hover-lift {
+  transition: 260ms ease;
+}
+.hover-lift:hover {
+  transform: translateY(-12px);
+  box-shadow: 0 22px 48px rgba(0,0,0,.42);
+}`
+      },
+      {
+        name: "Scale Hover",
+        about: "Element grows smoothly on hover.",
+        type: "box",
+        className: "hover-scale",
+        html: '<div class="hover-demo-box hover-scale">Hover</div>',
+        css: `.hover-scale {
+  transition: 260ms ease;
+}
+.hover-scale:hover {
+  transform: scale(1.12);
+  background: rgba(79,140,255,.95);
+}`
+      },
+      {
+        name: "Glow Hover",
+        about: "Blue glow appears around the element.",
+        type: "box",
+        className: "hover-glow",
+        html: '<div class="hover-demo-box hover-glow">Hover</div>',
+        css: `.hover-glow {
+  transition: 260ms ease;
+}
+.hover-glow:hover {
+  box-shadow: 0 0 35px rgba(79,140,255,.72);
+  border-color: rgba(79,140,255,.9);
+}`
+      },
+      {
+        name: "Border Glow Hover",
+        about: "Border becomes bright with inner and outer glow.",
+        type: "box",
+        className: "hover-border-glow",
+        html: '<div class="hover-demo-box hover-border-glow">Hover</div>',
+        css: `.hover-border-glow {
+  transition: 260ms ease;
+}
+.hover-border-glow:hover {
+  border-color: rgba(79,140,255,1);
+  box-shadow: inset 0 0 0 1px rgba(79,140,255,.5), 0 0 22px rgba(79,140,255,.45);
+}`
+      },
+      {
+        name: "3D Tilt Hover",
+        about: "Element tilts in 3D perspective on hover.",
+        type: "card",
+        className: "hover-tilt",
+        html: '<div class="hover-demo-card hover-tilt">Hover</div>',
+        css: `.hover-tilt {
+  transition: 260ms ease;
+}
+.hover-tilt:hover {
+  transform: perspective(500px) rotateX(10deg) rotateY(-14deg);
+}`
+      },
+      {
+        name: "Rotate Hover",
+        about: "Element rotates slightly and scales up.",
+        type: "box",
+        className: "hover-rotate",
+        html: '<div class="hover-demo-box hover-rotate">Hover</div>',
+        css: `.hover-rotate {
+  transition: 260ms ease;
+}
+.hover-rotate:hover {
+  transform: rotate(-4deg) scale(1.06);
+  background: rgba(79,140,255,.78);
+}`
+      },
+      {
+        name: "Blur Hover",
+        about: "Element becomes blurred on hover.",
+        type: "image",
+        className: "hover-blur",
+        html: '<div class="hover-demo-image hover-blur">Image</div>',
+        css: `.hover-blur {
+  transition: 260ms ease;
+}
+.hover-blur:hover {
+  filter: blur(2px);
+  transform: scale(1.05);
+}`
+      },
+      {
+        name: "Grayscale to Color",
+        about: "Image changes from grayscale to color.",
+        type: "image",
+        className: "hover-grayscale",
+        html: '<div class="hover-demo-image hover-grayscale">Image</div>',
+        css: `.hover-grayscale {
+  filter: grayscale(1);
+  transition: 260ms ease;
+}
+.hover-grayscale:hover {
+  filter: grayscale(0);
+  transform: scale(1.06);
+}`
+      },
+      {
+        name: "Image Zoom Hover",
+        about: "Image zooms inside the frame on hover.",
+        type: "image",
+        className: "hover-image-zoom",
+        html: '<div class="hover-demo-image hover-image-zoom">Image</div>',
+        css: `.hover-image-zoom {
+  transition: 260ms ease;
+}
+.hover-image-zoom:hover {
+  transform: scale(1.14);
+}`
+      },
+      {
+        name: "Image Pan Hover",
+        about: "Image background pans from left to right.",
+        type: "image",
+        className: "hover-image-pan",
+        html: '<div class="hover-demo-image hover-image-pan">Image</div>',
+        css: `.hover-image-pan {
+  background-size: 140%;
+  background-position: left center;
+  transition: 260ms ease;
+}
+.hover-image-pan:hover {
+  background-position: right center;
+}`
+      },
+      {
+        name: "Overlay Reveal Hover",
+        about: "Dark overlay slides up with text.",
+        type: "image",
+        className: "hover-overlay",
+        html: '<div class="hover-demo-image hover-overlay">Image</div>',
+        css: `.hover-overlay {
+  position: relative;
+  overflow: hidden;
+}
+.hover-overlay::after {
+  content: "View";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.58);
+  transform: translateY(100%);
+  transition: .28s ease;
+}
+.hover-overlay:hover::after {
+  transform: translateY(0);
+}`
+      },
+      {
+        name: "Shine Hover",
+        about: "White shine sweep passes over the element.",
+        type: "card",
+        className: "hover-shine",
+        html: '<div class="hover-demo-card hover-shine">Hover</div>',
+        css: `.hover-shine {
+  position: relative;
+  overflow: hidden;
+}
+.hover-shine::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -45%;
+  width: 35%;
+  height: 220%;
+  background: rgba(255,255,255,.55);
+  transform: rotate(25deg);
+  transition: .35s ease;
+}
+.hover-shine:hover::after {
+  left: 130%;
+}`
+      },
+      {
+        name: "Underline Slide Hover",
+        about: "Underline slides under link text.",
+        type: "link",
+        className: "hover-underline",
+        html: '<a class="hover-demo-link hover-underline" href="#">Link</a>',
+        css: `.hover-underline {
+  position: relative;
+  display: inline-block;
+  color: white;
+  text-decoration: none;
+}
+.hover-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: #4f8cff;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .25s ease;
+}
+.hover-underline:hover::after {
+  transform: scaleX(1);
+}`
+      },
+      {
+        name: "Highlight Hover",
+        about: "Background highlight fills behind text.",
+        type: "link",
+        className: "hover-highlight",
+        html: '<a class="hover-demo-link hover-highlight" href="#">Link</a>',
+        css: `.hover-highlight {
+  border-radius: 12px;
+  background: linear-gradient(90deg, transparent 50%, rgba(79,140,255,.35) 50%);
+  background-size: 220%;
+  background-position: 0%;
+  transition: .25s ease;
+  color: white;
+  text-decoration: none;
+}
+.hover-highlight:hover {
+  background-position: -100%;
+}`
+      },
+      {
+        name: "Text Glow Hover",
+        about: "Text glows strongly on hover.",
+        type: "link",
+        className: "hover-text-glow",
+        html: '<a class="hover-demo-link hover-text-glow" href="#">Text</a>',
+        css: `.hover-text-glow {
+  color: white;
+  text-decoration: none;
+  transition: 240ms ease;
+}
+.hover-text-glow:hover {
+  color: white;
+  text-shadow: 0 0 18px rgba(79,140,255,.95), 0 0 40px rgba(79,140,255,.55);
+}`
+      },
+      {
+        name: "Text Lift Hover",
+        about: "Text moves upward and changes color.",
+        type: "link",
+        className: "hover-text-lift",
+        html: '<a class="hover-demo-link hover-text-lift" href="#">Text</a>',
+        css: `.hover-text-lift {
+  display: inline-block;
+  color: white;
+  text-decoration: none;
+  transition: 240ms ease;
+}
+.hover-text-lift:hover {
+  transform: translateY(-8px);
+  color: #4f8cff;
+}`
+      },
+      {
+        name: "Ripple Hover",
+        about: "Ripple expands from center on hover.",
+        type: "box",
+        className: "hover-ripple",
+        html: '<div class="hover-demo-box hover-ripple">Hover</div>',
+        css: `.hover-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.hover-ripple::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(79,140,255,.55);
+  transform: scale(0);
+  opacity: 1;
+  transition: .45s ease;
+}
+.hover-ripple:hover::after {
+  transform: scale(8);
+  opacity: 0;
+}`
+      },
+      {
+        name: "Spotlight Hover",
+        about: "Light spotlight moves across the element.",
+        type: "card",
+        className: "hover-spotlight",
+        html: '<div class="hover-demo-card hover-spotlight">Hover</div>',
+        css: `.hover-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.hover-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(255,255,255,.35), transparent 36%);
+  transform: translate(-45%, -45%);
+  transition: .35s ease;
+}
+.hover-spotlight:hover::before {
+  transform: translate(25%, 20%);
+}`
+      },
+      {
+        name: "Glass Hover",
+        about: "Element turns into frosted glass on hover.",
+        type: "card",
+        className: "hover-glass",
+        html: '<div class="hover-demo-card hover-glass">Hover</div>',
+        css: `.hover-glass {
+  transition: 260ms ease;
+}
+.hover-glass:hover {
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 24px 46px rgba(0,0,0,.38);
+}`
+      },
+      {
+        name: "Gradient Border Hover",
+        about: "Gradient border appears around the card.",
+        type: "card",
+        className: "hover-gradient-border",
+        html: '<div class="hover-demo-card hover-gradient-border">Hover</div>',
+        css: `.hover-gradient-border {
+  position: relative;
+}
+.hover-gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(90deg, #4f8cff, #8d6bff, #4f8cff);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: .25s ease;
+}
+.hover-gradient-border:hover::before {
+  opacity: 1;
+}`
+      },
+      {
+        name: "Flip Hover",
+        about: "Card flips in 3D on hover.",
+        type: "card",
+        className: "hover-flip",
+        html: '<div class="hover-demo-card hover-flip">Hover</div>',
+        css: `.hover-flip {
+  transition: 260ms ease;
+  transform-style: preserve-3d;
+}
+.hover-flip:hover {
+  transform: rotateY(180deg);
+}`
+      },
+      {
+        name: "Content Reveal Hover",
+        about: "Extra content slides up from bottom.",
+        type: "card",
+        className: "hover-content-reveal",
+        html: '<div class="hover-demo-card hover-content-reveal">Hover</div>',
+        css: `.hover-content-reveal {
+  position: relative;
+  overflow: hidden;
+}
+.hover-content-reveal::after {
+  content: "More info";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 7px 8px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.16);
+  transform: translateY(130%);
+  transition: .25s ease;
+  font-size: 12px;
+}
+.hover-content-reveal:hover::after {
+  transform: translateY(0);
+}`
+      },
+      {
+        name: "Circle Reveal Hover",
+        about: "Circle expands behind the element.",
+        type: "box",
+        className: "hover-circle-reveal",
+        html: '<div class="hover-demo-box hover-circle-reveal">Hover</div>',
+        css: `.hover-circle-reveal {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+.hover-circle-reveal::before {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4f8cff;
+  transform: scale(0);
+  transition: .35s ease;
+  z-index: -1;
+}
+.hover-circle-reveal:hover::before {
+  transform: scale(8);
+}`
+      },
+      {
+        name: "Shadow Expand Hover",
+        about: "Shadow expands and card lifts upward.",
+        type: "card",
+        className: "hover-shadow-expand",
+        html: '<div class="hover-demo-card hover-shadow-expand">Hover</div>',
+        css: `.hover-shadow-expand {
+  transition: 260ms ease;
+}
+.hover-shadow-expand:hover {
+  box-shadow: 0 16px 0 rgba(255,255,255,.07), 0 32px 65px rgba(0,0,0,.45);
+  transform: translateY(-7px);
+}`
+      },
+      {
+        name: "Skew Hover",
+        about: "Element skews and scales on hover.",
+        type: "box",
+        className: "hover-skew",
+        html: '<div class="hover-demo-box hover-skew">Hover</div>',
+        css: `.hover-skew {
+  transition: 260ms ease;
+}
+.hover-skew:hover {
+  transform: skewX(-8deg) scale(1.06);
+  background: rgba(79,140,255,.85);
+}`
+      },
+      {
+        name: "Magnetic Hover",
+        about: "Element moves like a soft magnet on hover.",
+        type: "box",
+        className: "hover-magnetic",
+        html: '<div class="hover-demo-box hover-magnetic">Hover</div>',
+        css: `.hover-magnetic:hover {
+  animation: magneticHover .8s ease-in-out infinite;
+  background: rgba(79,140,255,.72);
+}
+@keyframes magneticHover {
+  0%, 100% { transform: translate(0,0); }
+  25% { transform: translate(5px,-4px); }
+  50% { transform: translate(-4px,5px); }
+  75% { transform: translate(4px,3px); }
+}`
+      }
+    ];
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards(list) {
+      grid.innerHTML = "";
+
+      list.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className} ${effect.type}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      countPill.textContent = list.length + " Effects";
+      emptyState.style.display = list.length ? "none" : "block";
+    }
+
+    effects.forEach((effect, index) => {
+      effect.id = String(index);
+    });
+
+    function baseCSSFor(type) {
+      if (type === "link") {
+        return `.hover-demo-link {
+  position: relative;
+  display: inline-block;
+  color: white;
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  transition: 240ms ease;
+  padding: 8px 4px;
+}`;
+      }
+
+      if (type === "image") {
+        return `.hover-demo-image {
+  width: 122px;
+  height: 82px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(79,140,255,.95), rgba(141,107,255,.95));
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  overflow: hidden;
+  transition: 260ms ease;
+  position: relative;
+}`;
+      }
+
+      if (type === "card") {
+        return `.hover-demo-card {
+  width: 122px;
+  height: 82px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07));
+  border: 1px solid rgba(255,255,255,0.16);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  transition: 260ms ease;
+  position: relative;
+  overflow: hidden;
+}`;
+      }
+
+      return `.hover-demo-box {
+  width: 115px;
+  height: 76px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.16);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  transition: 260ms ease;
+  position: relative;
+  overflow: hidden;
+}`;
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseCSSFor(effect.type)}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.trim().toLowerCase();
+
+      const filtered = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value) ||
+          effect.type.toLowerCase().includes(value)
+        );
+      });
+
+      renderCards(filtered);
+    });
+
+    renderCards(effects);
+  </script>
+</body>
+</html>
