@@ -8,19 +8,25 @@
   <style>
     :root {
       --bg: #000;
-      --card: rgba(255,255,255,0.08);
       --border: rgba(255,255,255,0.14);
       --text: #fff;
       --muted: rgba(255,255,255,0.58);
       --blue: #4f8cff;
       --purple: #8d6bff;
       --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -60,7 +66,7 @@
     .page {
       position: relative;
       z-index: 1;
-      width: min(100%, 1480px);
+      width: min(100%, 1560px);
       margin: 0 auto;
       padding: 22px;
       min-height: 100vh;
@@ -175,7 +181,7 @@
       font-size: 15px;
       line-height: 1.55;
       font-weight: 650;
-      max-width: 680px;
+      max-width: 760px;
     }
 
     .count-pill {
@@ -191,9 +197,9 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
-      padding-bottom: 70px;
+      padding-bottom: 35px;
     }
 
     .card {
@@ -222,6 +228,61 @@
       border-bottom: 1px solid rgba(255,255,255,0.09);
       background: rgba(0,0,0,0.20);
       overflow: hidden;
+      position: relative;
+      perspective: 900px;
+    }
+
+    .hover-box {
+      width: 124px;
+      height: 82px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+      border: 1px solid rgba(255,255,255,.16);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 900;
+      position: relative;
+      overflow: hidden;
+      transition: 260ms ease;
+      isolation: isolate;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+    }
+
+    .hover-box span {
+      position: relative;
+      z-index: 5;
+    }
+
+    .hover-link {
+      position: relative;
+      display: inline-block;
+      color: white;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: -0.055em;
+      font-weight: 950;
+      transition: 240ms ease;
+      padding: 8px 4px;
+    }
+
+    .hover-image {
+      width: 124px;
+      height: 82px;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.45), transparent 24%),
+        linear-gradient(135deg, rgba(79,140,255,.95), rgba(141,107,255,.95));
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 900;
+      position: relative;
+      overflow: hidden;
+      transition: 260ms ease;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
     }
 
     .card-body {
@@ -282,6 +343,18 @@
       display: none;
     }
 
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -305,300 +378,8 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Demo Base */
-    .hover-demo-box {
-      width: 115px;
-      height: 76px;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.12);
-      border: 1px solid rgba(255,255,255,0.16);
-      display: grid;
-      place-items: center;
-      color: white;
-      font-size: 14px;
-      font-weight: 900;
-      transition: 260ms ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hover-demo-card {
-      width: 122px;
-      height: 82px;
-      border-radius: 20px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07));
-      border: 1px solid rgba(255,255,255,0.16);
-      display: grid;
-      place-items: center;
-      color: white;
-      font-size: 14px;
-      font-weight: 900;
-      transition: 260ms ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hover-demo-image {
-      width: 122px;
-      height: 82px;
-      border-radius: 20px;
-      background:
-        linear-gradient(135deg, rgba(79,140,255,.95), rgba(141,107,255,.95)),
-        radial-gradient(circle at 30% 30%, white, transparent 25%);
-      display: grid;
-      place-items: center;
-      color: white;
-      font-size: 14px;
-      font-weight: 900;
-      overflow: hidden;
-      transition: 260ms ease;
-      position: relative;
-    }
-
-    .hover-demo-link {
-      position: relative;
-      color: white;
-      font-size: 22px;
-      font-weight: 950;
-      letter-spacing: -0.04em;
-      transition: 240ms ease;
-      padding: 8px 4px;
-    }
-
-    /* Hover Effects */
-    .hover-lift:hover {
-      transform: translateY(-12px);
-      box-shadow: 0 22px 48px rgba(0,0,0,.42);
-    }
-
-    .hover-scale:hover {
-      transform: scale(1.12);
-      background: rgba(79,140,255,.95);
-    }
-
-    .hover-glow:hover {
-      box-shadow: 0 0 35px rgba(79,140,255,.72);
-      border-color: rgba(79,140,255,.9);
-    }
-
-    .hover-border-glow:hover {
-      border-color: rgba(79,140,255,1);
-      box-shadow: inset 0 0 0 1px rgba(79,140,255,.5), 0 0 22px rgba(79,140,255,.45);
-    }
-
-    .hover-tilt:hover {
-      transform: perspective(500px) rotateX(10deg) rotateY(-14deg);
-    }
-
-    .hover-rotate:hover {
-      transform: rotate(-4deg) scale(1.06);
-      background: rgba(79,140,255,.78);
-    }
-
-    .hover-blur:hover {
-      filter: blur(2px);
-      transform: scale(1.05);
-    }
-
-    .hover-grayscale {
-      filter: grayscale(1);
-    }
-    .hover-grayscale:hover {
-      filter: grayscale(0);
-      transform: scale(1.06);
-    }
-
-    .hover-image-zoom:hover {
-      transform: scale(1.14);
-    }
-
-    .hover-image-pan {
-      background-size: 140%;
-      background-position: left center;
-    }
-    .hover-image-pan:hover {
-      background-position: right center;
-    }
-
-    .hover-overlay::after {
-      content: "View";
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      background: rgba(0,0,0,.58);
-      transform: translateY(100%);
-      transition: .28s ease;
-    }
-    .hover-overlay:hover::after {
-      transform: translateY(0);
-    }
-
-    .hover-shine::after {
-      content: "";
-      position: absolute;
-      top: -60%;
-      left: -45%;
-      width: 35%;
-      height: 220%;
-      background: rgba(255,255,255,.55);
-      transform: rotate(25deg);
-      transition: .35s ease;
-    }
-    .hover-shine:hover::after {
-      left: 130%;
-    }
-
-    .hover-underline::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      height: 3px;
-      border-radius: 999px;
-      background: var(--blue);
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform .25s ease;
-    }
-    .hover-underline:hover::after {
-      transform: scaleX(1);
-    }
-
-    .hover-highlight {
-      border-radius: 12px;
-      background: linear-gradient(90deg, transparent 50%, rgba(79,140,255,.35) 50%);
-      background-size: 220%;
-      background-position: 0%;
-    }
-    .hover-highlight:hover {
-      background-position: -100%;
-    }
-
-    .hover-text-glow:hover {
-      color: white;
-      text-shadow: 0 0 18px rgba(79,140,255,.95), 0 0 40px rgba(79,140,255,.55);
-    }
-
-    .hover-text-lift:hover {
-      transform: translateY(-8px);
-      color: var(--blue);
-    }
-
-    .hover-ripple::after {
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: rgba(79,140,255,.55);
-      transform: scale(0);
-      opacity: 1;
-      transition: .45s ease;
-    }
-    .hover-ripple:hover::after {
-      transform: scale(8);
-      opacity: 0;
-    }
-
-    .hover-spotlight::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background: radial-gradient(circle, rgba(255,255,255,.35), transparent 36%);
-      transform: translate(-45%, -45%);
-      transition: .35s ease;
-    }
-    .hover-spotlight:hover::before {
-      transform: translate(25%, 20%);
-    }
-
-    .hover-glass:hover {
-      background: rgba(255,255,255,.18);
-      backdrop-filter: blur(18px);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 24px 46px rgba(0,0,0,.38);
-    }
-
-    .hover-gradient-border::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 2px;
-      background: linear-gradient(90deg, var(--blue), var(--purple), var(--blue));
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      opacity: 0;
-      transition: .25s ease;
-    }
-    .hover-gradient-border:hover::before {
-      opacity: 1;
-    }
-
-    .hover-flip {
-      transform-style: preserve-3d;
-    }
-    .hover-flip:hover {
-      transform: rotateY(180deg);
-    }
-
-    .hover-content-reveal::after {
-      content: "More info";
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
-      padding: 7px 8px;
-      border-radius: 12px;
-      background: rgba(255,255,255,.16);
-      transform: translateY(130%);
-      transition: .25s ease;
-      font-size: 12px;
-    }
-    .hover-content-reveal:hover::after {
-      transform: translateY(0);
-    }
-
-    .hover-circle-reveal::before {
-      content: "";
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--blue);
-      transform: scale(0);
-      transition: .35s ease;
-      z-index: -1;
-    }
-    .hover-circle-reveal {
-      z-index: 1;
-    }
-    .hover-circle-reveal:hover::before {
-      transform: scale(8);
-    }
-
-    .hover-shadow-expand:hover {
-      box-shadow: 0 16px 0 rgba(255,255,255,.07), 0 32px 65px rgba(0,0,0,.45);
-      transform: translateY(-7px);
-    }
-
-    .hover-skew:hover {
-      transform: skewX(-8deg) scale(1.06);
-      background: rgba(79,140,255,.85);
-    }
-
-    .hover-magnetic:hover {
-      animation: magneticHover .8s ease-in-out infinite;
-      background: rgba(79,140,255,.72);
-    }
-    @keyframes magneticHover {
-      0%, 100% { transform: translate(0,0); }
-      25% { transform: translate(5px,-4px); }
-      50% { transform: translate(-4px,5px); }
-      75% { transform: translate(4px,3px); }
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
     }
 
     @media (max-width: 1100px) {
@@ -634,516 +415,347 @@
         <input id="searchInput" type="text" placeholder="Search effect..." />
       </div>
 
-      <nav class="menu">
-        <a href="text-animation.html">Text</a>
-        <a href="button-animation.html">Button</a>
-        <a class="active" href="hover-effects.html">Hover</a>
-        <a href="card-effects.html">Card</a>
-        <a href="ui-motion.html">UI Motion</a>
-        <a href="loader-effects.html">Loader</a>
-        <a href="input-focus-effects.html">Input</a>
-        <a href="cursor-effects.html">Cursor</a>
-        <a href="background-effects.html">Background</a>
-      </nav>
+      <nav class="menu" id="mainMenu"></nav>
     </header>
 
     <main>
       <header class="content-header">
         <div class="title-block">
           <h1>Hover Effects</h1>
-          <p>Live hover effects for cards, images, links, text, boxes, and premium UI components.</p>
+          <p>100 live hover effects. First 20 effects load initially, then next 20 effects load automatically while scrolling.</p>
         </div>
 
         <div class="count-pill" id="countPill">0 Effects</div>
       </header>
 
       <div id="emptyState" class="empty">
-        No effect found. Try searching “glow”, “image”, “underline”, “shine”, or “tilt”.
+        No effect found. Try searching “glow”, “image”, “underline”, “shine”, “tilt”, “overlay”, or “3D”.
       </div>
 
       <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
     </main>
   </div>
 
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
   <script>
-    const effects = [
-      {
-        name: "Lift Hover",
-        about: "Element lifts upward with soft shadow.",
-        type: "box",
-        className: "hover-lift",
-        html: '<div class="hover-demo-box hover-lift">Hover</div>',
-        css: `.hover-lift {
-  transition: 260ms ease;
-}
-.hover-lift:hover {
-  transform: translateY(-12px);
-  box-shadow: 0 22px 48px rgba(0,0,0,.42);
-}`
-      },
-      {
-        name: "Scale Hover",
-        about: "Element grows smoothly on hover.",
-        type: "box",
-        className: "hover-scale",
-        html: '<div class="hover-demo-box hover-scale">Hover</div>',
-        css: `.hover-scale {
-  transition: 260ms ease;
-}
-.hover-scale:hover {
-  transform: scale(1.12);
-  background: rgba(79,140,255,.95);
-}`
-      },
-      {
-        name: "Glow Hover",
-        about: "Blue glow appears around the element.",
-        type: "box",
-        className: "hover-glow",
-        html: '<div class="hover-demo-box hover-glow">Hover</div>',
-        css: `.hover-glow {
-  transition: 260ms ease;
-}
-.hover-glow:hover {
-  box-shadow: 0 0 35px rgba(79,140,255,.72);
-  border-color: rgba(79,140,255,.9);
-}`
-      },
-      {
-        name: "Border Glow Hover",
-        about: "Border becomes bright with inner and outer glow.",
-        type: "box",
-        className: "hover-border-glow",
-        html: '<div class="hover-demo-box hover-border-glow">Hover</div>',
-        css: `.hover-border-glow {
-  transition: 260ms ease;
-}
-.hover-border-glow:hover {
-  border-color: rgba(79,140,255,1);
-  box-shadow: inset 0 0 0 1px rgba(79,140,255,.5), 0 0 22px rgba(79,140,255,.45);
-}`
-      },
-      {
-        name: "3D Tilt Hover",
-        about: "Element tilts in 3D perspective on hover.",
-        type: "card",
-        className: "hover-tilt",
-        html: '<div class="hover-demo-card hover-tilt">Hover</div>',
-        css: `.hover-tilt {
-  transition: 260ms ease;
-}
-.hover-tilt:hover {
-  transform: perspective(500px) rotateX(10deg) rotateY(-14deg);
-}`
-      },
-      {
-        name: "Rotate Hover",
-        about: "Element rotates slightly and scales up.",
-        type: "box",
-        className: "hover-rotate",
-        html: '<div class="hover-demo-box hover-rotate">Hover</div>',
-        css: `.hover-rotate {
-  transition: 260ms ease;
-}
-.hover-rotate:hover {
-  transform: rotate(-4deg) scale(1.06);
-  background: rgba(79,140,255,.78);
-}`
-      },
-      {
-        name: "Blur Hover",
-        about: "Element becomes blurred on hover.",
-        type: "image",
-        className: "hover-blur",
-        html: '<div class="hover-demo-image hover-blur">Image</div>',
-        css: `.hover-blur {
-  transition: 260ms ease;
-}
-.hover-blur:hover {
-  filter: blur(2px);
-  transform: scale(1.05);
-}`
-      },
-      {
-        name: "Grayscale to Color",
-        about: "Image changes from grayscale to color.",
-        type: "image",
-        className: "hover-grayscale",
-        html: '<div class="hover-demo-image hover-grayscale">Image</div>',
-        css: `.hover-grayscale {
-  filter: grayscale(1);
-  transition: 260ms ease;
-}
-.hover-grayscale:hover {
-  filter: grayscale(0);
-  transform: scale(1.06);
-}`
-      },
-      {
-        name: "Image Zoom Hover",
-        about: "Image zooms inside the frame on hover.",
-        type: "image",
-        className: "hover-image-zoom",
-        html: '<div class="hover-demo-image hover-image-zoom">Image</div>',
-        css: `.hover-image-zoom {
-  transition: 260ms ease;
-}
-.hover-image-zoom:hover {
-  transform: scale(1.14);
-}`
-      },
-      {
-        name: "Image Pan Hover",
-        about: "Image background pans from left to right.",
-        type: "image",
-        className: "hover-image-pan",
-        html: '<div class="hover-demo-image hover-image-pan">Image</div>',
-        css: `.hover-image-pan {
-  background-size: 140%;
-  background-position: left center;
-  transition: 260ms ease;
-}
-.hover-image-pan:hover {
-  background-position: right center;
-}`
-      },
-      {
-        name: "Overlay Reveal Hover",
-        about: "Dark overlay slides up with text.",
-        type: "image",
-        className: "hover-overlay",
-        html: '<div class="hover-demo-image hover-overlay">Image</div>',
-        css: `.hover-overlay {
-  position: relative;
-  overflow: hidden;
-}
-.hover-overlay::after {
-  content: "View";
-  position: absolute;
-  inset: 0;
+    const effects = [];
+
+    const baseBoxCSS = `.hover-box {
+  width: 124px;
+  height: 82px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+  border: 1px solid rgba(255,255,255,.16);
+  color: white;
   display: grid;
   place-items: center;
-  background: rgba(0,0,0,.58);
-  transform: translateY(100%);
-  transition: .28s ease;
-}
-.hover-overlay:hover::after {
-  transform: translateY(0);
-}`
-      },
-      {
-        name: "Shine Hover",
-        about: "White shine sweep passes over the element.",
-        type: "card",
-        className: "hover-shine",
-        html: '<div class="hover-demo-card hover-shine">Hover</div>',
-        css: `.hover-shine {
+  font-size: 14px;
+  font-weight: 900;
   position: relative;
   overflow: hidden;
+  transition: 260ms ease;
+  isolation: isolate;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
 }
-.hover-shine::after {
-  content: "";
-  position: absolute;
-  top: -60%;
-  left: -45%;
-  width: 35%;
-  height: 220%;
-  background: rgba(255,255,255,.55);
-  transform: rotate(25deg);
-  transition: .35s ease;
-}
-.hover-shine:hover::after {
-  left: 130%;
-}`
-      },
-      {
-        name: "Underline Slide Hover",
-        about: "Underline slides under link text.",
-        type: "link",
-        className: "hover-underline",
-        html: '<a class="hover-demo-link hover-underline" href="#">Link</a>',
-        css: `.hover-underline {
+.hover-box span {
+  position: relative;
+  z-index: 5;
+}`;
+
+    const baseImageCSS = `.hover-image {
+  width: 124px;
+  height: 82px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.45), transparent 24%),
+    linear-gradient(135deg, rgba(79,140,255,.95), rgba(141,107,255,.95));
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  font-weight: 900;
+  position: relative;
+  overflow: hidden;
+  transition: 260ms ease;
+}`;
+
+    const baseLinkCSS = `.hover-link {
   position: relative;
   display: inline-block;
   color: white;
-  text-decoration: none;
-}
-.hover-underline::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 3px;
-  border-radius: 999px;
-  background: #4f8cff;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .25s ease;
-}
-.hover-underline:hover::after {
-  transform: scaleX(1);
-}`
-      },
-      {
-        name: "Highlight Hover",
-        about: "Background highlight fills behind text.",
-        type: "link",
-        className: "hover-highlight",
-        html: '<a class="hover-demo-link hover-highlight" href="#">Link</a>',
-        css: `.hover-highlight {
-  border-radius: 12px;
-  background: linear-gradient(90deg, transparent 50%, rgba(79,140,255,.35) 50%);
-  background-size: 220%;
-  background-position: 0%;
-  transition: .25s ease;
-  color: white;
-  text-decoration: none;
-}
-.hover-highlight:hover {
-  background-position: -100%;
-}`
-      },
-      {
-        name: "Text Glow Hover",
-        about: "Text glows strongly on hover.",
-        type: "link",
-        className: "hover-text-glow",
-        html: '<a class="hover-demo-link hover-text-glow" href="#">Text</a>',
-        css: `.hover-text-glow {
-  color: white;
-  text-decoration: none;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  font-weight: 950;
   transition: 240ms ease;
-}
-.hover-text-glow:hover {
-  color: white;
-  text-shadow: 0 0 18px rgba(79,140,255,.95), 0 0 40px rgba(79,140,255,.55);
-}`
-      },
-      {
-        name: "Text Lift Hover",
-        about: "Text moves upward and changes color.",
-        type: "link",
-        className: "hover-text-lift",
-        html: '<a class="hover-demo-link hover-text-lift" href="#">Text</a>',
-        css: `.hover-text-lift {
-  display: inline-block;
-  color: white;
-  text-decoration: none;
-  transition: 240ms ease;
-}
-.hover-text-lift:hover {
-  transform: translateY(-8px);
-  color: #4f8cff;
-}`
-      },
-      {
-        name: "Ripple Hover",
-        about: "Ripple expands from center on hover.",
-        type: "box",
-        className: "hover-ripple",
-        html: '<div class="hover-demo-box hover-ripple">Hover</div>',
-        css: `.hover-ripple {
-  position: relative;
-  overflow: hidden;
-}
-.hover-ripple::after {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(79,140,255,.55);
-  transform: scale(0);
-  opacity: 1;
-  transition: .45s ease;
-}
-.hover-ripple:hover::after {
-  transform: scale(8);
-  opacity: 0;
-}`
-      },
-      {
-        name: "Spotlight Hover",
-        about: "Light spotlight moves across the element.",
-        type: "card",
-        className: "hover-spotlight",
-        html: '<div class="hover-demo-card hover-spotlight">Hover</div>',
-        css: `.hover-spotlight {
-  position: relative;
-  overflow: hidden;
-}
-.hover-spotlight::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: radial-gradient(circle, rgba(255,255,255,.35), transparent 36%);
-  transform: translate(-45%, -45%);
-  transition: .35s ease;
-}
-.hover-spotlight:hover::before {
-  transform: translate(25%, 20%);
-}`
-      },
-      {
-        name: "Glass Hover",
-        about: "Element turns into frosted glass on hover.",
-        type: "card",
-        className: "hover-glass",
-        html: '<div class="hover-demo-card hover-glass">Hover</div>',
-        css: `.hover-glass {
-  transition: 260ms ease;
-}
-.hover-glass:hover {
-  background: rgba(255,255,255,.18);
-  backdrop-filter: blur(18px);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 24px 46px rgba(0,0,0,.38);
-}`
-      },
-      {
-        name: "Gradient Border Hover",
-        about: "Gradient border appears around the card.",
-        type: "card",
-        className: "hover-gradient-border",
-        html: '<div class="hover-demo-card hover-gradient-border">Hover</div>',
-        css: `.hover-gradient-border {
-  position: relative;
-}
-.hover-gradient-border::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-  background: linear-gradient(90deg, #4f8cff, #8d6bff, #4f8cff);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: .25s ease;
-}
-.hover-gradient-border:hover::before {
-  opacity: 1;
-}`
-      },
-      {
-        name: "Flip Hover",
-        about: "Card flips in 3D on hover.",
-        type: "card",
-        className: "hover-flip",
-        html: '<div class="hover-demo-card hover-flip">Hover</div>',
-        css: `.hover-flip {
-  transition: 260ms ease;
-  transform-style: preserve-3d;
-}
-.hover-flip:hover {
-  transform: rotateY(180deg);
-}`
-      },
-      {
-        name: "Content Reveal Hover",
-        about: "Extra content slides up from bottom.",
-        type: "card",
-        className: "hover-content-reveal",
-        html: '<div class="hover-demo-card hover-content-reveal">Hover</div>',
-        css: `.hover-content-reveal {
-  position: relative;
-  overflow: hidden;
-}
-.hover-content-reveal::after {
-  content: "More info";
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 10px;
-  padding: 7px 8px;
-  border-radius: 12px;
-  background: rgba(255,255,255,.16);
-  transform: translateY(130%);
-  transition: .25s ease;
-  font-size: 12px;
-}
-.hover-content-reveal:hover::after {
-  transform: translateY(0);
-}`
-      },
-      {
-        name: "Circle Reveal Hover",
-        about: "Circle expands behind the element.",
-        type: "box",
-        className: "hover-circle-reveal",
-        html: '<div class="hover-demo-box hover-circle-reveal">Hover</div>',
-        css: `.hover-circle-reveal {
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-}
-.hover-circle-reveal::before {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #4f8cff;
-  transform: scale(0);
-  transition: .35s ease;
-  z-index: -1;
-}
-.hover-circle-reveal:hover::before {
-  transform: scale(8);
-}`
-      },
-      {
-        name: "Shadow Expand Hover",
-        about: "Shadow expands and card lifts upward.",
-        type: "card",
-        className: "hover-shadow-expand",
-        html: '<div class="hover-demo-card hover-shadow-expand">Hover</div>',
-        css: `.hover-shadow-expand {
-  transition: 260ms ease;
-}
-.hover-shadow-expand:hover {
-  box-shadow: 0 16px 0 rgba(255,255,255,.07), 0 32px 65px rgba(0,0,0,.45);
-  transform: translateY(-7px);
-}`
-      },
-      {
-        name: "Skew Hover",
-        about: "Element skews and scales on hover.",
-        type: "box",
-        className: "hover-skew",
-        html: '<div class="hover-demo-box hover-skew">Hover</div>',
-        css: `.hover-skew {
-  transition: 260ms ease;
-}
-.hover-skew:hover {
-  transform: skewX(-8deg) scale(1.06);
-  background: rgba(79,140,255,.85);
-}`
-      },
-      {
-        name: "Magnetic Hover",
-        about: "Element moves like a soft magnet on hover.",
-        type: "box",
-        className: "hover-magnetic",
-        html: '<div class="hover-demo-box hover-magnetic">Hover</div>',
-        css: `.hover-magnetic:hover {
-  animation: magneticHover .8s ease-in-out infinite;
-  background: rgba(79,140,255,.72);
-}
-@keyframes magneticHover {
-  0%, 100% { transform: translate(0,0); }
-  25% { transform: translate(5px,-4px); }
-  50% { transform: translate(-4px,5px); }
-  75% { transform: translate(4px,3px); }
-}`
-      }
-    ];
+  padding: 8px 4px;
+}`;
+
+    function addEffect(name, about, type, className, css, html) {
+      let baseClass = type === "link" ? "hover-link" : type === "image" ? "hover-image" : "hover-box";
+      effects.push({
+        id: String(effects.length),
+        name,
+        about,
+        type,
+        className,
+        html: html || `<div class="${baseClass} ${className}"><span>${type === "link" ? "Text" : "Hover"}</span></div>`,
+        css
+      });
+    }
+
+    addEffect("Lift Hover", "Element lifts upward with soft shadow.", "box", "hover-lift", `.hover-lift:hover { transform: translateY(-12px); box-shadow: 0 25px 55px rgba(0,0,0,.48); }`);
+
+    addEffect("Scale Hover", "Element grows smoothly on hover.", "box", "hover-scale", `.hover-scale:hover { transform: scale(1.14); background: rgba(79,140,255,.75); }`);
+
+    addEffect("Small Scale Hover", "Subtle premium scale hover.", "box", "hover-small-scale", `.hover-small-scale:hover { transform: scale(1.045); background: rgba(255,255,255,.16); }`);
+
+    addEffect("Shrink Hover", "Element shrinks slightly on hover.", "box", "hover-shrink", `.hover-shrink:hover { transform: scale(.88); background: rgba(79,140,255,.35); }`);
+
+    addEffect("Press Hover", "Element looks pressed inward.", "box", "hover-press", `.hover-press:hover { transform: translateY(5px) scale(.96); box-shadow: inset 0 8px 18px rgba(0,0,0,.35); }`);
+
+    addEffect("Push Down Hover", "Physical push-down effect.", "box", "hover-push-down", `.hover-push-down { box-shadow: 0 9px 0 rgba(255,255,255,.08); } .hover-push-down:hover { transform: translateY(9px); box-shadow: 0 0 0 rgba(255,255,255,0); }`);
+
+    addEffect("Glow Hover", "Blue glow appears around element.", "box", "hover-glow", `.hover-glow:hover { border-color: rgba(79,140,255,.95); box-shadow: 0 0 36px rgba(79,140,255,.7); }`);
+
+    addEffect("Soft Glow Hover", "Soft white glow appears on hover.", "box", "hover-soft-glow", `.hover-soft-glow:hover { box-shadow: 0 0 28px rgba(255,255,255,.35); border-color: rgba(255,255,255,.35); }`);
+
+    addEffect("Red Glow Hover", "Red glow for warning elements.", "box", "hover-red-glow", `.hover-red-glow:hover { border-color: rgba(255,95,87,.8); box-shadow: 0 0 32px rgba(255,95,87,.65); background: rgba(255,95,87,.18); }`);
+
+    addEffect("Green Glow Hover", "Green success glow hover.", "box", "hover-green-glow", `.hover-green-glow:hover { border-color: rgba(53,199,89,.8); box-shadow: 0 0 32px rgba(53,199,89,.65); background: rgba(53,199,89,.18); }`);
+
+    addEffect("Gold Glow Hover", "Gold premium glow hover.", "box", "hover-gold-glow", `.hover-gold-glow:hover { border-color: rgba(255,189,46,.8); box-shadow: 0 0 32px rgba(255,189,46,.65); background: rgba(255,189,46,.16); }`);
+
+    addEffect("Border Glow Hover", "Inner and outer border glow.", "box", "hover-border-glow", `.hover-border-glow:hover { border-color: rgba(79,140,255,1); box-shadow: inset 0 0 0 1px rgba(79,140,255,.55), 0 0 28px rgba(79,140,255,.52); }`);
+
+    addEffect("Inset Glow Hover", "Glow appears inside element.", "box", "hover-inset-glow", `.hover-inset-glow:hover { box-shadow: inset 0 0 24px rgba(79,140,255,.55), 0 0 18px rgba(79,140,255,.25); border-color: rgba(79,140,255,.7); }`);
+
+    addEffect("Shadow Expand Hover", "Shadow expands with depth.", "box", "hover-shadow-expand", `.hover-shadow-expand:hover { transform: translateY(-7px); box-shadow: 0 18px 0 rgba(255,255,255,.07), 0 35px 70px rgba(0,0,0,.48); }`);
+
+    addEffect("Layered Shadow Hover", "Multiple stacked shadows on hover.", "box", "hover-layered-shadow", `.hover-layered-shadow { box-shadow: 8px 8px 0 rgba(255,255,255,.06), 16px 16px 0 rgba(255,255,255,.03); } .hover-layered-shadow:hover { transform: translate(-6px,-6px); box-shadow: 14px 14px 0 rgba(79,140,255,.16), 28px 28px 0 rgba(79,140,255,.07); }`);
+
+    addEffect("Rotate Hover", "Element rotates slightly on hover.", "box", "hover-rotate", `.hover-rotate:hover { transform: rotate(-5deg) scale(1.06); background: rgba(79,140,255,.7); }`);
+
+    addEffect("Rotate Right Hover", "Element rotates right on hover.", "box", "hover-rotate-right", `.hover-rotate-right:hover { transform: rotate(6deg) scale(1.06); background: rgba(141,107,255,.6); }`);
+
+    addEffect("Spin Hover", "Element spins on hover.", "box", "hover-spin", `.hover-spin:hover { transform: rotate(360deg); background: rgba(79,140,255,.7); }`);
+
+    addEffect("Flip X Hover", "Element flips vertically.", "box", "hover-flip-x", `.hover-flip-x:hover { transform: rotateX(180deg); }`);
+
+    addEffect("Flip Y Hover", "Element flips horizontally.", "box", "hover-flip-y", `.hover-flip-y:hover { transform: rotateY(180deg); }`);
+
+    addEffect("3D Tilt Hover", "3D perspective tilt effect.", "box", "hover-tilt", `.hover-tilt:hover { transform: perspective(600px) rotateX(12deg) rotateY(-16deg); }`);
+
+    addEffect("3D Push Hover", "Element moves forward in 3D.", "box", "hover-3d-push", `.hover-3d-push:hover { transform: perspective(700px) translateZ(80px); }`);
+
+    addEffect("Perspective Lean Hover", "Element leans in perspective.", "box", "hover-perspective-lean", `.hover-perspective-lean:hover { transform: perspective(700px) rotateX(35deg); transform-origin: bottom; }`);
+
+    addEffect("Skew Hover", "Element skews and scales.", "box", "hover-skew", `.hover-skew:hover { transform: skewX(-9deg) scale(1.06); background: rgba(79,140,255,.75); }`);
+
+    addEffect("Stretch Hover", "Element stretches horizontally.", "box", "hover-stretch", `.hover-stretch:hover { transform: scaleX(1.25); background: rgba(79,140,255,.45); }`);
+
+    addEffect("Squeeze Hover", "Element squeezes horizontally.", "box", "hover-squeeze", `.hover-squeeze:hover { transform: scaleX(.72); background: rgba(141,107,255,.45); }`);
+
+    addEffect("Rounded Morph Hover", "Border radius morphs on hover.", "box", "hover-rounded-morph", `.hover-rounded-morph:hover { border-radius: 36px 12px 36px 12px; background: rgba(79,140,255,.28); }`);
+
+    addEffect("Circle Morph Hover", "Shape morphs into circle.", "box", "hover-circle-morph", `.hover-circle-morph:hover { width: 82px; border-radius: 50%; background: rgba(79,140,255,.65); }`);
+
+    addEffect("Glass Hover", "Element turns into frosted glass.", "box", "hover-glass", `.hover-glass:hover { background: rgba(255,255,255,.18); backdrop-filter: blur(18px); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 24px 46px rgba(0,0,0,.38); }`);
+
+    addEffect("Blur Hover", "Element becomes blurred on hover.", "box", "hover-blur", `.hover-blur:hover { filter: blur(2px); transform: scale(1.05); }`);
+
+    addEffect("Focus Hover", "Blurred element becomes sharp.", "box", "hover-focus", `.hover-focus { filter: blur(3px); opacity: .55; } .hover-focus:hover { filter: blur(0); opacity: 1; transform: scale(1.08); }`);
+
+    addEffect("Brightness Hover", "Element brightness increases.", "box", "hover-brightness", `.hover-brightness:hover { filter: brightness(1.5); }`);
+
+    addEffect("Contrast Hover", "Element contrast increases.", "box", "hover-contrast", `.hover-contrast:hover { filter: contrast(1.7) brightness(1.1); }`);
+
+    addEffect("Saturate Hover", "Element becomes more colorful.", "box", "hover-saturate", `.hover-saturate:hover { filter: saturate(2); background: linear-gradient(135deg, #4f8cff, #8d6bff); }`);
+
+    addEffect("Grayscale Hover", "Element changes from grayscale to color.", "image", "hover-grayscale", `.hover-grayscale { filter: grayscale(1); } .hover-grayscale:hover { filter: grayscale(0); transform: scale(1.08); }`);
+
+    addEffect("Image Zoom Hover", "Image zooms inside frame.", "image", "hover-image-zoom", `.hover-image-zoom:hover { transform: scale(1.16); }`);
+
+    addEffect("Image Zoom Out Hover", "Image zooms out on hover.", "image", "hover-image-zoom-out", `.hover-image-zoom-out { transform: scale(1.12); } .hover-image-zoom-out:hover { transform: scale(1); }`);
+
+    addEffect("Image Pan Right Hover", "Image background pans right.", "image", "hover-image-pan-right", `.hover-image-pan-right { background-size: 150%; background-position: left center; } .hover-image-pan-right:hover { background-position: right center; }`);
+
+    addEffect("Image Pan Left Hover", "Image background pans left.", "image", "hover-image-pan-left", `.hover-image-pan-left { background-size: 150%; background-position: right center; } .hover-image-pan-left:hover { background-position: left center; }`);
+
+    addEffect("Image Rotate Hover", "Image rotates and zooms.", "image", "hover-image-rotate", `.hover-image-rotate:hover { transform: rotate(-5deg) scale(1.12); }`);
+
+    addEffect("Image Blur Reveal Hover", "Image blur clears on hover.", "image", "hover-image-blur-reveal", `.hover-image-blur-reveal { filter: blur(4px); } .hover-image-blur-reveal:hover { filter: blur(0); transform: scale(1.07); }`);
+
+    addEffect("Overlay Slide Up Hover", "Overlay slides up from bottom.", "image", "hover-overlay-up", `.hover-overlay-up::after { content: "View"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.58); transform: translateY(100%); transition: .28s ease; } .hover-overlay-up:hover::after { transform: translateY(0); }`);
+
+    addEffect("Overlay Slide Down Hover", "Overlay slides down from top.", "image", "hover-overlay-down", `.hover-overlay-down::after { content: "View"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.58); transform: translateY(-100%); transition: .28s ease; } .hover-overlay-down:hover::after { transform: translateY(0); }`);
+
+    addEffect("Overlay Fade Hover", "Overlay fades in smoothly.", "image", "hover-overlay-fade", `.hover-overlay-fade::after { content: "View"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.58); opacity: 0; transition: .28s ease; } .hover-overlay-fade:hover::after { opacity: 1; }`);
+
+    addEffect("Overlay Zoom Hover", "Overlay zooms in on hover.", "image", "hover-overlay-zoom", `.hover-overlay-zoom::after { content: "View"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.58); opacity: 0; transform: scale(.6); transition: .28s ease; } .hover-overlay-zoom:hover::after { opacity: 1; transform: scale(1); }`);
+
+    addEffect("Shine Hover", "White shine sweep passes over.", "box", "hover-shine", `.hover-shine::after { content: ""; position: absolute; top: -60%; left: -45%; width: 35%; height: 220%; background: rgba(255,255,255,.55); transform: rotate(25deg); transition: .35s ease; z-index: 3; } .hover-shine:hover::after { left: 130%; }`);
+
+    addEffect("Auto Shine Hover", "Continuous shine on hover.", "box", "hover-auto-shine", `.hover-auto-shine:hover::after { content: ""; position: absolute; top: -60%; width: 35%; height: 220%; background: rgba(255,255,255,.55); transform: rotate(25deg); animation: hoverAutoShine 1.1s linear infinite; z-index: 3; } @keyframes hoverAutoShine { 0% { left: -45%; } 100% { left: 130%; } }`);
+
+    addEffect("Spotlight Hover", "Light spotlight moves across element.", "box", "hover-spotlight", `.hover-spotlight::before { content: ""; position: absolute; inset: -50%; background: radial-gradient(circle, rgba(255,255,255,.35), transparent 35%); transform: translate(-45%,-45%); transition: .35s ease; z-index: 1; } .hover-spotlight:hover::before { transform: translate(25%,20%); }`);
+
+    addEffect("Scanline Hover", "Scanline moves vertically.", "box", "hover-scanline", `.hover-scanline::after { content: ""; position: absolute; left: 0; right: 0; height: 3px; background: #4f8cff; box-shadow: 0 0 18px rgba(79,140,255,.9); opacity: 0; z-index: 4; } .hover-scanline:hover::after { opacity: 1; animation: hoverScanline 1s ease-in-out infinite; } @keyframes hoverScanline { 0%,100% { top: 0; } 50% { top: calc(100% - 3px); } }`);
+
+    addEffect("Ripple Hover", "Ripple expands from center.", "box", "hover-ripple", `.hover-ripple::after { content: ""; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: rgba(79,140,255,.55); transform: scale(0); opacity: 1; transition: .45s ease; z-index: 1; } .hover-ripple:hover::after { transform: scale(8); opacity: 0; }`);
+
+    addEffect("Circle Reveal Hover", "Circle expands behind text.", "box", "hover-circle-reveal", `.hover-circle-reveal::before { content: ""; position: absolute; width: 22px; height: 22px; border-radius: 50%; background: #4f8cff; transform: scale(0); transition: .38s ease; z-index: 1; } .hover-circle-reveal:hover::before { transform: scale(8); }`);
+
+    addEffect("Diagonal Fill Hover", "Gradient fills diagonally.", "box", "hover-diagonal-fill", `.hover-diagonal-fill::before { content: ""; position: absolute; inset: 0; background: linear-gradient(135deg, #4f8cff, #8d6bff); transform: translate(-100%,100%); transition: .38s ease; z-index: 1; } .hover-diagonal-fill:hover::before { transform: translate(0,0); }`);
+
+    addEffect("Fill Left Hover", "Background fills from left.", "box", "hover-fill-left", `.hover-fill-left::before { content: ""; position: absolute; inset: 0; background: #4f8cff; transform: scaleX(0); transform-origin: left; transition: .35s ease; z-index: 1; } .hover-fill-left:hover::before { transform: scaleX(1); }`);
+
+    addEffect("Fill Right Hover", "Background fills from right.", "box", "hover-fill-right", `.hover-fill-right::before { content: ""; position: absolute; inset: 0; background: #4f8cff; transform: scaleX(0); transform-origin: right; transition: .35s ease; z-index: 1; } .hover-fill-right:hover::before { transform: scaleX(1); }`);
+
+    addEffect("Fill Up Hover", "Background fills from bottom.", "box", "hover-fill-up", `.hover-fill-up::before { content: ""; position: absolute; inset: 0; background: #4f8cff; transform: translateY(100%); transition: .35s ease; z-index: 1; } .hover-fill-up:hover::before { transform: translateY(0); }`);
+
+    addEffect("Fill Down Hover", "Background fills from top.", "box", "hover-fill-down", `.hover-fill-down::before { content: ""; position: absolute; inset: 0; background: #4f8cff; transform: translateY(-100%); transition: .35s ease; z-index: 1; } .hover-fill-down:hover::before { transform: translateY(0); }`);
+
+    addEffect("Split Fill Hover", "Two halves fill from opposite direction.", "box", "hover-split-fill", `.hover-split-fill::before, .hover-split-fill::after { content: ""; position: absolute; top: 0; width: 50%; height: 100%; background: #4f8cff; transition: .35s ease; z-index: 1; } .hover-split-fill::before { left: 0; transform: translateY(-100%); } .hover-split-fill::after { right: 0; transform: translateY(100%); } .hover-split-fill:hover::before, .hover-split-fill:hover::after { transform: translateY(0); }`);
+
+    addEffect("Gradient Background Hover", "Gradient background appears.", "box", "hover-gradient-bg", `.hover-gradient-bg:hover { background: linear-gradient(135deg, #4f8cff, #8d6bff); border-color: transparent; }`);
+
+    addEffect("Animated Gradient Hover", "Gradient moves on hover.", "box", "hover-animated-gradient", `.hover-animated-gradient:hover { background: linear-gradient(90deg, #4f8cff, #8d6bff, #4f8cff); background-size: 220%; animation: hoverGradientMove 1.3s ease-in-out infinite; } @keyframes hoverGradientMove { 0%,100% { background-position: 0% center; } 50% { background-position: 100% center; } }`);
+
+    addEffect("Rainbow Hover", "Rainbow gradient appears on hover.", "box", "hover-rainbow", `.hover-rainbow:hover { background: linear-gradient(90deg, #ff5f57, #ffbd2e, #35c759, #4f8cff, #8d6bff); background-size: 260%; animation: hoverRainbow 1.5s linear infinite; } @keyframes hoverRainbow { to { background-position: 260% center; } }`);
+
+    addEffect("Holographic Hover", "Holographic pastel hover style.", "box", "hover-holo", `.hover-holo:hover { background: linear-gradient(120deg, rgba(255,255,255,.22), rgba(135,247,255,.32), rgba(255,158,231,.28)); background-size: 260%; animation: hoverHolo 1.5s ease-in-out infinite; } @keyframes hoverHolo { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} }`);
+
+    addEffect("Border Draw Hover", "Moving border line appears.", "box", "hover-border-draw", `.hover-border-draw::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; background: linear-gradient(90deg, transparent, #4f8cff, transparent); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: .25s ease; z-index: 4; } .hover-border-draw:hover::before { opacity: 1; animation: hoverBorderDraw 1s linear infinite; } @keyframes hoverBorderDraw { to { filter: hue-rotate(360deg); } }`);
+
+    addEffect("Gradient Border Hover", "Gradient border appears.", "box", "hover-gradient-border", `.hover-gradient-border::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px; background: linear-gradient(90deg, #4f8cff, #8d6bff, #4f8cff); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: .25s ease; z-index: 4; } .hover-gradient-border:hover::before { opacity: 1; }`);
+
+    addEffect("Rotating Border Hover", "Rotating conic border on hover.", "box", "hover-rotating-border", `.hover-rotating-border:hover::before { content: ""; position: absolute; inset: -60%; background: conic-gradient(from 0deg, transparent, #4f8cff, transparent, #8d6bff, transparent); animation: hoverRotateBorder 1.5s linear infinite; z-index: 1; } .hover-rotating-border:hover::after { content: ""; position: absolute; inset: 2px; border-radius: inherit; background: #111; z-index: 2; } @keyframes hoverRotateBorder { to { transform: rotate(360deg); } }`);
+
+    addEffect("Dashed Border Hover", "Dashed border pulses on hover.", "box", "hover-dashed-border", `.hover-dashed-border:hover { border: 2px dashed rgba(79,140,255,.9); animation: hoverDashedBorder 1s linear infinite; } @keyframes hoverDashedBorder { 0%,100%{border-color:rgba(79,140,255,.35);} 50%{border-color:rgba(79,140,255,1);} }`);
+
+    addEffect("Corner Peel Hover", "Top corner peel appears.", "box", "hover-corner-peel", `.hover-corner-peel::after { content: ""; position: absolute; right: 0; top: 0; width: 0; height: 0; border-top: 34px solid rgba(255,255,255,.35); border-left: 34px solid transparent; transform: translate(34px,-34px); transition: .28s ease; z-index: 4; } .hover-corner-peel:hover::after { transform: translate(0,0); }`);
+
+    addEffect("Content Reveal Hover", "Small content slides from bottom.", "box", "hover-content-reveal", `.hover-content-reveal::after { content: "More"; position: absolute; left: 10px; right: 10px; bottom: 10px; padding: 7px; border-radius: 12px; background: rgba(255,255,255,.16); transform: translateY(140%); transition: .28s ease; z-index: 5; font-size: 12px; } .hover-content-reveal:hover::after { transform: translateY(0); }`);
+
+    addEffect("Text Swap Hover", "Text changes on hover.", "box", "hover-text-swap", `.hover-text-swap span { transition: .25s ease; } .hover-text-swap:hover span { opacity: 0; transform: scale(.8); } .hover-text-swap::after { content: "Done"; position: absolute; opacity: 0; transform: scale(1.2); transition: .25s ease; z-index: 5; } .hover-text-swap:hover::after { opacity: 1; transform: scale(1); }`);
+
+    addEffect("Text Slide Hover", "Text slides up and new text appears.", "box", "hover-text-slide", `.hover-text-slide span { transition: .28s ease; } .hover-text-slide:hover span { transform: translateY(-22px); opacity: 0; } .hover-text-slide::after { content: "New"; position: absolute; transform: translateY(22px); opacity: 0; transition: .28s ease; z-index: 5; } .hover-text-slide:hover::after { transform: translateY(0); opacity: 1; }`);
+
+    addEffect("Letter Space Hover", "Letters spread on hover.", "link", "hover-letter-space", `.hover-letter-space:hover { letter-spacing: .18em; color: #4f8cff; }`, `<a class="hover-link hover-letter-space" href="#">Text</a>`);
+
+    addEffect("Text Glow Hover", "Text gets blue glow.", "link", "hover-text-glow", `.hover-text-glow:hover { text-shadow: 0 0 18px rgba(79,140,255,.95), 0 0 40px rgba(79,140,255,.55); color: white; }`, `<a class="hover-link hover-text-glow" href="#">Text</a>`);
+
+    addEffect("Text Lift Hover", "Text lifts upward.", "link", "hover-text-lift", `.hover-text-lift:hover { transform: translateY(-8px); color: #4f8cff; }`, `<a class="hover-link hover-text-lift" href="#">Text</a>`);
+
+    addEffect("Underline Slide Hover", "Underline slides under text.", "link", "hover-underline-slide", `.hover-underline-slide::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 3px; border-radius: 999px; background: #4f8cff; transform: scaleX(0); transform-origin: left; transition: .25s ease; } .hover-underline-slide:hover::after { transform: scaleX(1); }`, `<a class="hover-link hover-underline-slide" href="#">Text</a>`);
+
+    addEffect("Underline Center Hover", "Underline expands from center.", "link", "hover-underline-center", `.hover-underline-center::after { content: ""; position: absolute; left: 0; bottom: 0; width: 100%; height: 3px; border-radius: 999px; background: #4f8cff; transform: scaleX(0); transform-origin: center; transition: .25s ease; } .hover-underline-center:hover::after { transform: scaleX(1); }`, `<a class="hover-link hover-underline-center" href="#">Text</a>`);
+
+    addEffect("Overline Hover", "Line appears above text.", "link", "hover-overline", `.hover-overline::before { content: ""; position: absolute; left: 0; top: 0; width: 100%; height: 3px; border-radius: 999px; background: #8d6bff; transform: scaleX(0); transform-origin: right; transition: .25s ease; } .hover-overline:hover::before { transform: scaleX(1); }`, `<a class="hover-link hover-overline" href="#">Text</a>`);
+
+    addEffect("Strike Hover", "Strike line passes through text.", "link", "hover-strike", `.hover-strike::after { content: ""; position: absolute; left: 0; top: 50%; width: 100%; height: 3px; border-radius: 999px; background: #ff5f57; transform: scaleX(0); transform-origin: left; transition: .25s ease; } .hover-strike:hover::after { transform: scaleX(1); }`, `<a class="hover-link hover-strike" href="#">Text</a>`);
+
+    addEffect("Highlight Hover", "Highlight fills behind text.", "link", "hover-highlight", `.hover-highlight { border-radius: 12px; background: linear-gradient(90deg, transparent 50%, rgba(79,140,255,.35) 50%); background-size: 220%; background-position: 0%; } .hover-highlight:hover { background-position: -100%; }`, `<a class="hover-link hover-highlight" href="#">Text</a>`);
+
+    addEffect("Text Color Hover", "Text color changes on hover.", "link", "hover-text-color", `.hover-text-color:hover { color: #4f8cff; }`, `<a class="hover-link hover-text-color" href="#">Text</a>`);
+
+    addEffect("Rainbow Text Hover", "Rainbow gradient appears on text.", "link", "hover-rainbow-text", `.hover-rainbow-text:hover { background: linear-gradient(90deg, #ff5f57, #ffbd2e, #35c759, #4f8cff, #8d6bff); background-size: 260%; color: transparent; -webkit-background-clip: text; background-clip: text; animation: hoverRainbowText 1.4s linear infinite; } @keyframes hoverRainbowText { to { background-position: 260% center; } }`, `<a class="hover-link hover-rainbow-text" href="#">Text</a>`);
+
+    addEffect("Shine Text Hover", "Shine sweep appears on text.", "link", "hover-shine-text", `.hover-shine-text:hover { background: linear-gradient(90deg, #fff, #fff, #80b2ff, #fff, #fff); background-size: 260%; color: transparent; -webkit-background-clip: text; background-clip: text; animation: hoverShineText 1.4s linear infinite; } @keyframes hoverShineText { to { background-position: -260% center; } }`, `<a class="hover-link hover-shine-text" href="#">Text</a>`);
+
+    addEffect("Neon Text Hover", "Neon text glow on hover.", "link", "hover-neon-text", `.hover-neon-text:hover { color: white; text-shadow: 0 0 8px rgba(79,140,255,.9), 0 0 22px rgba(79,140,255,.75), 0 0 45px rgba(79,140,255,.45); }`, `<a class="hover-link hover-neon-text" href="#">Text</a>`);
+
+    addEffect("Glitch Text Hover", "Text glitches on hover.", "link", "hover-glitch-text", `.hover-glitch-text:hover { text-shadow: 2px 0 #ff453a, -2px 0 #4f8cff; animation: hoverGlitchText .8s infinite; } @keyframes hoverGlitchText { 0%,100%{transform:translate(0);} 25%{transform:translate(-2px,1px);} 50%{transform:translate(2px,-1px);} 75%{transform:translate(-1px,2px);} }`, `<a class="hover-link hover-glitch-text" href="#">Text</a>`);
+
+    addEffect("Mask Text Hover", "Text reveal mask on hover.", "link", "hover-mask-text", `.hover-mask-text { clip-path: inset(0 0 0 0); } .hover-mask-text:hover { animation: hoverMaskText 1s ease-in-out infinite; } @keyframes hoverMaskText { 0%,100%{clip-path:inset(0 0 0 0);} 50%{clip-path:inset(0 0 0 45%);} }`, `<a class="hover-link hover-mask-text" href="#">Text</a>`);
+
+    addEffect("Magnetic Hover", "Element moves like a magnet.", "box", "hover-magnetic", `.hover-magnetic:hover { animation: hoverMagnetic .8s ease-in-out infinite; background: rgba(79,140,255,.55); } @keyframes hoverMagnetic { 0%,100%{transform:translate(0,0);} 25%{transform:translate(5px,-4px);} 50%{transform:translate(-4px,5px);} 75%{transform:translate(4px,3px);} }`);
+
+    addEffect("Jelly Hover", "Element gets elastic jelly motion.", "box", "hover-jelly", `.hover-jelly:hover { animation: hoverJelly .8s ease-in-out infinite; } @keyframes hoverJelly { 0%,100%{transform:scale(1);} 30%{transform:scale(1.12,.88);} 50%{transform:scale(.92,1.08);} 70%{transform:scale(1.04,.96);} }`);
+
+    addEffect("Rubber Hover", "Rubber stretch on hover.", "box", "hover-rubber", `.hover-rubber:hover { animation: hoverRubber .9s ease-in-out infinite; } @keyframes hoverRubber { 0%,100%{transform:scale(1);} 35%{transform:scaleX(1.22) scaleY(.82);} 55%{transform:scaleX(.9) scaleY(1.12);} 75%{transform:scaleX(1.04) scaleY(.96);} }`);
+
+    addEffect("Wobble Hover", "Element wobbles on hover.", "box", "hover-wobble", `.hover-wobble:hover { animation: hoverWobble .9s ease-in-out infinite; } @keyframes hoverWobble { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-9px) rotate(-3deg);} 40%{transform:translateX(7px) rotate(2deg);} 60%{transform:translateX(-5px) rotate(-2deg);} 80%{transform:translateX(3px) rotate(1deg);} }`);
+
+    addEffect("Shake Hover", "Element shakes on hover.", "box", "hover-shake", `.hover-shake:hover { animation: hoverShake .5s ease-in-out infinite; } @keyframes hoverShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }`);
+
+    addEffect("Bounce Hover", "Element bounces while hovered.", "box", "hover-bounce", `.hover-bounce:hover { animation: hoverBounce .8s ease-in-out infinite; } @keyframes hoverBounce { 0%,100%{transform:translateY(0);} 40%{transform:translateY(-12px);} 60%{transform:translateY(4px);} }`);
+
+    addEffect("Float Hover", "Element floats while hovered.", "box", "hover-float", `.hover-float:hover { animation: hoverFloat 1.2s ease-in-out infinite; } @keyframes hoverFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }`);
+
+    addEffect("Pulse Hover", "Element pulses while hovered.", "box", "hover-pulse", `.hover-pulse:hover { animation: hoverPulse .9s ease-in-out infinite; } @keyframes hoverPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.1);} }`);
+
+    addEffect("Heartbeat Hover", "Heartbeat pulse on hover.", "box", "hover-heartbeat", `.hover-heartbeat:hover { animation: hoverHeartbeat .9s ease-in-out infinite; } @keyframes hoverHeartbeat { 0%,100%{transform:scale(1);} 25%{transform:scale(1.12);} 45%{transform:scale(.96);} 65%{transform:scale(1.18);} }`);
+
+    addEffect("Swing Hover", "Element swings while hovered.", "box", "hover-swing", `.hover-swing { transform-origin: top center; } .hover-swing:hover { animation: hoverSwing .9s ease-in-out infinite; } @keyframes hoverSwing { 0%,100%{transform:rotate(0);} 25%{transform:rotate(8deg);} 75%{transform:rotate(-8deg);} }`);
+
+    addEffect("Drift Hover", "Element slowly drifts on hover.", "box", "hover-drift", `.hover-drift:hover { animation: hoverDrift 1.4s ease-in-out infinite; } @keyframes hoverDrift { 0%,100%{transform:translate(0,0);} 50%{transform:translate(12px,-8px);} }`);
+
+    addEffect("Orbit Hover", "Element orbits on hover.", "box", "hover-orbit", `.hover-orbit:hover { animation: hoverOrbit 1.5s linear infinite; } @keyframes hoverOrbit { 0%{transform:rotate(0deg) translateX(10px) rotate(0deg);} 100%{transform:rotate(360deg) translateX(10px) rotate(-360deg);} }`);
+
+    addEffect("Ping Hover", "Outer ping ring appears.", "box", "hover-ping", `.hover-ping:hover::after { content: ""; position: absolute; inset: 0; border-radius: inherit; border: 2px solid #4f8cff; animation: hoverPing 1s ease-out infinite; z-index: 1; } @keyframes hoverPing { 0%{transform:scale(1); opacity:1;} 100%{transform:scale(1.45); opacity:0;} }`);
+
+    addEffect("Echo Hover", "Echo shadows appear behind.", "box", "hover-echo", `.hover-echo:hover { box-shadow: 8px 0 0 rgba(79,140,255,.25), 16px 0 0 rgba(141,107,255,.15), 0 20px 45px rgba(0,0,0,.35); }`);
+
+    addEffect("Ghost Hover", "Ghost copy appears behind.", "box", "hover-ghost", `.hover-ghost:hover::after { content: "Hover"; position: absolute; color: rgba(255,255,255,.25); transform: translate(12px,8px); z-index: 1; }`);
+
+    addEffect("Smoke Hover", "Element fades with blur like smoke.", "box", "hover-smoke", `.hover-smoke:hover { filter: blur(5px); opacity: .45; transform: translateY(-10px); }`);
+
+    addEffect("Liquid Hover", "Element bends like liquid.", "box", "hover-liquid", `.hover-liquid:hover { animation: hoverLiquid .9s ease-in-out infinite; } @keyframes hoverLiquid { 0%,100%{transform:skewX(0) scaleY(1);} 35%{transform:skewX(8deg) scaleY(1.1);} 70%{transform:skewX(-8deg) scaleY(.92);} }`);
+
+    addEffect("Live Hover", "Live red glow hover.", "box", "hover-live", `.hover-live:hover { background: rgba(255,95,87,.18); border-color: rgba(255,95,87,.45); box-shadow: 0 0 28px rgba(255,95,87,.7); }`);
+
+    addEffect("Verified Hover", "Verified tick appears.", "box", "hover-verified", `.hover-verified:hover::after { content: "✓"; position: absolute; right: 10px; top: 8px; width: 22px; height: 22px; border-radius: 50%; background: #4f8cff; display: grid; place-items: center; font-size: 13px; animation: hoverVerified .3s ease; z-index: 6; } @keyframes hoverVerified { from{transform:scale(.4); opacity:0;} to{transform:scale(1); opacity:1;} }`);
+
+    addEffect("Badge Hover", "Small badge appears on hover.", "box", "hover-badge", `.hover-badge:hover::after { content: "NEW"; position: absolute; right: -8px; top: -8px; padding: 4px 7px; border-radius: 999px; background: #ff5f57; font-size: 10px; font-weight: 950; z-index: 6; animation: hoverBadge .3s ease; } @keyframes hoverBadge { from{transform:scale(.4); opacity:0;} to{transform:scale(1); opacity:1;} }`);
+
+    addEffect("Premium Hover", "Gold premium style on hover.", "box", "hover-premium", `.hover-premium:hover { background: linear-gradient(90deg, rgba(255,189,46,.18), rgba(255,159,10,.32)); border-color: rgba(255,189,46,.55); color: #fff7df; box-shadow: 0 0 28px rgba(255,189,46,.6); }`);
+
+    addEffect("AI Glow Hover", "AI style glow on hover.", "box", "hover-ai-glow", `.hover-ai-glow:hover { color: #dbe8ff; text-shadow: 0 0 14px rgba(79,140,255,.7); box-shadow: 0 0 28px rgba(79,140,255,.65); }`);
+
+    addEffect("Cursor Follow Hover", "Fake cursor dot appears.", "box", "hover-cursor-follow", `.hover-cursor-follow:hover::after { content: ""; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #4f8cff; right: 18px; top: 18px; box-shadow: 0 0 18px rgba(79,140,255,.8); animation: hoverCursorDot .8s ease-in-out infinite; z-index: 6; } @keyframes hoverCursorDot { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-8px,8px);} }`);
+
+    addEffect("Particle Hover", "Small particles appear on hover.", "box", "hover-particle", `.hover-particle:hover::before, .hover-particle:hover::after { content: "✦"; position: absolute; color: white; font-size: 12px; opacity: 0; animation: hoverParticle 1s ease-in-out infinite; z-index: 6; } .hover-particle:hover::before { left: 12px; top: 8px; } .hover-particle:hover::after { right: 12px; bottom: 8px; animation-delay: .3s; } @keyframes hoverParticle { 0%,100%{opacity:0; transform:scale(.4) rotate(0);} 50%{opacity:1; transform:scale(1.2) rotate(90deg);} }`);
+
+    addEffect("Fire Hover", "Warm fire hover style.", "box", "hover-fire", `.hover-fire:hover { background: linear-gradient(90deg, rgba(255,95,87,.28), rgba(255,159,10,.4), rgba(255,95,87,.28)); background-size: 220%; border-color: rgba(255,159,10,.5); animation: hoverFire 1.2s ease-in-out infinite; } @keyframes hoverFire { 0%,100%{background-position:0% center; transform:scale(1);} 50%{background-position:100% center; transform:scale(1.06);} }`);
+
+    addEffect("Ice Hover", "Cool frozen hover style.", "box", "hover-ice", `.hover-ice:hover { color: #dff6ff; background: rgba(135,247,255,.12); border-color: rgba(135,247,255,.35); text-shadow: 0 0 12px rgba(135,247,255,.8); box-shadow: 0 0 24px rgba(135,247,255,.4); }`);
+
+    addEffect("Matrix Hover", "Green hacker hover effect.", "box", "hover-matrix", `.hover-matrix:hover { color: #35c759; border-color: rgba(53,199,89,.45); text-shadow: 0 0 14px rgba(53,199,89,.7); animation: hoverMatrix .8s steps(2) infinite; } @keyframes hoverMatrix { 0%,100%{opacity:1;} 50%{opacity:.5; transform:translateY(2px);} }`);
+
+    addEffect("Cyber Hover", "Cyberpunk glitch hover.", "box", "hover-cyber", `.hover-cyber:hover { text-shadow: 2px 0 #ff5f57, -2px 0 #4f8cff; animation: hoverCyber .7s steps(2) infinite; } @keyframes hoverCyber { 0%,100%{transform:translate(0);} 30%{transform:translate(-2px,1px);} 60%{transform:translate(2px,-1px);} }`);
+
+    addEffect("Outline Hover", "Element becomes outline style.", "box", "hover-outline", `.hover-outline:hover { background: transparent; border-color: rgba(255,255,255,.65); box-shadow: inset 0 0 0 2px rgba(255,255,255,.15); }`);
+
+    addEffect("Stroke Fill Hover", "Outline fills with color.", "box", "hover-stroke-fill", `.hover-stroke-fill { background: transparent; border-color: rgba(79,140,255,.55); } .hover-stroke-fill:hover { background: rgba(79,140,255,.35); }`);
+
+    addEffect("Minimal Hover", "Very minimal background hover.", "box", "hover-minimal", `.hover-minimal { background: transparent; border-color: transparent; box-shadow: none; } .hover-minimal:hover { background: rgba(255,255,255,.1); transform: translateY(-3px); }`);
+
+    addEffect("Apple Smooth Hover", "Soft Apple-like hover movement.", "box", "hover-apple-smooth", `.hover-apple-smooth:hover { transform: translateY(-7px) scale(1.035); box-shadow: 0 24px 50px rgba(0,0,0,.38); }`);
+
+    addEffect("Cinematic Hover", "Cinematic scale and blur hover.", "box", "hover-cinematic", `.hover-cinematic:hover { transform: scale(1.08); filter: contrast(1.12) brightness(1.15); box-shadow: 0 32px 80px rgba(0,0,0,.48); }`);
+
+    addEffect("Final Premium Hover", "Premium gradient, shine, and glow hover.", "box", "hover-final-premium", `.hover-final-premium:hover { background: linear-gradient(90deg, #4f8cff, #8d6bff, #4f8cff); background-size: 240%; border-color: transparent; box-shadow: 0 0 30px rgba(79,140,255,.65); animation: hoverFinalGradient 1.4s ease-in-out infinite; } .hover-final-premium:hover::after { content: ""; position: absolute; top: -60%; left: -45%; width: 32%; height: 220%; background: rgba(255,255,255,.55); transform: rotate(25deg); animation: hoverFinalShine 1.3s linear infinite; z-index: 4; } @keyframes hoverFinalGradient { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} } @keyframes hoverFinalShine { to { left: 130%; } }`);
 
     const grid = document.getElementById("grid");
     const searchInput = document.getElementById("searchInput");
     const countPill = document.getElementById("countPill");
     const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
+
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = effects.map(effect => effect.css).join("\n\n");
 
     function copyIcon() {
       return `
@@ -1154,10 +766,12 @@
       `;
     }
 
-    function renderCards(list) {
+    function renderCards() {
       grid.innerHTML = "";
 
-      list.forEach(effect => {
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
         const card = document.createElement("div");
         card.className = "card";
         card.dataset.search = `${effect.name} ${effect.about} ${effect.className} ${effect.type}`.toLowerCase();
@@ -1184,78 +798,23 @@
         });
       });
 
-      countPill.textContent = list.length + " Effects";
-      emptyState.style.display = list.length ? "none" : "block";
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
+
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
     }
 
-    effects.forEach((effect, index) => {
-      effect.id = String(index);
-    });
-
     function baseCSSFor(type) {
-      if (type === "link") {
-        return `.hover-demo-link {
-  position: relative;
-  display: inline-block;
-  color: white;
-  font-size: 22px;
-  font-weight: 950;
-  letter-spacing: -0.04em;
-  transition: 240ms ease;
-  padding: 8px 4px;
-}`;
-      }
-
-      if (type === "image") {
-        return `.hover-demo-image {
-  width: 122px;
-  height: 82px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(79,140,255,.95), rgba(141,107,255,.95));
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: 14px;
-  font-weight: 900;
-  overflow: hidden;
-  transition: 260ms ease;
-  position: relative;
-}`;
-      }
-
-      if (type === "card") {
-        return `.hover-demo-card {
-  width: 122px;
-  height: 82px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.07));
-  border: 1px solid rgba(255,255,255,0.16);
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: 14px;
-  font-weight: 900;
-  transition: 260ms ease;
-  position: relative;
-  overflow: hidden;
-}`;
-      }
-
-      return `.hover-demo-box {
-  width: 115px;
-  height: 76px;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.12);
-  border: 1px solid rgba(255,255,255,0.16);
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: 14px;
-  font-weight: 900;
-  transition: 260ms ease;
-  position: relative;
-  overflow: hidden;
-}`;
+      if (type === "link") return baseLinkCSS;
+      if (type === "image") return baseImageCSS;
+      return baseBoxCSS;
     }
 
     function copyCode(id) {
@@ -1324,10 +883,10 @@ ${effect.css}
       }, 1500);
     }
 
-    searchInput.addEventListener("input", () => {
+    function applySearch() {
       const value = searchInput.value.trim().toLowerCase();
 
-      const filtered = effects.filter(effect => {
+      filteredEffects = effects.filter(effect => {
         return (
           effect.name.toLowerCase().includes(value) ||
           effect.about.toLowerCase().includes(value) ||
@@ -1336,10 +895,31 @@ ${effect.css}
         );
       });
 
-      renderCards(filtered);
-    });
+      visibleCount = batchSize;
+      renderCards();
+    }
 
-    renderCards(effects);
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
   </script>
 </body>
 </html>
