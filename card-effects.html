@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Card Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 680px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-bottom: 70px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      perspective: 900px;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Demo Card Base */
+    .demo-card {
+      position: relative;
+      width: 132px;
+      height: 90px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+      border: 1px solid rgba(255,255,255,.16);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 14px;
+      font-weight: 900;
+      overflow: hidden;
+      transition: 260ms ease;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+    }
+
+    .demo-card span {
+      position: relative;
+      z-index: 3;
+    }
+
+    /* Card Effects */
+    .card-lift:hover {
+      transform: translateY(-14px);
+      box-shadow: 0 30px 65px rgba(0,0,0,.48);
+    }
+
+    .card-scale:hover {
+      transform: scale(1.12);
+      background: linear-gradient(180deg, rgba(79,140,255,.45), rgba(255,255,255,.08));
+    }
+
+    .card-glow:hover {
+      border-color: rgba(79,140,255,.9);
+      box-shadow: 0 0 36px rgba(79,140,255,.62);
+    }
+
+    .card-border-glow:hover {
+      border-color: rgba(79,140,255,1);
+      box-shadow: inset 0 0 0 1px rgba(79,140,255,.55), 0 0 28px rgba(79,140,255,.52);
+    }
+
+    .card-tilt:hover {
+      transform: perspective(600px) rotateX(12deg) rotateY(-16deg);
+    }
+
+    .card-rotate:hover {
+      transform: rotate(-5deg) scale(1.06);
+    }
+
+    .card-flip {
+      transform-style: preserve-3d;
+    }
+    .card-flip:hover {
+      transform: rotateY(180deg);
+    }
+
+    .card-shine::after {
+      content: "";
+      position: absolute;
+      top: -60%;
+      left: -45%;
+      width: 36%;
+      height: 220%;
+      background: rgba(255,255,255,.55);
+      transform: rotate(25deg);
+      transition: .35s ease;
+      z-index: 2;
+    }
+    .card-shine:hover::after {
+      left: 130%;
+    }
+
+    .card-overlay::after {
+      content: "Open";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(0,0,0,.60);
+      transform: translateY(100%);
+      transition: .28s ease;
+      z-index: 4;
+    }
+    .card-overlay:hover::after {
+      transform: translateY(0);
+    }
+
+    .card-content-reveal::after {
+      content: "Details";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      padding: 7px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.16);
+      transform: translateY(140%);
+      transition: .28s ease;
+      z-index: 5;
+      font-size: 12px;
+    }
+    .card-content-reveal:hover::after {
+      transform: translateY(0);
+    }
+
+    .card-gradient-border::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--purple), var(--blue));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: .25s ease;
+      z-index: 4;
+    }
+    .card-gradient-border:hover::before {
+      opacity: 1;
+    }
+
+    .card-glass:hover {
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(18px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 24px 46px rgba(0,0,0,.38);
+    }
+
+    .card-blur:hover {
+      filter: blur(2px);
+      transform: scale(1.05);
+    }
+
+    .card-skew:hover {
+      transform: skewX(-8deg) scale(1.06);
+      background: rgba(79,140,255,.52);
+    }
+
+    .card-shadow-expand:hover {
+      box-shadow: 0 18px 0 rgba(255,255,255,.07), 0 35px 70px rgba(0,0,0,.48);
+      transform: translateY(-7px);
+    }
+
+    .card-breathe {
+      animation: cardBreathe 2.2s ease-in-out infinite;
+    }
+    @keyframes cardBreathe {
+      0%, 100% { transform: scale(1); box-shadow: 0 14px 34px rgba(0,0,0,.28); }
+      50% { transform: scale(1.06); box-shadow: 0 0 28px rgba(79,140,255,.42); }
+    }
+
+    .card-float {
+      animation: cardFloat 2.5s ease-in-out infinite;
+    }
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .card-pulse-border {
+      animation: pulseBorder 1.6s ease-in-out infinite;
+    }
+    @keyframes pulseBorder {
+      0%, 100% { border-color: rgba(255,255,255,.16); box-shadow: 0 0 0 rgba(79,140,255,0); }
+      50% { border-color: rgba(79,140,255,.95); box-shadow: 0 0 28px rgba(79,140,255,.48); }
+    }
+
+    .card-ripple::after {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(79,140,255,.55);
+      transform: scale(0);
+      opacity: 1;
+      transition: .45s ease;
+      z-index: 1;
+    }
+    .card-ripple:hover::after {
+      transform: scale(9);
+      opacity: 0;
+    }
+
+    .card-spotlight::before {
+      content: "";
+      position: absolute;
+      inset: -45%;
+      background: radial-gradient(circle, rgba(255,255,255,.34), transparent 36%);
+      transform: translate(-45%, -45%);
+      transition: .35s ease;
+      z-index: 1;
+    }
+    .card-spotlight:hover::before {
+      transform: translate(28%, 22%);
+    }
+
+    .card-diagonal-fill::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      transform: translate(-100%, 100%);
+      transition: .35s ease;
+      z-index: 1;
+    }
+    .card-diagonal-fill:hover::before {
+      transform: translate(0,0);
+    }
+
+    .card-corner-peel::after {
+      content: "";
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 0;
+      height: 0;
+      border-top: 34px solid rgba(255,255,255,.35);
+      border-left: 34px solid transparent;
+      transform: translate(34px, -34px);
+      transition: .28s ease;
+      z-index: 3;
+    }
+    .card-corner-peel:hover::after {
+      transform: translate(0, 0);
+    }
+
+    .card-morph:hover {
+      border-radius: 38px 16px 38px 16px;
+      background: linear-gradient(135deg, rgba(79,140,255,.55), rgba(141,107,255,.34));
+    }
+
+    .card-stack {
+      box-shadow:
+        8px 8px 0 rgba(255,255,255,.06),
+        16px 16px 0 rgba(255,255,255,.03),
+        0 14px 34px rgba(0,0,0,.28);
+    }
+    .card-stack:hover {
+      transform: translate(-6px, -6px);
+      box-shadow:
+        14px 14px 0 rgba(79,140,255,.16),
+        28px 28px 0 rgba(79,140,255,.07),
+        0 28px 70px rgba(0,0,0,.42);
+    }
+
+    .card-slide-text span {
+      transition: .28s ease;
+    }
+    .card-slide-text:hover span {
+      transform: translateY(-18px);
+      opacity: 0;
+    }
+    .card-slide-text::after {
+      content: "New";
+      position: absolute;
+      transform: translateY(18px);
+      opacity: 0;
+      transition: .28s ease;
+      z-index: 3;
+    }
+    .card-slide-text:hover::after {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .card-image-zoom::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(79,140,255,.9), rgba(141,107,255,.85));
+      transform: scale(1);
+      transition: .3s ease;
+      z-index: 1;
+    }
+    .card-image-zoom:hover::before {
+      transform: scale(1.18);
+    }
+
+    .card-gradient-shift {
+      background: linear-gradient(90deg, rgba(79,140,255,.42), rgba(141,107,255,.28), rgba(79,140,255,.42));
+      background-size: 240%;
+      animation: gradientShift 2.8s ease-in-out infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% center; }
+      50% { background-position: 100% center; }
+    }
+
+    .card-check:hover::after {
+      content: "✓";
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(53,199,89,.9);
+      color: #fff;
+      z-index: 5;
+      animation: checkPop .28s ease;
+    }
+    @keyframes checkPop {
+      from { transform: scale(.4); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .card-danger:hover {
+      border-color: rgba(255,95,87,.7);
+      background: rgba(255,95,87,.16);
+      animation: cardDangerShake .45s ease-in-out infinite;
+    }
+    @keyframes cardDangerShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu">
+        <a href="text-animation.html">Text</a>
+        <a href="button-animation.html">Button</a>
+        <a href="hover-effects.html">Hover</a>
+        <a class="active" href="card-effects.html">Card</a>
+        <a href="ui-motion.html">UI Motion</a>
+        <a href="loader-effects.html">Loader</a>
+        <a href="input-focus-effects.html">Input</a>
+        <a href="cursor-effects.html">Cursor</a>
+        <a href="background-effects.html">Background</a>
+      </nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Card Effects</h1>
+          <p>Live card hover and motion effects for product cards, video cards, dashboard cards, and premium UI boxes.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “lift”, “glow”, “tilt”, “glass”, or “overlay”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+    </main>
+  </div>
+
+  <script>
+    const effects = [
+      {
+        name: "Card Lift",
+        about: "Card lifts upward with stronger shadow on hover.",
+        className: "card-lift",
+        html: '<div class="demo-card card-lift"><span>Card</span></div>',
+        css: `.card-lift {
+  transition: 260ms ease;
+}
+.card-lift:hover {
+  transform: translateY(-14px);
+  box-shadow: 0 30px 65px rgba(0,0,0,.48);
+}`
+      },
+      {
+        name: "Card Scale",
+        about: "Card scales up smoothly on hover.",
+        className: "card-scale",
+        html: '<div class="demo-card card-scale"><span>Card</span></div>',
+        css: `.card-scale {
+  transition: 260ms ease;
+}
+.card-scale:hover {
+  transform: scale(1.12);
+  background: linear-gradient(180deg, rgba(79,140,255,.45), rgba(255,255,255,.08));
+}`
+      },
+      {
+        name: "Card Glow",
+        about: "Blue glow appears around the card.",
+        className: "card-glow",
+        html: '<div class="demo-card card-glow"><span>Card</span></div>',
+        css: `.card-glow {
+  transition: 260ms ease;
+}
+.card-glow:hover {
+  border-color: rgba(79,140,255,.9);
+  box-shadow: 0 0 36px rgba(79,140,255,.62);
+}`
+      },
+      {
+        name: "Border Glow Card",
+        about: "Inner and outer glow highlights the card border.",
+        className: "card-border-glow",
+        html: '<div class="demo-card card-border-glow"><span>Card</span></div>',
+        css: `.card-border-glow {
+  transition: 260ms ease;
+}
+.card-border-glow:hover {
+  border-color: rgba(79,140,255,1);
+  box-shadow: inset 0 0 0 1px rgba(79,140,255,.55), 0 0 28px rgba(79,140,255,.52);
+}`
+      },
+      {
+        name: "3D Tilt Card",
+        about: "Card tilts in 3D perspective on hover.",
+        className: "card-tilt",
+        html: '<div class="demo-card card-tilt"><span>Card</span></div>',
+        css: `.card-tilt {
+  transition: 260ms ease;
+}
+.card-tilt:hover {
+  transform: perspective(600px) rotateX(12deg) rotateY(-16deg);
+}`
+      },
+      {
+        name: "Rotate Card",
+        about: "Card rotates and scales slightly on hover.",
+        className: "card-rotate",
+        html: '<div class="demo-card card-rotate"><span>Card</span></div>',
+        css: `.card-rotate {
+  transition: 260ms ease;
+}
+.card-rotate:hover {
+  transform: rotate(-5deg) scale(1.06);
+}`
+      },
+      {
+        name: "Flip Card",
+        about: "Card flips in 3D on hover.",
+        className: "card-flip",
+        html: '<div class="demo-card card-flip"><span>Card</span></div>',
+        css: `.card-flip {
+  transition: 260ms ease;
+  transform-style: preserve-3d;
+}
+.card-flip:hover {
+  transform: rotateY(180deg);
+}`
+      },
+      {
+        name: "Shine Card",
+        about: "A premium shine sweep passes across the card.",
+        className: "card-shine",
+        html: '<div class="demo-card card-shine"><span>Card</span></div>',
+        css: `.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+.card-shine::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -45%;
+  width: 36%;
+  height: 220%;
+  background: rgba(255,255,255,.55);
+  transform: rotate(25deg);
+  transition: .35s ease;
+  z-index: 2;
+}
+.card-shine:hover::after {
+  left: 130%;
+}`
+      },
+      {
+        name: "Overlay Reveal Card",
+        about: "Dark overlay slides up over the card.",
+        className: "card-overlay",
+        html: '<div class="demo-card card-overlay"><span>Card</span></div>',
+        css: `.card-overlay {
+  position: relative;
+  overflow: hidden;
+}
+.card-overlay::after {
+  content: "Open";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0,0,0,.60);
+  transform: translateY(100%);
+  transition: .28s ease;
+  z-index: 4;
+}
+.card-overlay:hover::after {
+  transform: translateY(0);
+}`
+      },
+      {
+        name: "Content Reveal Card",
+        about: "Extra content slides up from card bottom.",
+        className: "card-content-reveal",
+        html: '<div class="demo-card card-content-reveal"><span>Card</span></div>',
+        css: `.card-content-reveal {
+  position: relative;
+  overflow: hidden;
+}
+.card-content-reveal::after {
+  content: "Details";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  padding: 7px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.16);
+  transform: translateY(140%);
+  transition: .28s ease;
+  z-index: 5;
+  font-size: 12px;
+}
+.card-content-reveal:hover::after {
+  transform: translateY(0);
+}`
+      },
+      {
+        name: "Gradient Border Card",
+        about: "Gradient border appears around the card.",
+        className: "card-gradient-border",
+        html: '<div class="demo-card card-gradient-border"><span>Card</span></div>',
+        css: `.card-gradient-border {
+  position: relative;
+}
+.card-gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(90deg, #4f8cff, #8d6bff, #4f8cff);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: .25s ease;
+}
+.card-gradient-border:hover::before {
+  opacity: 1;
+}`
+      },
+      {
+        name: "Glass Card",
+        about: "Card turns into frosted glass on hover.",
+        className: "card-glass",
+        html: '<div class="demo-card card-glass"><span>Card</span></div>',
+        css: `.card-glass {
+  transition: 260ms ease;
+}
+.card-glass:hover {
+  background: rgba(255,255,255,.18);
+  backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 24px 46px rgba(0,0,0,.38);
+}`
+      },
+      {
+        name: "Blur Card",
+        about: "Card gets blurred on hover.",
+        className: "card-blur",
+        html: '<div class="demo-card card-blur"><span>Card</span></div>',
+        css: `.card-blur {
+  transition: 260ms ease;
+}
+.card-blur:hover {
+  filter: blur(2px);
+  transform: scale(1.05);
+}`
+      },
+      {
+        name: "Skew Card",
+        about: "Card skews and scales on hover.",
+        className: "card-skew",
+        html: '<div class="demo-card card-skew"><span>Card</span></div>',
+        css: `.card-skew {
+  transition: 260ms ease;
+}
+.card-skew:hover {
+  transform: skewX(-8deg) scale(1.06);
+  background: rgba(79,140,255,.52);
+}`
+      },
+      {
+        name: "Shadow Expand Card",
+        about: "Card shadow expands with layered depth.",
+        className: "card-shadow-expand",
+        html: '<div class="demo-card card-shadow-expand"><span>Card</span></div>',
+        css: `.card-shadow-expand {
+  transition: 260ms ease;
+}
+.card-shadow-expand:hover {
+  box-shadow: 0 18px 0 rgba(255,255,255,.07), 0 35px 70px rgba(0,0,0,.48);
+  transform: translateY(-7px);
+}`
+      },
+      {
+        name: "Breathing Card",
+        about: "Card continuously breathes with subtle glow.",
+        className: "card-breathe",
+        html: '<div class="demo-card card-breathe"><span>Card</span></div>',
+        css: `.card-breathe {
+  animation: cardBreathe 2.2s ease-in-out infinite;
+}
+@keyframes cardBreathe {
+  0%, 100% { transform: scale(1); box-shadow: 0 14px 34px rgba(0,0,0,.28); }
+  50% { transform: scale(1.06); box-shadow: 0 0 28px rgba(79,140,255,.42); }
+}`
+      },
+      {
+        name: "Floating Card",
+        about: "Card floats up and down smoothly.",
+        className: "card-float",
+        html: '<div class="demo-card card-float"><span>Card</span></div>',
+        css: `.card-float {
+  animation: cardFloat 2.5s ease-in-out infinite;
+}
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}`
+      },
+      {
+        name: "Pulse Border Card",
+        about: "Card border pulses with blue glow.",
+        className: "card-pulse-border",
+        html: '<div class="demo-card card-pulse-border"><span>Card</span></div>',
+        css: `.card-pulse-border {
+  animation: pulseBorder 1.6s ease-in-out infinite;
+}
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(255,255,255,.16); box-shadow: 0 0 0 rgba(79,140,255,0); }
+  50% { border-color: rgba(79,140,255,.95); box-shadow: 0 0 28px rgba(79,140,255,.48); }
+}`
+      },
+      {
+        name: "Ripple Card",
+        about: "Ripple expands from the card center.",
+        className: "card-ripple",
+        html: '<div class="demo-card card-ripple"><span>Card</span></div>',
+        css: `.card-ripple {
+  position: relative;
+  overflow: hidden;
+}
+.card-ripple::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(79,140,255,.55);
+  transform: scale(0);
+  opacity: 1;
+  transition: .45s ease;
+}
+.card-ripple:hover::after {
+  transform: scale(9);
+  opacity: 0;
+}`
+      },
+      {
+        name: "Spotlight Card",
+        about: "Light spotlight moves across the card.",
+        className: "card-spotlight",
+        html: '<div class="demo-card card-spotlight"><span>Card</span></div>',
+        css: `.card-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.card-spotlight::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: radial-gradient(circle, rgba(255,255,255,.34), transparent 36%);
+  transform: translate(-45%, -45%);
+  transition: .35s ease;
+}
+.card-spotlight:hover::before {
+  transform: translate(28%, 22%);
+}`
+      },
+      {
+        name: "Diagonal Fill Card",
+        about: "Gradient fills the card diagonally on hover.",
+        className: "card-diagonal-fill",
+        html: '<div class="demo-card card-diagonal-fill"><span>Card</span></div>',
+        css: `.card-diagonal-fill {
+  position: relative;
+  overflow: hidden;
+}
+.card-diagonal-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #4f8cff, #8d6bff);
+  transform: translate(-100%, 100%);
+  transition: .35s ease;
+}
+.card-diagonal-fill:hover::before {
+  transform: translate(0,0);
+}`
+      },
+      {
+        name: "Corner Peel Card",
+        about: "Top corner peel appears on hover.",
+        className: "card-corner-peel",
+        html: '<div class="demo-card card-corner-peel"><span>Card</span></div>',
+        css: `.card-corner-peel {
+  position: relative;
+  overflow: hidden;
+}
+.card-corner-peel::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 34px solid rgba(255,255,255,.35);
+  border-left: 34px solid transparent;
+  transform: translate(34px, -34px);
+  transition: .28s ease;
+}
+.card-corner-peel:hover::after {
+  transform: translate(0, 0);
+}`
+      },
+      {
+        name: "Morph Card",
+        about: "Card shape morphs with rounded asymmetry.",
+        className: "card-morph",
+        html: '<div class="demo-card card-morph"><span>Card</span></div>',
+        css: `.card-morph {
+  transition: 260ms ease;
+}
+.card-morph:hover {
+  border-radius: 38px 16px 38px 16px;
+  background: linear-gradient(135deg, rgba(79,140,255,.55), rgba(141,107,255,.34));
+}`
+      },
+      {
+        name: "Stack Card",
+        about: "Layered stack depth moves on hover.",
+        className: "card-stack",
+        html: '<div class="demo-card card-stack"><span>Card</span></div>',
+        css: `.card-stack {
+  transition: 260ms ease;
+  box-shadow:
+    8px 8px 0 rgba(255,255,255,.06),
+    16px 16px 0 rgba(255,255,255,.03),
+    0 14px 34px rgba(0,0,0,.28);
+}
+.card-stack:hover {
+  transform: translate(-6px, -6px);
+  box-shadow:
+    14px 14px 0 rgba(79,140,255,.16),
+    28px 28px 0 rgba(79,140,255,.07),
+    0 28px 70px rgba(0,0,0,.42);
+}`
+      },
+      {
+        name: "Slide Text Card",
+        about: "Text slides out and new text appears.",
+        className: "card-slide-text",
+        html: '<div class="demo-card card-slide-text"><span>Card</span></div>',
+        css: `.card-slide-text {
+  position: relative;
+  overflow: hidden;
+}
+.card-slide-text span {
+  transition: .28s ease;
+}
+.card-slide-text:hover span {
+  transform: translateY(-18px);
+  opacity: 0;
+}
+.card-slide-text::after {
+  content: "New";
+  position: absolute;
+  transform: translateY(18px);
+  opacity: 0;
+  transition: .28s ease;
+}
+.card-slide-text:hover::after {
+  transform: translateY(0);
+  opacity: 1;
+}`
+      },
+      {
+        name: "Image Zoom Card",
+        about: "Card background zooms like an image hover.",
+        className: "card-image-zoom",
+        html: '<div class="demo-card card-image-zoom"><span>Card</span></div>',
+        css: `.card-image-zoom {
+  position: relative;
+  overflow: hidden;
+}
+.card-image-zoom::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(79,140,255,.9), rgba(141,107,255,.85));
+  transform: scale(1);
+  transition: .3s ease;
+}
+.card-image-zoom:hover::before {
+  transform: scale(1.18);
+}
+.card-image-zoom span {
+  position: relative;
+  z-index: 2;
+}`
+      },
+      {
+        name: "Gradient Shift Card",
+        about: "Animated gradient keeps moving on the card.",
+        className: "card-gradient-shift",
+        html: '<div class="demo-card card-gradient-shift"><span>Card</span></div>',
+        css: `.card-gradient-shift {
+  background: linear-gradient(90deg, rgba(79,140,255,.42), rgba(141,107,255,.28), rgba(79,140,255,.42));
+  background-size: 240%;
+  animation: gradientShift 2.8s ease-in-out infinite;
+}
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 100% center; }
+}`
+      },
+      {
+        name: "Check Card",
+        about: "Check badge pops in on hover.",
+        className: "card-check",
+        html: '<div class="demo-card card-check"><span>Card</span></div>',
+        css: `.card-check {
+  position: relative;
+}
+.card-check:hover::after {
+  content: "✓";
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(53,199,89,.9);
+  color: #fff;
+  animation: checkPop .28s ease;
+}
+@keyframes checkPop {
+  from { transform: scale(.4); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}`
+      },
+      {
+        name: "Danger Shake Card",
+        about: "Card shakes with red warning style.",
+        className: "card-danger",
+        html: '<div class="demo-card card-danger"><span>Card</span></div>',
+        css: `.card-danger {
+  transition: 260ms ease;
+}
+.card-danger:hover {
+  border-color: rgba(255,95,87,.7);
+  background: rgba(255,95,87,.16);
+  animation: cardDangerShake .45s ease-in-out infinite;
+}
+@keyframes cardDangerShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}`
+      }
+    ];
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+
+    effects.forEach((effect, index) => {
+      effect.id = String(index);
+    });
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards(list) {
+      grid.innerHTML = "";
+
+      list.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      countPill.textContent = list.length + " Effects";
+      emptyState.style.display = list.length ? "none" : "block";
+    }
+
+    function baseCSS() {
+      return `.demo-card {
+  position: relative;
+  width: 132px;
+  height: 90px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+  border: 1px solid rgba(255,255,255,.16);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 14px;
+  font-weight: 900;
+  overflow: hidden;
+  transition: 260ms ease;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+.demo-card span {
+  position: relative;
+  z-index: 3;
+}`;
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseCSS()}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.trim().toLowerCase();
+
+      const filtered = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value)
+        );
+      });
+
+      renderCards(filtered);
+    });
+
+    renderCards(effects);
+  </script>
+</body>
+</html>
