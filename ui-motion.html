@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UI Motion Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 680px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding-bottom: 70px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Demo Base */
+    .ui-demo {
+      position: relative;
+      width: 128px;
+      height: 82px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+      border: 1px solid rgba(255,255,255,.16);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 900;
+      overflow: hidden;
+      transition: 260ms ease;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+    }
+
+    .ui-demo span {
+      position: relative;
+      z-index: 5;
+    }
+
+    /* UI Motion Effects */
+    .modal-fade {
+      animation: modalFade 2.1s ease-in-out infinite;
+    }
+    @keyframes modalFade {
+      0% { opacity: 0; transform: scale(.96); }
+      45%, 75% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(.96); }
+    }
+
+    .modal-scale {
+      animation: modalScale 2s cubic-bezier(.2,.8,.2,1) infinite;
+    }
+    @keyframes modalScale {
+      0% { opacity: 0; transform: scale(.65); }
+      45%, 75% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(.85); }
+    }
+
+    .modal-slide-up {
+      animation: modalSlideUp 2.1s ease-in-out infinite;
+    }
+    @keyframes modalSlideUp {
+      0% { opacity: 0; transform: translateY(42px); }
+      45%, 75% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(22px); }
+    }
+
+    .modal-slide-down {
+      animation: modalSlideDown 2.1s ease-in-out infinite;
+    }
+    @keyframes modalSlideDown {
+      0% { opacity: 0; transform: translateY(-42px); }
+      45%, 75% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-22px); }
+    }
+
+    .toast-slide {
+      width: 132px;
+      height: 48px;
+      border-radius: 16px;
+      animation: toastSlide 2.2s ease-in-out infinite;
+    }
+    @keyframes toastSlide {
+      0% { opacity: 0; transform: translateX(60px); }
+      35%, 75% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(60px); }
+    }
+
+    .drawer-left {
+      width: 46px;
+      height: 90px;
+      justify-self: start;
+      margin-left: 12px;
+      animation: drawerLeft 2.2s ease-in-out infinite;
+    }
+    @keyframes drawerLeft {
+      0% { opacity: 0; transform: translateX(-60px); }
+      45%, 75% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(-60px); }
+    }
+
+    .drawer-right {
+      width: 46px;
+      height: 90px;
+      justify-self: end;
+      margin-right: 12px;
+      animation: drawerRight 2.2s ease-in-out infinite;
+    }
+    @keyframes drawerRight {
+      0% { opacity: 0; transform: translateX(60px); }
+      45%, 75% { opacity: 1; transform: translateX(0); }
+      100% { opacity: 0; transform: translateX(60px); }
+    }
+
+    .bottom-sheet {
+      width: 132px;
+      height: 52px;
+      align-self: end;
+      animation: bottomSheet 2.2s ease-in-out infinite;
+    }
+    @keyframes bottomSheet {
+      0% { opacity: 0; transform: translateY(70px); }
+      45%, 75% { opacity: 1; transform: translateY(18px); }
+      100% { opacity: 0; transform: translateY(70px); }
+    }
+
+    .dropdown-motion {
+      height: 34px;
+      animation: dropdownMotion 2s ease-in-out infinite;
+      transform-origin: top;
+    }
+    @keyframes dropdownMotion {
+      0% { opacity: 0; transform: scaleY(.25); }
+      40%, 75% { opacity: 1; transform: scaleY(1); }
+      100% { opacity: 0; transform: scaleY(.25); }
+    }
+
+    .accordion-expand {
+      animation: accordionExpand 2.1s ease-in-out infinite;
+      transform-origin: top;
+    }
+    @keyframes accordionExpand {
+      0% { height: 28px; }
+      45%, 75% { height: 82px; }
+      100% { height: 28px; }
+    }
+
+    .tab-indicator {
+      width: 136px;
+      height: 48px;
+      display: block;
+      padding: 6px;
+    }
+    .tab-indicator::before {
+      content: "";
+      display: block;
+      width: 38px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--blue);
+      animation: tabMove 1.7s ease-in-out infinite;
+    }
+    @keyframes tabMove {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(78px); }
+    }
+
+    .hamburger-morph {
+      width: 68px;
+      height: 56px;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+    .hamburger-morph::before,
+    .hamburger-morph::after,
+    .hamburger-morph span {
+      content: "";
+      position: absolute;
+      left: 12px;
+      width: 44px;
+      height: 4px;
+      border-radius: 999px;
+      background: white;
+      transition: .3s ease;
+    }
+    .hamburger-morph::before {
+      top: 16px;
+      animation: hamTop 1.8s ease-in-out infinite;
+    }
+    .hamburger-morph span {
+      top: 26px;
+      animation: hamMid 1.8s ease-in-out infinite;
+    }
+    .hamburger-morph::after {
+      top: 36px;
+      animation: hamBot 1.8s ease-in-out infinite;
+    }
+    @keyframes hamTop {
+      0%, 100% { transform: rotate(0) translate(0,0); }
+      50% { transform: rotate(45deg) translate(7px,7px); }
+    }
+    @keyframes hamMid {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes hamBot {
+      0%, 100% { transform: rotate(0) translate(0,0); }
+      50% { transform: rotate(-45deg) translate(7px,-7px); }
+    }
+
+    .switch-motion {
+      width: 86px;
+      height: 44px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.12);
+      display: block;
+      padding: 5px;
+    }
+    .switch-motion::before {
+      content: "";
+      display: block;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: white;
+      animation: switchMove 1.8s ease-in-out infinite;
+    }
+    @keyframes switchMove {
+      0%, 100% { transform: translateX(0); background: white; }
+      50% { transform: translateX(42px); background: var(--green); }
+    }
+
+    .checkbox-motion {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      background: transparent;
+      animation: checkboxBox 1.8s ease-in-out infinite;
+    }
+    .checkbox-motion::after {
+      content: "✓";
+      font-size: 30px;
+      color: white;
+      opacity: 0;
+      animation: checkboxTick 1.8s ease-in-out infinite;
+    }
+    @keyframes checkboxBox {
+      0%, 100% { border-color: rgba(255,255,255,.25); background: transparent; }
+      50% { border-color: rgba(53,199,89,.9); background: rgba(53,199,89,.8); }
+    }
+    @keyframes checkboxTick {
+      0%, 30%, 100% { opacity: 0; transform: scale(.4); }
+      50%, 75% { opacity: 1; transform: scale(1); }
+    }
+
+    .radio-motion {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: transparent;
+      animation: radioRing 1.8s ease-in-out infinite;
+    }
+    .radio-motion::after {
+      content: "";
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--blue);
+      transform: scale(0);
+      animation: radioDot 1.8s ease-in-out infinite;
+    }
+    @keyframes radioRing {
+      0%, 100% { border-color: rgba(255,255,255,.25); }
+      50% { border-color: rgba(79,140,255,.9); }
+    }
+    @keyframes radioDot {
+      0%, 30%, 100% { transform: scale(0); }
+      50%, 75% { transform: scale(1); }
+    }
+
+    .copy-success {
+      width: 112px;
+      height: 48px;
+      border-radius: 16px;
+      animation: copyPop 1.8s ease-in-out infinite;
+    }
+    .copy-success::after {
+      content: "Copied";
+    }
+    @keyframes copyPop {
+      0%, 100% { opacity: 0; transform: translateY(20px) scale(.9); }
+      40%, 75% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .counter-motion::after {
+      content: "0";
+      font-size: 26px;
+      font-weight: 950;
+      animation: counterChange 2s steps(5) infinite;
+    }
+    @keyframes counterChange {
+      0% { content: "0"; }
+      20% { content: "12"; }
+      40% { content: "48"; }
+      60% { content: "89"; }
+      80%, 100% { content: "100"; }
+    }
+
+    .progress-ring {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background:
+        conic-gradient(var(--blue) 0deg, var(--blue) 260deg, rgba(255,255,255,.15) 260deg);
+      animation: ringSpin 1.8s ease-in-out infinite;
+    }
+    .progress-ring::after {
+      content: "";
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #101010;
+      position: absolute;
+    }
+    @keyframes ringSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .stepper-motion {
+      width: 126px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      overflow: visible;
+    }
+    .stepper-motion i {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      animation: stepActive 2s ease-in-out infinite;
+    }
+    .stepper-motion i:nth-child(2) { animation-delay: .35s; }
+    .stepper-motion i:nth-child(3) { animation-delay: .7s; }
+    @keyframes stepActive {
+      0%, 100% { background: rgba(255,255,255,.18); transform: scale(1); }
+      40%, 65% { background: var(--blue); transform: scale(1.25); }
+    }
+
+    .notification-bell {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      animation: bellShake 1.3s ease-in-out infinite;
+    }
+    .notification-bell::after {
+      content: "🔔";
+      font-size: 30px;
+    }
+    @keyframes bellShake {
+      0%, 100% { transform: rotate(0); }
+      20% { transform: rotate(-12deg); }
+      40% { transform: rotate(12deg); }
+      60% { transform: rotate(-8deg); }
+      80% { transform: rotate(8deg); }
+    }
+
+    .alert-shake {
+      background: rgba(255,95,87,.16);
+      border-color: rgba(255,95,87,.45);
+      animation: alertShake .6s ease-in-out infinite;
+    }
+    @keyframes alertShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .skeleton-motion {
+      background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.22), rgba(255,255,255,.07));
+      background-size: 220%;
+      animation: skeletonMove 1.4s linear infinite;
+    }
+    @keyframes skeletonMove {
+      to { background-position: -220% center; }
+    }
+
+    .dynamic-island {
+      width: 112px;
+      height: 34px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.13);
+      animation: islandExpand 2.1s ease-in-out infinite;
+    }
+    @keyframes islandExpand {
+      0%, 100% { width: 90px; height: 32px; }
+      50% { width: 132px; height: 54px; }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu">
+        <a href="text-animation.html">Text</a>
+        <a href="button-animation.html">Button</a>
+        <a href="hover-effects.html">Hover</a>
+        <a href="card-effects.html">Card</a>
+        <a class="active" href="ui-motion.html">UI Motion</a>
+        <a href="loader-effects.html">Loader</a>
+        <a href="input-focus-effects.html">Input</a>
+        <a href="cursor-effects.html">Cursor</a>
+        <a href="background-effects.html">Background</a>
+      </nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>UI Motion</h1>
+          <p>Modal, drawer, toast, tab, dropdown, toggle, checkbox, notification, and modern app micro-motion effects.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “modal”, “toast”, “drawer”, “toggle”, or “dropdown”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+    </main>
+  </div>
+
+  <script>
+    const effects = [
+      {
+        name: "Modal Fade",
+        about: "Modal fades in and out softly.",
+        className: "modal-fade",
+        html: '<div class="ui-demo modal-fade"><span>Modal</span></div>',
+        css: `.modal-fade { animation: modalFade 2.1s ease-in-out infinite; }
+@keyframes modalFade {
+  0% { opacity: 0; transform: scale(.96); }
+  45%, 75% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.96); }
+}`
+      },
+      {
+        name: "Modal Scale",
+        about: "Modal opens with a premium scale-in motion.",
+        className: "modal-scale",
+        html: '<div class="ui-demo modal-scale"><span>Modal</span></div>',
+        css: `.modal-scale { animation: modalScale 2s cubic-bezier(.2,.8,.2,1) infinite; }
+@keyframes modalScale {
+  0% { opacity: 0; transform: scale(.65); }
+  45%, 75% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(.85); }
+}`
+      },
+      {
+        name: "Modal Slide Up",
+        about: "Modal slides up from bottom.",
+        className: "modal-slide-up",
+        html: '<div class="ui-demo modal-slide-up"><span>Modal</span></div>',
+        css: `.modal-slide-up { animation: modalSlideUp 2.1s ease-in-out infinite; }
+@keyframes modalSlideUp {
+  0% { opacity: 0; transform: translateY(42px); }
+  45%, 75% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(22px); }
+}`
+      },
+      {
+        name: "Modal Slide Down",
+        about: "Modal slides down from top.",
+        className: "modal-slide-down",
+        html: '<div class="ui-demo modal-slide-down"><span>Modal</span></div>',
+        css: `.modal-slide-down { animation: modalSlideDown 2.1s ease-in-out infinite; }
+@keyframes modalSlideDown {
+  0% { opacity: 0; transform: translateY(-42px); }
+  45%, 75% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-22px); }
+}`
+      },
+      {
+        name: "Toast Slide",
+        about: "Toast notification slides in from right.",
+        className: "toast-slide",
+        html: '<div class="ui-demo toast-slide"><span>Toast</span></div>',
+        css: `.toast-slide { animation: toastSlide 2.2s ease-in-out infinite; }
+@keyframes toastSlide {
+  0% { opacity: 0; transform: translateX(60px); }
+  35%, 75% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(60px); }
+}`
+      },
+      {
+        name: "Drawer Left",
+        about: "Left drawer slides in and out.",
+        className: "drawer-left",
+        html: '<div class="ui-demo drawer-left"><span>Menu</span></div>',
+        css: `.drawer-left { animation: drawerLeft 2.2s ease-in-out infinite; }
+@keyframes drawerLeft {
+  0% { opacity: 0; transform: translateX(-60px); }
+  45%, 75% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(-60px); }
+}`
+      },
+      {
+        name: "Drawer Right",
+        about: "Right drawer slides in and out.",
+        className: "drawer-right",
+        html: '<div class="ui-demo drawer-right"><span>Menu</span></div>',
+        css: `.drawer-right { animation: drawerRight 2.2s ease-in-out infinite; }
+@keyframes drawerRight {
+  0% { opacity: 0; transform: translateX(60px); }
+  45%, 75% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(60px); }
+}`
+      },
+      {
+        name: "Bottom Sheet",
+        about: "Mobile bottom sheet rises from bottom.",
+        className: "bottom-sheet",
+        html: '<div class="ui-demo bottom-sheet"><span>Sheet</span></div>',
+        css: `.bottom-sheet { animation: bottomSheet 2.2s ease-in-out infinite; }
+@keyframes bottomSheet {
+  0% { opacity: 0; transform: translateY(70px); }
+  45%, 75% { opacity: 1; transform: translateY(18px); }
+  100% { opacity: 0; transform: translateY(70px); }
+}`
+      },
+      {
+        name: "Dropdown Motion",
+        about: "Dropdown opens with scale from top.",
+        className: "dropdown-motion",
+        html: '<div class="ui-demo dropdown-motion"><span>Drop</span></div>',
+        css: `.dropdown-motion {
+  transform-origin: top;
+  animation: dropdownMotion 2s ease-in-out infinite;
+}
+@keyframes dropdownMotion {
+  0% { opacity: 0; transform: scaleY(.25); }
+  40%, 75% { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(.25); }
+}`
+      },
+      {
+        name: "Accordion Expand",
+        about: "Accordion smoothly expands and collapses.",
+        className: "accordion-expand",
+        html: '<div class="ui-demo accordion-expand"><span>Open</span></div>',
+        css: `.accordion-expand {
+  overflow: hidden;
+  transform-origin: top;
+  animation: accordionExpand 2.1s ease-in-out infinite;
+}
+@keyframes accordionExpand {
+  0% { height: 28px; }
+  45%, 75% { height: 82px; }
+  100% { height: 28px; }
+}`
+      },
+      {
+        name: "Tab Indicator",
+        about: "Active tab line moves left and right.",
+        className: "tab-indicator",
+        html: '<div class="ui-demo tab-indicator"></div>',
+        css: `.tab-indicator {
+  width: 136px;
+  height: 48px;
+  padding: 6px;
+}
+.tab-indicator::before {
+  content: "";
+  display: block;
+  width: 38px;
+  height: 8px;
+  border-radius: 999px;
+  background: #4f8cff;
+  animation: tabMove 1.7s ease-in-out infinite;
+}
+@keyframes tabMove {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(78px); }
+}`
+      },
+      {
+        name: "Hamburger Morph",
+        about: "Menu icon morphs into close icon.",
+        className: "hamburger-morph",
+        html: '<div class="ui-demo hamburger-morph"><span></span></div>',
+        css: `.hamburger-morph {
+  position: relative;
+  width: 68px;
+  height: 56px;
+}
+.hamburger-morph::before,
+.hamburger-morph::after,
+.hamburger-morph span {
+  content: "";
+  position: absolute;
+  left: 12px;
+  width: 44px;
+  height: 4px;
+  border-radius: 999px;
+  background: white;
+}
+.hamburger-morph::before {
+  top: 16px;
+  animation: hamTop 1.8s ease-in-out infinite;
+}
+.hamburger-morph span {
+  top: 26px;
+  animation: hamMid 1.8s ease-in-out infinite;
+}
+.hamburger-morph::after {
+  top: 36px;
+  animation: hamBot 1.8s ease-in-out infinite;
+}
+@keyframes hamTop {
+  0%, 100% { transform: rotate(0) translate(0,0); }
+  50% { transform: rotate(45deg) translate(7px,7px); }
+}
+@keyframes hamMid {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes hamBot {
+  0%, 100% { transform: rotate(0) translate(0,0); }
+  50% { transform: rotate(-45deg) translate(7px,-7px); }
+}`
+      },
+      {
+        name: "Toggle Switch",
+        about: "Switch knob moves between off and on.",
+        className: "switch-motion",
+        html: '<div class="ui-demo switch-motion"></div>',
+        css: `.switch-motion {
+  width: 86px;
+  height: 44px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  padding: 5px;
+}
+.switch-motion::before {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: white;
+  animation: switchMove 1.8s ease-in-out infinite;
+}
+@keyframes switchMove {
+  0%, 100% { transform: translateX(0); background: white; }
+  50% { transform: translateX(42px); background: #35c759; }
+}`
+      },
+      {
+        name: "Checkbox Tick",
+        about: "Checkbox turns green and tick pops in.",
+        className: "checkbox-motion",
+        html: '<div class="ui-demo checkbox-motion"></div>',
+        css: `.checkbox-motion {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.25);
+  display: grid;
+  place-items: center;
+  animation: checkboxBox 1.8s ease-in-out infinite;
+}
+.checkbox-motion::after {
+  content: "✓";
+  font-size: 30px;
+  color: white;
+  opacity: 0;
+  animation: checkboxTick 1.8s ease-in-out infinite;
+}
+@keyframes checkboxBox {
+  0%, 100% { border-color: rgba(255,255,255,.25); background: transparent; }
+  50% { border-color: rgba(53,199,89,.9); background: rgba(53,199,89,.8); }
+}
+@keyframes checkboxTick {
+  0%, 30%, 100% { opacity: 0; transform: scale(.4); }
+  50%, 75% { opacity: 1; transform: scale(1); }
+}`
+      },
+      {
+        name: "Radio Dot",
+        about: "Radio button dot scales in and out.",
+        className: "radio-motion",
+        html: '<div class="ui-demo radio-motion"></div>',
+        css: `.radio-motion {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.25);
+  display: grid;
+  place-items: center;
+  animation: radioRing 1.8s ease-in-out infinite;
+}
+.radio-motion::after {
+  content: "";
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #4f8cff;
+  transform: scale(0);
+  animation: radioDot 1.8s ease-in-out infinite;
+}
+@keyframes radioRing {
+  0%, 100% { border-color: rgba(255,255,255,.25); }
+  50% { border-color: rgba(79,140,255,.9); }
+}
+@keyframes radioDot {
+  0%, 30%, 100% { transform: scale(0); }
+  50%, 75% { transform: scale(1); }
+}`
+      },
+      {
+        name: "Copy Success",
+        about: "Small success toast pops up after copy.",
+        className: "copy-success",
+        html: '<div class="ui-demo copy-success"></div>',
+        css: `.copy-success {
+  animation: copyPop 1.8s ease-in-out infinite;
+}
+.copy-success::after {
+  content: "Copied";
+}
+@keyframes copyPop {
+  0%, 100% { opacity: 0; transform: translateY(20px) scale(.9); }
+  40%, 75% { opacity: 1; transform: translateY(0) scale(1); }
+}`
+      },
+      {
+        name: "Counter Motion",
+        about: "Counter number changes in steps.",
+        className: "counter-motion",
+        html: '<div class="ui-demo counter-motion"></div>',
+        css: `.counter-motion::after {
+  content: "0";
+  font-size: 26px;
+  font-weight: 950;
+  animation: counterChange 2s steps(5) infinite;
+}
+@keyframes counterChange {
+  0% { content: "0"; }
+  20% { content: "12"; }
+  40% { content: "48"; }
+  60% { content: "89"; }
+  80%, 100% { content: "100"; }
+}`
+      },
+      {
+        name: "Progress Ring",
+        about: "Circular progress ring rotates smoothly.",
+        className: "progress-ring",
+        html: '<div class="ui-demo progress-ring"></div>',
+        css: `.progress-ring {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: conic-gradient(#4f8cff 0deg, #4f8cff 260deg, rgba(255,255,255,.15) 260deg);
+  animation: ringSpin 1.8s ease-in-out infinite;
+}
+.progress-ring::after {
+  content: "";
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #101010;
+  position: absolute;
+}
+@keyframes ringSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}`
+      },
+      {
+        name: "Stepper Motion",
+        about: "Stepper dots activate one-by-one.",
+        className: "stepper-motion",
+        html: '<div class="ui-demo stepper-motion"><i></i><i></i><i></i></div>',
+        css: `.stepper-motion {
+  width: 126px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+}
+.stepper-motion i {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  animation: stepActive 2s ease-in-out infinite;
+}
+.stepper-motion i:nth-child(2) { animation-delay: .35s; }
+.stepper-motion i:nth-child(3) { animation-delay: .7s; }
+@keyframes stepActive {
+  0%, 100% { background: rgba(255,255,255,.18); transform: scale(1); }
+  40%, 65% { background: #4f8cff; transform: scale(1.25); }
+}`
+      },
+      {
+        name: "Notification Bell",
+        about: "Bell shakes like a notification alert.",
+        className: "notification-bell",
+        html: '<div class="ui-demo notification-bell"></div>',
+        css: `.notification-bell {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  animation: bellShake 1.3s ease-in-out infinite;
+}
+.notification-bell::after {
+  content: "🔔";
+  font-size: 30px;
+}
+@keyframes bellShake {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-12deg); }
+  40% { transform: rotate(12deg); }
+  60% { transform: rotate(-8deg); }
+  80% { transform: rotate(8deg); }
+}`
+      },
+      {
+        name: "Alert Shake",
+        about: "Alert box shakes with red warning style.",
+        className: "alert-shake",
+        html: '<div class="ui-demo alert-shake"><span>Alert</span></div>',
+        css: `.alert-shake {
+  background: rgba(255,95,87,.16);
+  border-color: rgba(255,95,87,.45);
+  animation: alertShake .6s ease-in-out infinite;
+}
+@keyframes alertShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}`
+      },
+      {
+        name: "Skeleton Motion",
+        about: "Shimmer loading motion for placeholder UI.",
+        className: "skeleton-motion",
+        html: '<div class="ui-demo skeleton-motion"></div>',
+        css: `.skeleton-motion {
+  background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.22), rgba(255,255,255,.07));
+  background-size: 220%;
+  animation: skeletonMove 1.4s linear infinite;
+}
+@keyframes skeletonMove {
+  to { background-position: -220% center; }
+}`
+      },
+      {
+        name: "Dynamic Island",
+        about: "Pill expands like modern app status island.",
+        className: "dynamic-island",
+        html: '<div class="ui-demo dynamic-island"></div>',
+        css: `.dynamic-island {
+  width: 112px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.13);
+  animation: islandExpand 2.1s ease-in-out infinite;
+}
+@keyframes islandExpand {
+  0%, 100% { width: 90px; height: 32px; }
+  50% { width: 132px; height: 54px; }
+}`
+      }
+    ];
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+
+    effects.forEach((effect, index) => {
+      effect.id = String(index);
+    });
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards(list) {
+      grid.innerHTML = "";
+
+      list.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      countPill.textContent = list.length + " Effects";
+      emptyState.style.display = list.length ? "none" : "block";
+    }
+
+    function baseCSS() {
+      return `.ui-demo {
+  position: relative;
+  width: 128px;
+  height: 82px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+  border: 1px solid rgba(255,255,255,.16);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  overflow: hidden;
+  transition: 260ms ease;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+.ui-demo span {
+  position: relative;
+  z-index: 5;
+}`;
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseCSS()}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.trim().toLowerCase();
+
+      const filtered = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value)
+        );
+      });
+
+      renderCards(filtered);
+    });
+
+    renderCards(effects);
+  </script>
+</body>
+</html>
