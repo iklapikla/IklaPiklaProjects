@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Page Transition Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1560px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 760px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      padding-bottom: 35px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+      perspective: 900px;
+    }
+
+    .transition-demo {
+      position: relative;
+      width: 150px;
+      height: 92px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 950;
+      overflow: hidden;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+      transform-style: preserve-3d;
+    }
+
+    .transition-demo span {
+      position: relative;
+      z-index: 10;
+      text-shadow: 0 4px 18px rgba(0,0,0,.55);
+    }
+
+    .transition-demo .screen {
+      position: absolute;
+      inset: 12px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(255,255,255,0.25), transparent 28%),
+        linear-gradient(135deg, rgba(79,140,255,0.85), rgba(141,107,255,0.82));
+      border: 1px solid rgba(255,255,255,0.20);
+      box-shadow: 0 18px 36px rgba(0,0,0,0.32);
+      z-index: 4;
+    }
+
+    .transition-demo .screen::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 34px;
+      top: 14px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.42);
+    }
+
+    .transition-demo .screen::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 18px;
+      top: 28px;
+      height: 28px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.14);
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu" id="mainMenu"></nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Page Transition Effects</h1>
+          <p>100 page and screen transition effects for app navigation, route change, modal page shift, splash transitions, overlays, mobile screens, and premium product UI.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “fade”, “slide”, “scale”, “flip”, “wipe”, “splash”, “overlay”, or “premium”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
+    </main>
+  </div>
+
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
+  <script>
+    const baseTransitionCSS = `.transition-demo {
+  position: relative;
+  width: 150px;
+  height: 92px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 13px;
+  font-weight: 950;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+  transform-style: preserve-3d;
+}
+.transition-demo span {
+  position: relative;
+  z-index: 10;
+  text-shadow: 0 4px 18px rgba(0,0,0,.55);
+}
+.transition-demo .screen {
+  position: absolute;
+  inset: 12px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 25% 20%, rgba(255,255,255,0.25), transparent 28%),
+    linear-gradient(135deg, rgba(79,140,255,0.85), rgba(141,107,255,0.82));
+  border: 1px solid rgba(255,255,255,0.20);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.32);
+  z-index: 4;
+}
+.transition-demo .screen::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 34px;
+  top: 14px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.42);
+}
+.transition-demo .screen::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 18px;
+  top: 28px;
+  height: 28px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.14);
+}`;
+
+    const commonKeyframes = `
+@keyframes ptFade { 0%,100%{opacity:0;} 35%,75%{opacity:1;} }
+@keyframes ptFadeUp { 0%,100%{opacity:0;transform:translateY(36px);} 35%,75%{opacity:1;transform:translateY(0);} }
+@keyframes ptFadeDown { 0%,100%{opacity:0;transform:translateY(-36px);} 35%,75%{opacity:1;transform:translateY(0);} }
+@keyframes ptSlideLeft { 0%,100%{transform:translateX(-120%);opacity:0;} 35%,75%{transform:translateX(0);opacity:1;} }
+@keyframes ptSlideRight { 0%,100%{transform:translateX(120%);opacity:0;} 35%,75%{transform:translateX(0);opacity:1;} }
+@keyframes ptSlideUp { 0%,100%{transform:translateY(120%);opacity:0;} 35%,75%{transform:translateY(0);opacity:1;} }
+@keyframes ptSlideDown { 0%,100%{transform:translateY(-120%);opacity:0;} 35%,75%{transform:translateY(0);opacity:1;} }
+@keyframes ptScaleIn { 0%,100%{opacity:0;transform:scale(.55);} 35%,75%{opacity:1;transform:scale(1);} }
+@keyframes ptScaleOut { 0%,100%{opacity:0;transform:scale(1.35);} 35%,75%{opacity:1;transform:scale(1);} }
+@keyframes ptRotateIn { 0%,100%{opacity:0;transform:rotate(-25deg) scale(.75);} 35%,75%{opacity:1;transform:rotate(0) scale(1);} }
+@keyframes ptFlipX { 0%,100%{opacity:0;transform:rotateX(88deg);} 35%,75%{opacity:1;transform:rotateX(0);} }
+@keyframes ptFlipY { 0%,100%{opacity:0;transform:rotateY(88deg);} 35%,75%{opacity:1;transform:rotateY(0);} }
+@keyframes ptBlur { 0%,100%{opacity:0;filter:blur(12px);transform:scale(.92);} 35%,75%{opacity:1;filter:blur(0);transform:scale(1);} }
+@keyframes ptClipLeft { 0%,100%{clip-path:inset(0 100% 0 0);} 35%,75%{clip-path:inset(0 0 0 0);} }
+@keyframes ptClipRight { 0%,100%{clip-path:inset(0 0 0 100%);} 35%,75%{clip-path:inset(0 0 0 0);} }
+@keyframes ptClipTop { 0%,100%{clip-path:inset(100% 0 0 0);} 35%,75%{clip-path:inset(0 0 0 0);} }
+@keyframes ptClipBottom { 0%,100%{clip-path:inset(0 0 100% 0);} 35%,75%{clip-path:inset(0 0 0 0);} }
+@keyframes ptCircle { 0%,100%{clip-path:circle(0% at 50% 50%);} 35%,75%{clip-path:circle(75% at 50% 50%);} }
+@keyframes ptWipeX { 0%,100%{transform:translateX(-120%);} 40%,70%{transform:translateX(0);} }
+@keyframes ptWipeY { 0%,100%{transform:translateY(-120%);} 40%,70%{transform:translateY(0);} }
+@keyframes ptShine { 0%{left:-50%;} 55%,100%{left:130%;} }
+@keyframes ptGradient { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} }
+@keyframes ptPulse { 0%,100%{transform:scale(1);opacity:.65;} 50%{transform:scale(1.08);opacity:1;} }
+@keyframes ptGlow { 0%,100%{box-shadow:0 0 0 rgba(79,140,255,0);} 50%{box-shadow:0 0 28px rgba(79,140,255,.75);} }
+@keyframes ptScan { 0%,100%{top:0;} 50%{top:calc(100% - 3px);} }
+@keyframes ptSpin { to{transform:rotate(360deg);} }
+@keyframes ptNoise { 0%,100%{transform:translate(0,0);} 25%{transform:translate(-4px,3px);} 50%{transform:translate(3px,-3px);} 75%{transform:translate(-2px,-4px);} }
+`;
+
+    const transitionEffects = [
+      ["Fade Page", "Page fades in softly.", "fade"],
+      ["Fade Up Page", "Page fades up from bottom.", "fadeUp"],
+      ["Fade Down Page", "Page fades down from top.", "fadeDown"],
+      ["Slide Left Page", "Page slides in from left.", "slideLeft"],
+      ["Slide Right Page", "Page slides in from right.", "slideRight"],
+      ["Slide Up Page", "Page slides upward into view.", "slideUp"],
+      ["Slide Down Page", "Page slides downward into view.", "slideDown"],
+      ["Scale In Page", "Page scales in from center.", "scaleIn"],
+      ["Scale Out Page", "Page zooms back into normal size.", "scaleOut"],
+      ["Rotate In Page", "Page rotates into place.", "rotateIn"],
+
+      ["Flip X Page", "Page flips on horizontal axis.", "flipX"],
+      ["Flip Y Page", "Page flips on vertical axis.", "flipY"],
+      ["Blur Page", "Page sharpens from blur.", "blur"],
+      ["Clip Left Page", "Page reveals from left clipping.", "clipLeft"],
+      ["Clip Right Page", "Page reveals from right clipping.", "clipRight"],
+      ["Clip Top Page", "Page reveals from top clipping.", "clipTop"],
+      ["Clip Bottom Page", "Page reveals from bottom clipping.", "clipBottom"],
+      ["Circle Reveal Page", "Page opens with circular mask.", "circle"],
+      ["Wipe X Page", "Horizontal wipe transition.", "wipeX"],
+      ["Wipe Y Page", "Vertical wipe transition.", "wipeY"],
+
+      ["Overlay Slide Left", "Overlay panel slides from left.", "overlayLeft"],
+      ["Overlay Slide Right", "Overlay panel slides from right.", "overlayRight"],
+      ["Overlay Slide Up", "Overlay panel rises from bottom.", "overlayUp"],
+      ["Overlay Slide Down", "Overlay panel drops from top.", "overlayDown"],
+      ["Black Overlay Fade", "Dark overlay fades before page appears.", "overlayFade"],
+      ["Glass Overlay Transition", "Glass layer covers and reveals page.", "glassOverlay"],
+      ["Gradient Overlay", "Gradient transition overlay.", "gradientOverlay"],
+      ["Neon Overlay", "Neon color overlay transition.", "neonOverlay"],
+      ["White Flash Transition", "White flash between pages.", "flashWhite"],
+      ["Dark Flash Transition", "Dark flash between pages.", "flashDark"],
+
+      ["Door Open Transition", "Two panels open like doors.", "doorOpen"],
+      ["Door Close Transition", "Two panels close then reveal.", "doorClose"],
+      ["Curtain Open", "Curtain panels open sideways.", "curtainOpen"],
+      ["Curtain Down", "Curtain drops from top.", "curtainDown"],
+      ["Venetian Blinds", "Multiple strips reveal page.", "blinds"],
+      ["Split Horizontal", "Page splits horizontally.", "splitH"],
+      ["Split Vertical", "Page splits vertically.", "splitV"],
+      ["Diagonal Wipe", "Diagonal wipe transition.", "diagonal"],
+      ["Stripe Wipe", "Stripe overlay wipes page.", "stripe"],
+      ["Checker Wipe", "Checker pattern transition.", "checker"],
+
+      ["Card Push Left", "Current page pushes to left.", "pushLeft"],
+      ["Card Push Right", "Current page pushes to right.", "pushRight"],
+      ["Card Push Up", "Current page pushes upward.", "pushUp"],
+      ["Card Push Down", "Current page pushes downward.", "pushDown"],
+      ["Stacked Card Transition", "Next page stacks above old page.", "stack"],
+      ["Depth Card Transition", "Card moves forward with depth.", "depth"],
+      ["3D Rotate Page", "Page rotates in 3D.", "rotate3d"],
+      ["Cube Left Transition", "Cube rotates to left.", "cubeLeft"],
+      ["Cube Right Transition", "Cube rotates to right.", "cubeRight"],
+      ["Book Page Turn", "Page turns like a book.", "book"],
+
+      ["Mobile App Slide", "Mobile screen slide transition.", "mobileSlide"],
+      ["Mobile Modal Up", "Modal screen opens from bottom.", "mobileModal"],
+      ["Mobile Sheet Transition", "Bottom sheet page transition.", "sheet"],
+      ["iOS Push Transition", "iOS style push navigation.", "iosPush"],
+      ["Android Reveal", "Android style material reveal.", "androidReveal"],
+      ["Tab Switch Fade", "Tab screen fades between states.", "tabFade"],
+      ["Tab Slide Transition", "Tabs slide horizontally.", "tabSlide"],
+      ["Navigation Stack", "Screen stacks over previous page.", "navStack"],
+      ["Popup Page Transition", "Popup page scales from center.", "popup"],
+      ["Drawer Page Transition", "Drawer reveals new page.", "drawer"],
+
+      ["Splash Screen Fade", "Splash screen fades to app page.", "splashFade"],
+      ["Logo Splash Transition", "Logo splash expands into page.", "logoSplash"],
+      ["Loader To Page", "Loader transforms into page.", "loaderToPage"],
+      ["Progress To Page", "Progress bar completes then page appears.", "progressToPage"],
+      ["Skeleton To Page", "Skeleton loading becomes page.", "skeletonToPage"],
+      ["AI Loading Transition", "AI loading state becomes result page.", "aiLoading"],
+      ["Shimmer To Page", "Shimmer overlay reveals page.", "shimmerToPage"],
+      ["Scan To Page", "Scanline reveals new page.", "scanToPage"],
+      ["Typing To Page", "Typing loader changes to page.", "typingToPage"],
+      ["Result Card Transition", "Result card expands into full page.", "resultCard"],
+
+      ["Circle Splash", "Circle expands into full page.", "circleSplash"],
+      ["Ripple Splash", "Ripple expands before page opens.", "rippleSplash"],
+      ["Ink Spread Transition", "Ink blob spreads over screen.", "ink"],
+      ["Liquid Transition", "Liquid wave covers page.", "liquid"],
+      ["Wave Transition", "Wave slides over page.", "wave"],
+      ["Blob Transition", "Blob morph reveals page.", "blob"],
+      ["Paint Swipe", "Paint-like swipe transition.", "paint"],
+      ["Smoke Reveal", "Smoke clears into page.", "smoke"],
+      ["Particle Reveal", "Particles form the page.", "particles"],
+      ["Spark Reveal", "Sparkle burst reveals page.", "spark"],
+
+      ["Glitch Page Transition", "RGB glitch transition.", "glitch"],
+      ["Cyber Scan Transition", "Cyber scanline page transition.", "cyberScan"],
+      ["Matrix Transition", "Matrix rain to page reveal.", "matrix"],
+      ["Holographic Transition", "Holographic overlay transition.", "holo"],
+      ["Neon Flash Transition", "Neon flash then page appears.", "neonFlash"],
+      ["TV Static Transition", "Static noise before page loads.", "static"],
+      ["Terminal Transition", "Terminal screen changes to page.", "terminal"],
+      ["HUD Transition", "HUD frame opens page.", "hud"],
+      ["Data Stream Transition", "Data lines reveal page.", "dataStream"],
+      ["Digital Pixel Transition", "Pixel grid builds the page.", "pixel"],
+
+      ["Premium Glass Transition", "Glass blur transition between pages.", "premiumGlass"],
+      ["Premium Gradient Transition", "Luxury gradient screen transition.", "premiumGradient"],
+      ["Apple Zoom Transition", "Apple-like zoom page shift.", "appleZoom"],
+      ["Mac Window Transition", "Mac window opens into page.", "macWindow"],
+      ["Cinematic Bars Transition", "Cinematic bars reveal page.", "cinematic"],
+      ["Hero Morph Transition", "Hero card morphs into page.", "heroMorph"],
+      ["Product Page Transition", "Product screen expands smoothly.", "product"],
+      ["Portfolio Page Transition", "Portfolio page slides with depth.", "portfolio"],
+      ["Dashboard Transition", "Dashboard cards assemble into page.", "dashboard"],
+      ["Final Premium Transition", "Premium glow, shine, overlay, and scale transition.", "finalPremium"]
+    ];
+
+    function cssFor(kind, className) {
+      const s = "." + className;
+
+      const map = {
+        fade: `${s} .screen{animation:ptFade 2s ease-in-out infinite;}`,
+        fadeUp: `${s} .screen{animation:ptFadeUp 2s ease-in-out infinite;}`,
+        fadeDown: `${s} .screen{animation:ptFadeDown 2s ease-in-out infinite;}`,
+        slideLeft: `${s} .screen{animation:ptSlideLeft 2s ease-in-out infinite;}`,
+        slideRight: `${s} .screen{animation:ptSlideRight 2s ease-in-out infinite;}`,
+        slideUp: `${s} .screen{animation:ptSlideUp 2s ease-in-out infinite;}`,
+        slideDown: `${s} .screen{animation:ptSlideDown 2s ease-in-out infinite;}`,
+        scaleIn: `${s} .screen{animation:ptScaleIn 2s ease-in-out infinite;}`,
+        scaleOut: `${s} .screen{animation:ptScaleOut 2s ease-in-out infinite;}`,
+        rotateIn: `${s} .screen{animation:ptRotateIn 2s ease-in-out infinite;}`,
+
+        flipX: `${s} .screen{animation:ptFlipX 2s ease-in-out infinite;transform-style:preserve-3d;}`,
+        flipY: `${s} .screen{animation:ptFlipY 2s ease-in-out infinite;transform-style:preserve-3d;}`,
+        blur: `${s} .screen{animation:ptBlur 2s ease-in-out infinite;}`,
+        clipLeft: `${s} .screen{animation:ptClipLeft 2s ease-in-out infinite;}`,
+        clipRight: `${s} .screen{animation:ptClipRight 2s ease-in-out infinite;}`,
+        clipTop: `${s} .screen{animation:ptClipTop 2s ease-in-out infinite;}`,
+        clipBottom: `${s} .screen{animation:ptClipBottom 2s ease-in-out infinite;}`,
+        circle: `${s} .screen{animation:ptCircle 2s ease-in-out infinite;}`,
+        wipeX: `${s}::before{content:"";position:absolute;inset:0;background:#4f8cff;z-index:8;animation:ptWipeX 2s ease-in-out infinite;}`,
+        wipeY: `${s}::before{content:"";position:absolute;inset:0;background:#8d6bff;z-index:8;animation:ptWipeY 2s ease-in-out infinite;}`,
+
+        overlayLeft: `${s}::before{content:"";position:absolute;inset:0;background:#4f8cff;z-index:8;animation:ptSlideLeft 2s ease-in-out infinite;}`,
+        overlayRight: `${s}::before{content:"";position:absolute;inset:0;background:#8d6bff;z-index:8;animation:ptSlideRight 2s ease-in-out infinite;}`,
+        overlayUp: `${s}::before{content:"";position:absolute;inset:0;background:#4f8cff;z-index:8;animation:ptSlideUp 2s ease-in-out infinite;}`,
+        overlayDown: `${s}::before{content:"";position:absolute;inset:0;background:#8d6bff;z-index:8;animation:ptSlideDown 2s ease-in-out infinite;}`,
+        overlayFade: `${s}::before{content:"";position:absolute;inset:0;background:#000;z-index:8;animation:ptFade 2s ease-in-out infinite;}`,
+        glassOverlay: `${s}::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.14);backdrop-filter:blur(12px);z-index:8;animation:ptFade 2s ease-in-out infinite;}`,
+        gradientOverlay: `${s}::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:220%;z-index:8;animation:ptGradient 2s infinite,ptFade 2s infinite;}`,
+        neonOverlay: `${s}::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#ff5f57,#4f8cff,#8d6bff);background-size:220%;z-index:8;animation:ptGradient 1.5s infinite,ptFade 2s infinite;}`,
+        flashWhite: `${s}::before{content:"";position:absolute;inset:0;background:white;z-index:8;animation:${className}Flash 2s infinite;} @keyframes ${className}Flash{0%,35%,100%{opacity:0;}45%{opacity:1;}55%{opacity:0;}}`,
+        flashDark: `${s}::before{content:"";position:absolute;inset:0;background:#000;z-index:8;animation:${className}Flash 2s infinite;} @keyframes ${className}Flash{0%,35%,100%{opacity:0;}45%{opacity:1;}55%{opacity:0;}}`,
+
+        doorOpen: `${s}::before,${s}::after{content:"";position:absolute;top:0;bottom:0;width:50%;background:#4f8cff;z-index:8;animation:${className}Door 2s infinite;} ${s}::before{left:0;transform-origin:left;} ${s}::after{right:0;transform-origin:right;} @keyframes ${className}Door{0%,100%{transform:scaleX(1);}45%,75%{transform:scaleX(0);}}`,
+        doorClose: `${s}::before,${s}::after{content:"";position:absolute;top:0;bottom:0;width:50%;background:#8d6bff;z-index:8;animation:${className}DoorClose 2s infinite;} ${s}::before{left:0;transform-origin:left;} ${s}::after{right:0;transform-origin:right;} @keyframes ${className}DoorClose{0%,100%{transform:scaleX(0);}45%,75%{transform:scaleX(1);}}`,
+        curtainOpen: `${s}::before,${s}::after{content:"";position:absolute;top:0;bottom:0;width:50%;background:linear-gradient(90deg,#4f8cff,#8d6bff);z-index:8;animation:${className}Curtain 2s infinite;} ${s}::before{left:0;} ${s}::after{right:0;} @keyframes ${className}Curtain{0%,100%{transform:translateX(0);}45%,75%{transform:translateX(-100%);}} ${s}::after{animation-name:${className}CurtainRight;} @keyframes ${className}CurtainRight{0%,100%{transform:translateX(0);}45%,75%{transform:translateX(100%);}}`,
+        curtainDown: `${s}::before{content:"";position:absolute;left:0;right:0;top:0;height:100%;background:#4f8cff;z-index:8;animation:ptSlideDown 2s infinite;}`,
+        blinds: `${s}::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,#4f8cff 0 12px,transparent 12px 20px);z-index:8;animation:ptClipLeft 2s infinite;}`,
+        splitH: `${s}::before,${s}::after{content:"";position:absolute;left:0;right:0;height:50%;background:#4f8cff;z-index:8;animation:${className}SplitH 2s infinite;} ${s}::before{top:0;} ${s}::after{bottom:0;animation-name:${className}SplitH2;} @keyframes ${className}SplitH{0%,100%{transform:translateY(0);}45%,75%{transform:translateY(-100%);}} @keyframes ${className}SplitH2{0%,100%{transform:translateY(0);}45%,75%{transform:translateY(100%);}}`,
+        splitV: `${s}::before,${s}::after{content:"";position:absolute;top:0;bottom:0;width:50%;background:#8d6bff;z-index:8;animation:${className}SplitV 2s infinite;} ${s}::before{left:0;} ${s}::after{right:0;animation-name:${className}SplitV2;} @keyframes ${className}SplitV{0%,100%{transform:translateX(0);}45%,75%{transform:translateX(-100%);}} @keyframes ${className}SplitV2{0%,100%{transform:translateX(0);}45%,75%{transform:translateX(100%);}}`,
+        diagonal: `${s}::before{content:"";position:absolute;inset:-40px;background:#4f8cff;z-index:8;transform:rotate(18deg);animation:${className}Diag 2s infinite;} @keyframes ${className}Diag{0%,100%{translate:-140px 0;}45%,75%{translate:0 0;}}`,
+        stripe: `${s}::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,#4f8cff 0 10px,#8d6bff 10px 20px);z-index:8;animation:ptClipLeft 2s infinite;}`,
+        checker: `${s}::before{content:"";position:absolute;inset:0;background-color:#4f8cff;background-image:linear-gradient(45deg,#8d6bff 25%,transparent 25%),linear-gradient(-45deg,#8d6bff 25%,transparent 25%);background-size:20px 20px;z-index:8;animation:ptFade 2s infinite;}`,
+
+        pushLeft: `${s} .screen{animation:${className}Push 2s infinite;} @keyframes ${className}Push{0%,100%{transform:translateX(80px) scale(.9);opacity:.3;}45%,75%{transform:translateX(0) scale(1);opacity:1;}}`,
+        pushRight: `${s} .screen{animation:${className}Push 2s infinite;} @keyframes ${className}Push{0%,100%{transform:translateX(-80px) scale(.9);opacity:.3;}45%,75%{transform:translateX(0) scale(1);opacity:1;}}`,
+        pushUp: `${s} .screen{animation:${className}Push 2s infinite;} @keyframes ${className}Push{0%,100%{transform:translateY(55px) scale(.9);opacity:.3;}45%,75%{transform:translateY(0) scale(1);opacity:1;}}`,
+        pushDown: `${s} .screen{animation:${className}Push 2s infinite;} @keyframes ${className}Push{0%,100%{transform:translateY(-55px) scale(.9);opacity:.3;}45%,75%{transform:translateY(0) scale(1);opacity:1;}}`,
+        stack: `${s} .screen{animation:${className}Stack 2s infinite;} @keyframes ${className}Stack{0%,100%{transform:translateY(26px) scale(.82);opacity:.5;}45%,75%{transform:translateY(0) scale(1);opacity:1;}}`,
+        depth: `${s} .screen{animation:${className}Depth 2s infinite;} @keyframes ${className}Depth{0%,100%{transform:translateZ(-80px) scale(.7);opacity:.35;}45%,75%{transform:translateZ(0) scale(1);opacity:1;}}`,
+        rotate3d: `${s} .screen{animation:${className}Rotate3D 2s infinite;transform-style:preserve-3d;} @keyframes ${className}Rotate3D{0%,100%{transform:perspective(700px) rotateX(22deg) rotateY(-24deg);opacity:.4;}45%,75%{transform:perspective(700px) rotateX(0) rotateY(0);opacity:1;}}`,
+        cubeLeft: `${s} .screen{animation:${className}Cube 2s infinite;transform-origin:left center;} @keyframes ${className}Cube{0%,100%{transform:perspective(700px) rotateY(-90deg);opacity:.3;}45%,75%{transform:perspective(700px) rotateY(0);opacity:1;}}`,
+        cubeRight: `${s} .screen{animation:${className}Cube 2s infinite;transform-origin:right center;} @keyframes ${className}Cube{0%,100%{transform:perspective(700px) rotateY(90deg);opacity:.3;}45%,75%{transform:perspective(700px) rotateY(0);opacity:1;}}`,
+        book: `${s} .screen{animation:${className}Book 2s infinite;transform-origin:left center;} @keyframes ${className}Book{0%,100%{transform:perspective(700px) rotateY(-105deg);opacity:.35;}45%,75%{transform:perspective(700px) rotateY(0);opacity:1;}}`,
+
+        mobileSlide: `${s} .screen{inset:10px 42px;border-radius:18px;animation:ptSlideRight 2s infinite;}`,
+        mobileModal: `${s} .screen{inset:26px 24px 8px;border-radius:18px;animation:ptSlideUp 2s infinite;}`,
+        sheet: `${s} .screen{inset:38px 18px 8px;border-radius:18px 18px 14px 14px;animation:ptSlideUp 2s infinite;}`,
+        iosPush: `${s} .screen{animation:ptSlideRight 2s cubic-bezier(.22,1,.36,1) infinite;}`,
+        androidReveal: `${s} .screen{animation:ptCircle 2s cubic-bezier(.22,1,.36,1) infinite;}`,
+        tabFade: `${s} .screen{animation:ptFade 1.8s infinite;} ${s}::after{content:"";position:absolute;bottom:15px;width:70px;height:6px;border-radius:999px;background:#4f8cff;z-index:8;}`,
+        tabSlide: `${s} .screen{animation:ptSlideRight 2s infinite;} ${s}::after{content:"";position:absolute;bottom:15px;width:70px;height:6px;border-radius:999px;background:#4f8cff;z-index:8;animation:${className}Tab 2s infinite;} @keyframes ${className}Tab{0%,100%{transform:translateX(-25px);}50%{transform:translateX(25px);}}`,
+        navStack: `${s} .screen{animation:${className}Nav 2s infinite;} @keyframes ${className}Nav{0%,100%{transform:translateX(60px) scale(.92);opacity:.4;}45%,75%{transform:translateX(0) scale(1);opacity:1;}}`,
+        popup: `${s} .screen{inset:24px;animation:ptScaleIn 2s infinite;}`,
+        drawer: `${s} .screen{inset:12px 42px 12px 12px;animation:ptSlideLeft 2s infinite;}`,
+
+        splashFade: `${s}::before{content:"S";position:absolute;inset:0;background:#4f8cff;display:grid;place-items:center;font-size:30px;font-weight:950;z-index:8;animation:ptFade 2s infinite;}`,
+        logoSplash: `${s}::before{content:"★";position:absolute;width:44px;height:44px;border-radius:16px;background:#4f8cff;display:grid;place-items:center;font-size:24px;z-index:8;animation:${className}Logo 2s infinite;} @keyframes ${className}Logo{0%,100%{transform:scale(.5);opacity:0;}35%{opacity:1;transform:scale(1);}70%{transform:scale(4);opacity:0;}}`,
+        loaderToPage: `${s}::before{content:"";position:absolute;width:36px;height:36px;border-radius:50%;border:4px solid rgba(255,255,255,.25);border-top-color:#4f8cff;z-index:8;animation:${className}Loader 2s infinite;} @keyframes ${className}Loader{0%,35%{transform:rotate(0);opacity:1;}55%{transform:rotate(360deg) scale(1);}80%,100%{transform:rotate(720deg) scale(4);opacity:0;}}`,
+        progressToPage: `${s}::before{content:"";position:absolute;left:20px;right:20px;height:8px;border-radius:999px;background:#4f8cff;transform-origin:left;z-index:8;animation:ptClipLeft 2s infinite;}`,
+        skeletonToPage: `${s} .screen{background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.25),rgba(255,255,255,.08));background-size:220%;animation:${className}Skeleton 2s infinite;} @keyframes ${className}Skeleton{0%,45%{background-position:220% center;opacity:.7;}70%,100%{background:linear-gradient(135deg,#4f8cff,#8d6bff);opacity:1;}}`,
+        aiLoading: `${s}::before{content:"AI";position:absolute;width:54px;height:54px;border-radius:20px;background:rgba(79,140,255,.22);display:grid;place-items:center;color:#dbe8ff;text-shadow:0 0 14px #4f8cff;z-index:8;animation:ptPulse 1.2s infinite;}`,
+        shimmerToPage: `${s}::after{content:"";position:absolute;top:-80%;left:-50%;width:34%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);z-index:8;animation:ptShine 2s infinite;}`,
+        scanToPage: `${s}::after{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px #4f8cff;z-index:8;animation:ptScan 1.6s infinite;}`,
+        typingToPage: `${s}::before{content:"Loading...";position:absolute;font-size:14px;z-index:8;animation:ptFade 2s infinite;}`,
+        resultCard: `${s} .screen{animation:${className}Result 2s infinite;} @keyframes ${className}Result{0%,100%{inset:35px 45px;opacity:.5;}45%,75%{inset:12px;opacity:1;}}`,
+
+        circleSplash: `${s}::before{content:"";position:absolute;width:40px;height:40px;border-radius:50%;background:#4f8cff;z-index:8;animation:${className}Circle 2s infinite;} @keyframes ${className}Circle{0%,100%{transform:scale(0);opacity:1;}45%,75%{transform:scale(5);opacity:1;}}`,
+        rippleSplash: `${s}::before,${s}::after{content:"";position:absolute;width:30px;height:30px;border-radius:50%;border:2px solid #4f8cff;z-index:8;animation:${className}Ripple 2s infinite;} ${s}::after{animation-delay:.25s;} @keyframes ${className}Ripple{0%{transform:scale(0);opacity:1;}70%,100%{transform:scale(4);opacity:0;}}`,
+        ink: `${s}::before{content:"";position:absolute;width:50px;height:50px;border-radius:42% 58% 63% 37%;background:#4f8cff;z-index:8;animation:${className}Ink 2s infinite;} @keyframes ${className}Ink{0%,100%{transform:scale(0) rotate(0);}45%,75%{transform:scale(5) rotate(180deg);}}`,
+        liquid: `${s}::before{content:"";position:absolute;left:-40%;right:-40%;bottom:-120%;height:160%;background:#4f8cff;border-radius:45%;z-index:8;animation:${className}Liquid 2s infinite;} @keyframes ${className}Liquid{0%,100%{transform:translateY(60%) rotate(0);}45%,75%{transform:translateY(-30%) rotate(180deg);}}`,
+        wave: `${s}::before{content:"";position:absolute;left:-25px;right:-25px;bottom:-50px;height:90px;border-radius:50% 50% 0 0;background:#4f8cff;z-index:8;animation:ptSlideUp 2s infinite;}`,
+        blob: `${s}::before{content:"";position:absolute;width:70px;height:70px;border-radius:42% 58% 63% 37%;background:#8d6bff;z-index:8;animation:${className}Blob 2s infinite;} @keyframes ${className}Blob{0%,100%{transform:scale(.3);border-radius:42% 58% 63% 37%;}45%,75%{transform:scale(3.8);border-radius:58% 42% 37% 63%;}}`,
+        paint: `${s}::before{content:"";position:absolute;inset:-20px;background:linear-gradient(90deg,#4f8cff,#8d6bff);z-index:8;clip-path:polygon(0 0,0 0,0 100%,0 100%);animation:ptClipLeft 2s infinite;}`,
+        smoke: `${s}::before{content:"";position:absolute;inset:-40px;background:radial-gradient(circle,rgba(255,255,255,.34),transparent 55%);filter:blur(16px);z-index:8;animation:ptFade 2s infinite;}`,
+        particles: `${s} i{position:absolute;width:8px;height:8px;border-radius:50%;background:#4f8cff;z-index:8;animation:${className}Particle 2s infinite;} ${s} i:nth-child(2){left:38px;animation-delay:.1s;} ${s} i:nth-child(3){left:70px;animation-delay:.2s;} ${s} i:nth-child(4){left:102px;animation-delay:.3s;} @keyframes ${className}Particle{0%,100%{transform:translateY(40px) scale(.3);opacity:0;}45%,75%{transform:translateY(0) scale(1);opacity:1;}}`,
+        spark: `${s}::before{content:"✦ ✧ ✦";position:absolute;font-size:24px;color:white;letter-spacing:10px;z-index:8;animation:ptPulse 1.5s infinite;}`,
+
+        glitch: `${s} .screen{animation:${className}Glitch 1s steps(2) infinite;} @keyframes ${className}Glitch{0%,100%{transform:translate(0);filter:none;}50%{transform:translate(3px,-2px);filter:hue-rotate(120deg);}}`,
+        cyberScan: `${s}::after{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px #4f8cff;z-index:8;animation:ptScan 1.4s infinite;}`,
+        matrix: `${s}::before{content:"0101 1010";position:absolute;inset:0;color:#35c759;background:#020804;display:grid;place-items:center;font-family:monospace;z-index:8;animation:ptFade 2s infinite;}`,
+        holo: `${s}::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(255,255,255,.35),rgba(135,247,255,.4),rgba(255,158,231,.35));background-size:260%;z-index:8;animation:ptGradient 2s infinite,ptFade 2s infinite;}`,
+        neonFlash: `${s}::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#ff5f57,#4f8cff,#8d6bff);background-size:260%;z-index:8;animation:ptGradient 1s infinite,ptFade 2s infinite;}`,
+        static: `${s}::before{content:"";position:absolute;inset:-20px;background:radial-gradient(circle,rgba(255,255,255,.34) 0 1px,transparent 2px);background-size:7px 7px;z-index:8;animation:ptNoise .3s steps(2) infinite;opacity:.75;}`,
+        terminal: `${s}::before{content:"> open page";position:absolute;inset:0;background:#020804;color:#35c759;display:grid;place-items:center;font-family:monospace;z-index:8;animation:ptFade 2s infinite;}`,
+        hud: `${s}::before{content:"";position:absolute;width:76px;height:76px;border-radius:50%;border:2px solid rgba(79,140,255,.65);z-index:8;animation:ptSpin 2s linear infinite;} ${s}::after{content:"";position:absolute;inset:16px;border:1px solid rgba(79,140,255,.35);z-index:8;animation:ptFade 2s infinite;}`,
+        dataStream: `${s}::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(79,140,255,.45) 0 3px,transparent 3px 10px);z-index:8;animation:ptSlideDown 2s infinite;}`,
+        pixel: `${s}::before{content:"";position:absolute;inset:0;background:linear-gradient(45deg,#4f8cff 25%,transparent 25%),linear-gradient(-45deg,#8d6bff 25%,transparent 25%);background-size:18px 18px;z-index:8;animation:ptFade 2s infinite;}`,
+
+        premiumGlass: `${s}::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.14);backdrop-filter:blur(18px);z-index:8;animation:ptFade 2s infinite;} ${s} .screen{animation:ptScaleIn 2s infinite;}`,
+        premiumGradient: `${s}::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:240%;z-index:8;animation:ptGradient 2s infinite,ptClipLeft 2s infinite;}`,
+        appleZoom: `${s} .screen{animation:${className}Apple 2s cubic-bezier(.22,1,.36,1) infinite;} @keyframes ${className}Apple{0%,100%{transform:scale(.72);opacity:.4;filter:blur(8px);}45%,75%{transform:scale(1);opacity:1;filter:blur(0);}}`,
+        macWindow: `${s} .screen{animation:ptScaleIn 2s infinite;} ${s} .screen::before{background:linear-gradient(90deg,#ff5f57 0 8px,#ffbd2e 8px 16px,#35c759 16px 24px,rgba(255,255,255,.4) 24px);}`,
+        cinematic: `${s}::before,${s}::after{content:"";position:absolute;left:0;right:0;height:20px;background:#000;z-index:8;animation:${className}Bars 2s infinite;} ${s}::before{top:0;} ${s}::after{bottom:0;} @keyframes ${className}Bars{0%,100%{height:46px;}45%,75%{height:16px;}}`,
+        heroMorph: `${s} .screen{animation:${className}Hero 2s infinite;} @keyframes ${className}Hero{0%,100%{inset:32px 48px;opacity:.5;border-radius:28px;}45%,75%{inset:12px;opacity:1;border-radius:18px;}}`,
+        product: `${s} .screen{animation:${className}Product 2s infinite;} @keyframes ${className}Product{0%,100%{transform:translateY(24px) scale(.72);opacity:.45;}45%,75%{transform:translateY(0) scale(1);opacity:1;}}`,
+        portfolio: `${s} .screen{animation:${className}Portfolio 2s infinite;} @keyframes ${className}Portfolio{0%,100%{transform:translateX(48px) rotateY(30deg);opacity:.4;}45%,75%{transform:translateX(0) rotateY(0);opacity:1;}}`,
+        dashboard: `${s} i{position:absolute;width:42px;height:26px;border-radius:10px;background:rgba(79,140,255,.35);border:1px solid rgba(79,140,255,.5);z-index:5;animation:ptScaleIn 2s infinite;} ${s} i:nth-child(2){left:26px;top:22px;} ${s} i:nth-child(3){right:26px;top:22px;animation-delay:.12s;} ${s} i:nth-child(4){left:26px;bottom:22px;animation-delay:.24s;} ${s} i:nth-child(5){right:26px;bottom:22px;animation-delay:.36s;}`,
+        finalPremium: `${s}{background:linear-gradient(90deg,#050505,#0e1329,#050505);background-size:240%;animation:ptGradient 2.8s infinite;} ${s}::before{content:"";position:absolute;inset:-40px;background:radial-gradient(circle at 20% 30%,rgba(79,140,255,.65),transparent 32%),radial-gradient(circle at 80% 60%,rgba(141,107,255,.55),transparent 32%);filter:blur(14px);animation:ptPulse 2s infinite;} ${s}::after{content:"";position:absolute;top:-80%;left:-50%;width:34%;height:260%;background:rgba(255,255,255,.45);transform:rotate(25deg);z-index:8;animation:ptShine 2.4s infinite;} ${s} .screen{animation:ptScaleIn 2s infinite,ptGlow 1.7s infinite;}`
+      };
+
+      return map[kind] || `${s} .screen{animation:ptFadeUp 2s infinite;}`;
+    }
+
+    function htmlFor(kind, className, label) {
+      if (kind === "particles" || kind === "dashboard") {
+        return `<div class="transition-demo ${className}"><span>${label}</span><i></i><i></i><i></i><i></i></div>`;
+      }
+
+      if (["wipeX","wipeY","overlayLeft","overlayRight","overlayUp","overlayDown","overlayFade","glassOverlay","gradientOverlay","neonOverlay","flashWhite","flashDark","doorOpen","doorClose","curtainOpen","curtainDown","blinds","splitH","splitV","diagonal","stripe","checker","splashFade","logoSplash","loaderToPage","progressToPage","aiLoading","shimmerToPage","scanToPage","typingToPage","circleSplash","rippleSplash","ink","liquid","wave","blob","paint","smoke","spark","matrix","holo","neonFlash","static","terminal","hud","dataStream","pixel","premiumGradient","cinematic"].includes(kind)) {
+        return `<div class="transition-demo ${className}"><span>${label}</span><i class="screen"></i></div>`;
+      }
+
+      return `<div class="transition-demo ${className}"><span>${label}</span><i class="screen"></i></div>`;
+    }
+
+    const effects = transitionEffects.map((item, index) => {
+      const name = item[0];
+      const about = item[1];
+      const kind = item[2];
+      const className = "page-transition-" + index;
+
+      return {
+        id: String(index),
+        name,
+        about,
+        kind,
+        className,
+        html: htmlFor(kind, className, name.split(" ")[0]),
+        css: cssFor(kind, className)
+      };
+    });
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
+
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = commonKeyframes + "\n\n" + effects.map(effect => effect.css).join("\n\n");
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards() {
+      grid.innerHTML = "";
+
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className} ${effect.kind}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
+
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseTransitionCSS}
+
+${commonKeyframes}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    function applySearch() {
+      const value = searchInput.value.trim().toLowerCase();
+
+      filteredEffects = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value) ||
+          effect.kind.toLowerCase().includes(value)
+        );
+      });
+
+      visibleCount = batchSize;
+      renderCards();
+    }
+
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
+  </script>
+</body>
+</html>
