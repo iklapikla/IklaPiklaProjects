@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cursor Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1560px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 760px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      padding-bottom: 35px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+      perspective: 900px;
+    }
+
+    .cursor-stage {
+      position: relative;
+      width: 150px;
+      height: 92px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      display: grid;
+      place-items: center;
+      color: rgba(255,255,255,0.72);
+      font-size: 12px;
+      font-weight: 900;
+      overflow: hidden;
+      transition: 260ms ease;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+    }
+
+    .cursor-dot {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #4f8cff;
+      left: 24px;
+      top: 26px;
+      z-index: 5;
+      box-shadow: 0 0 18px rgba(79,140,255,.8);
+    }
+
+    .cursor-pointer {
+      position: absolute;
+      left: 25px;
+      top: 22px;
+      z-index: 5;
+      width: 0;
+      height: 0;
+      border-left: 18px solid white;
+      border-top: 12px solid transparent;
+      border-bottom: 12px solid transparent;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,.45));
+      transform: rotate(18deg);
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu" id="mainMenu"></nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Cursor Effects</h1>
+          <p>100 cursor and mouse interaction effects for custom pointer, trails, glow, magnetic hover, click ripple, drag, zoom, spotlight, and premium UI movement.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “trail”, “glow”, “magnetic”, “ripple”, “pointer”, “spotlight”, or “drag”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
+    </main>
+  </div>
+
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
+  <script>
+    const effects = [];
+
+    const baseCursorCSS = `.cursor-stage {
+  position: relative;
+  width: 150px;
+  height: 92px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  display: grid;
+  place-items: center;
+  color: rgba(255,255,255,0.72);
+  font-size: 12px;
+  font-weight: 900;
+  overflow: hidden;
+  transition: 260ms ease;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+.cursor-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4f8cff;
+  left: 24px;
+  top: 26px;
+  z-index: 5;
+  box-shadow: 0 0 18px rgba(79,140,255,.8);
+}
+.cursor-pointer {
+  position: absolute;
+  left: 25px;
+  top: 22px;
+  z-index: 5;
+  width: 0;
+  height: 0;
+  border-left: 18px solid white;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,.45));
+  transform: rotate(18deg);
+}`;
+
+    const commonKeyframes = `
+@keyframes cursorMove { 0%,100%{transform:translate(0,0);} 50%{transform:translate(82px,34px);} }
+@keyframes cursorMoveWide { 0%,100%{transform:translate(0,0);} 25%{transform:translate(84px,0);} 50%{transform:translate(84px,36px);} 75%{transform:translate(0,36px);} }
+@keyframes cursorPulse { 0%,100%{transform:scale(1);opacity:.75;} 50%{transform:scale(1.45);opacity:1;} }
+@keyframes cursorPing { 0%{box-shadow:0 0 0 0 rgba(79,140,255,.75);} 70%{box-shadow:0 0 0 18px rgba(79,140,255,0);} 100%{box-shadow:0 0 0 0 rgba(79,140,255,0);} }
+@keyframes cursorGlow { 0%,100%{box-shadow:0 0 12px rgba(79,140,255,.3);} 50%{box-shadow:0 0 32px rgba(79,140,255,.95);} }
+@keyframes cursorSpin { to{transform:rotate(360deg);} }
+@keyframes cursorTrailFade { 0%{opacity:1;transform:scale(1);} 100%{opacity:0;transform:scale(.4);} }
+@keyframes cursorClick { 0%,100%{transform:scale(1);} 50%{transform:scale(.72);} }
+@keyframes cursorRipple { 0%{transform:scale(0);opacity:1;} 100%{transform:scale(3.2);opacity:0;} }
+@keyframes cursorShake { 0%,100%{transform:translate(0,0);} 25%{transform:translate(-5px,0);} 75%{transform:translate(5px,0);} }
+@keyframes cursorSpot { 0%,100%{transform:translate(-40%,-30%);} 50%{transform:translate(40%,25%);} }
+@keyframes cursorGradient { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} }
+@keyframes cursorBlink { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+@keyframes cursorBounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-14px);} }
+@keyframes cursorFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+`;
+
+    function addEffect(name, about, className, css, html) {
+      effects.push({
+        id: String(effects.length),
+        name,
+        about,
+        className,
+        html: html || `<div class="cursor-stage ${className}"><span>Move</span><i class="cursor-dot"></i></div>`,
+        css
+      });
+    }
+
+    addEffect("Dot Cursor Move", "Small dot cursor moves across the box.", "cursor-dot-move", `.cursor-dot-move .cursor-dot{animation:cursorMove 1.8s ease-in-out infinite;}`);
+    addEffect("Wide Cursor Path", "Cursor moves around four corners.", "cursor-wide-path", `.cursor-wide-path .cursor-dot{animation:cursorMoveWide 2.4s ease-in-out infinite;}`);
+    addEffect("Pulse Cursor", "Cursor dot pulses while moving.", "cursor-pulse", `.cursor-pulse .cursor-dot{animation:cursorMove 1.8s ease-in-out infinite,cursorPulse .9s ease-in-out infinite;}`);
+    addEffect("Glow Cursor", "Cursor has strong blue glow.", "cursor-glow", `.cursor-glow .cursor-dot{animation:cursorMove 1.8s ease-in-out infinite,cursorGlow 1.2s ease-in-out infinite;}`);
+    addEffect("Ping Cursor", "Cursor emits expanding ping ring.", "cursor-ping", `.cursor-ping .cursor-dot{animation:cursorMove 1.8s ease-in-out infinite,cursorPing 1.1s ease-out infinite;}`);
+    addEffect("Big Cursor", "Large soft cursor dot moves smoothly.", "cursor-big", `.cursor-big .cursor-dot{width:30px;height:30px;background:rgba(79,140,255,.35);animation:cursorMove 1.8s ease-in-out infinite;}`);
+    addEffect("Tiny Cursor", "Small precise cursor dot movement.", "cursor-tiny", `.cursor-tiny .cursor-dot{width:8px;height:8px;animation:cursorMove 1.8s ease-in-out infinite;}`);
+    addEffect("White Cursor Dot", "White cursor dot with clean shadow.", "cursor-white-dot", `.cursor-white-dot .cursor-dot{background:white;box-shadow:0 0 18px rgba(255,255,255,.75);animation:cursorMove 1.8s ease-in-out infinite;}`);
+    addEffect("Red Cursor Dot", "Red cursor dot for alert interactions.", "cursor-red-dot", `.cursor-red-dot .cursor-dot{background:#ff5f57;box-shadow:0 0 18px rgba(255,95,87,.8);animation:cursorMove 1.8s ease-in-out infinite;}`);
+    addEffect("Green Cursor Dot", "Green cursor dot for success interactions.", "cursor-green-dot", `.cursor-green-dot .cursor-dot{background:#35c759;box-shadow:0 0 18px rgba(53,199,89,.8);animation:cursorMove 1.8s ease-in-out infinite;}`);
+
+    addEffect("Arrow Pointer Move", "Classic arrow pointer moves across preview.", "cursor-arrow-move", `.cursor-arrow-move .cursor-pointer{animation:cursorMove 1.8s ease-in-out infinite;}`, `<div class="cursor-stage cursor-arrow-move"><span>Pointer</span><i class="cursor-pointer"></i></div>`);
+    addEffect("Arrow Pointer Glow", "Arrow pointer moves with glow.", "cursor-arrow-glow", `.cursor-arrow-glow .cursor-pointer{animation:cursorMove 1.8s ease-in-out infinite;filter:drop-shadow(0 0 12px rgba(79,140,255,.9));}`, `<div class="cursor-stage cursor-arrow-glow"><span>Pointer</span><i class="cursor-pointer"></i></div>`);
+    addEffect("Pointer Click", "Pointer presses like a mouse click.", "cursor-pointer-click", `.cursor-pointer-click .cursor-pointer{animation:pointerClickMove 1.6s ease-in-out infinite;} @keyframes pointerClickMove{0%,100%{transform:rotate(18deg) translate(0,0) scale(1);}50%{transform:rotate(18deg) translate(70px,30px) scale(.78);}}`, `<div class="cursor-stage cursor-pointer-click"><span>Click</span><i class="cursor-pointer"></i></div>`);
+    addEffect("Pointer Shake", "Pointer shakes for warning interaction.", "cursor-pointer-shake", `.cursor-pointer-shake .cursor-pointer{animation:pointerShake 1s ease-in-out infinite;} @keyframes pointerShake{0%,100%{transform:rotate(18deg) translate(50px,22px);}25%{transform:rotate(18deg) translate(44px,22px);}75%{transform:rotate(18deg) translate(56px,22px);}}`, `<div class="cursor-stage cursor-pointer-shake"><span>Wrong</span><i class="cursor-pointer"></i></div>`);
+    addEffect("Pointer Drag", "Pointer drags a small object.", "cursor-pointer-drag", `.cursor-pointer-drag .cursor-pointer{animation:dragPointer 1.8s ease-in-out infinite;} .cursor-pointer-drag::after{content:"";position:absolute;width:28px;height:22px;border-radius:8px;background:#4f8cff;left:52px;top:38px;animation:dragBox 1.8s ease-in-out infinite;} @keyframes dragPointer{0%,100%{transform:rotate(18deg) translate(0,0);}50%{transform:rotate(18deg) translate(70px,28px);}} @keyframes dragBox{0%,35%{transform:translate(0,0);}70%,100%{transform:translate(38px,16px);}}`, `<div class="cursor-stage cursor-pointer-drag"><span>Drag</span><i class="cursor-pointer"></i></div>`);
+    addEffect("Hand Cursor", "Hand pointer icon style.", "cursor-hand", `.cursor-hand .hand{position:absolute;left:22px;top:25px;font-size:28px;animation:cursorMove 1.8s ease-in-out infinite;z-index:5;}`, `<div class="cursor-stage cursor-hand"><span>Hand</span><i class="hand">☝</i></div>`);
+    addEffect("Grab Cursor", "Grab hand moves with object feel.", "cursor-grab", `.cursor-grab .hand{position:absolute;left:22px;top:25px;font-size:28px;animation:cursorMove 1.8s ease-in-out infinite;z-index:5;}`, `<div class="cursor-stage cursor-grab"><span>Grab</span><i class="hand">✊</i></div>`);
+    addEffect("Crosshair Cursor", "Crosshair cursor scans target.", "cursor-crosshair", `.cursor-crosshair .cross{position:absolute;left:25px;top:25px;width:28px;height:28px;border-radius:50%;border:2px solid #4f8cff;animation:cursorMove 1.8s ease-in-out infinite;z-index:5;} .cursor-crosshair .cross::before,.cursor-crosshair .cross::after{content:"";position:absolute;background:#4f8cff;} .cursor-crosshair .cross::before{left:50%;top:-7px;width:2px;height:40px;} .cursor-crosshair .cross::after{top:50%;left:-7px;height:2px;width:40px;}`, `<div class="cursor-stage cursor-crosshair"><span>Target</span><i class="cross"></i></div>`);
+    addEffect("Text Cursor", "Text caret blinks inside stage.", "cursor-text-caret", `.cursor-text-caret .caret{position:absolute;left:58px;top:32px;width:3px;height:30px;border-radius:999px;background:#4f8cff;animation:cursorBlink .7s step-end infinite;}`, `<div class="cursor-stage cursor-text-caret"><span>Typing</span><i class="caret"></i></div>`);
+    addEffect("Resize Cursor", "Resize cursor moves side-to-side.", "cursor-resize", `.cursor-resize .resize{position:absolute;font-size:28px;animation:resizeMove 1.6s ease-in-out infinite;} @keyframes resizeMove{0%,100%{transform:translateX(-25px);}50%{transform:translateX(25px);}}`, `<div class="cursor-stage cursor-resize"><span>Resize</span><i class="resize">↔</i></div>`);
+
+    addEffect("Cursor Trail", "Multiple fading dots follow the cursor.", "cursor-trail", `.cursor-trail .cursor-dot{animation:cursorMove 1.8s ease-in-out infinite;} .cursor-trail .t1,.cursor-trail .t2,.cursor-trail .t3{position:absolute;width:12px;height:12px;border-radius:50%;background:rgba(79,140,255,.45);left:24px;top:26px;animation:cursorMove 1.8s ease-in-out infinite;} .cursor-trail .t1{animation-delay:.08s;opacity:.65}.cursor-trail .t2{animation-delay:.16s;opacity:.4}.cursor-trail .t3{animation-delay:.24s;opacity:.22}`, `<div class="cursor-stage cursor-trail"><span>Trail</span><i class="cursor-dot"></i><i class="t1"></i><i class="t2"></i><i class="t3"></i></div>`);
+    addEffect("Long Trail", "Longer cursor trail follows movement.", "cursor-long-trail", `.cursor-long-trail i{position:absolute;width:11px;height:11px;border-radius:50%;background:#4f8cff;left:24px;top:26px;animation:cursorMove 1.9s ease-in-out infinite;} .cursor-long-trail i:nth-child(2){animation-delay:.08s;opacity:.75}.cursor-long-trail i:nth-child(3){animation-delay:.16s;opacity:.55}.cursor-long-trail i:nth-child(4){animation-delay:.24s;opacity:.35}.cursor-long-trail i:nth-child(5){animation-delay:.32s;opacity:.2}`, `<div class="cursor-stage cursor-long-trail"><span>Trail</span><i></i><i></i><i></i><i></i><i></i></div>`);
+    addEffect("Rainbow Trail", "Colorful trail dots follow cursor.", "cursor-rainbow-trail", `.cursor-rainbow-trail i{position:absolute;width:12px;height:12px;border-radius:50%;left:24px;top:26px;animation:cursorMove 1.9s ease-in-out infinite;} .cursor-rainbow-trail i:nth-child(1){background:#ff5f57}.cursor-rainbow-trail i:nth-child(2){background:#ffbd2e;animation-delay:.08s}.cursor-rainbow-trail i:nth-child(3){background:#35c759;animation-delay:.16s}.cursor-rainbow-trail i:nth-child(4){background:#4f8cff;animation-delay:.24s}.cursor-rainbow-trail i:nth-child(5){background:#8d6bff;animation-delay:.32s}`, `<div class="cursor-stage cursor-rainbow-trail"><span>Rainbow</span><i></i><i></i><i></i><i></i><i></i></div>`);
+    addEffect("Glow Trail", "Glowing cursor trail effect.", "cursor-glow-trail", `.cursor-glow-trail i{position:absolute;width:14px;height:14px;border-radius:50%;background:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.8);left:24px;top:26px;animation:cursorMove 1.8s ease-in-out infinite;} .cursor-glow-trail i:nth-child(2){animation-delay:.12s;opacity:.55}.cursor-glow-trail i:nth-child(3){animation-delay:.24s;opacity:.25}`, `<div class="cursor-stage cursor-glow-trail"><span>Glow</span><i></i><i></i><i></i></div>`);
+    addEffect("Smoke Trail", "Blurred smoke trail follows cursor.", "cursor-smoke-trail", `.cursor-smoke-trail i{position:absolute;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.22);filter:blur(6px);left:24px;top:26px;animation:cursorMove 1.9s ease-in-out infinite;} .cursor-smoke-trail i:nth-child(2){animation-delay:.15s;opacity:.55}.cursor-smoke-trail i:nth-child(3){animation-delay:.3s;opacity:.25}`, `<div class="cursor-stage cursor-smoke-trail"><span>Smoke</span><i></i><i></i><i></i></div>`);
+    addEffect("Spark Trail", "Sparkles follow the cursor path.", "cursor-spark-trail", `.cursor-spark-trail .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-spark-trail::before,.cursor-spark-trail::after{content:"✦";position:absolute;color:white;font-size:13px;z-index:4;animation:sparkTrail 1.3s ease-in-out infinite;} .cursor-spark-trail::before{left:45px;top:30px}.cursor-spark-trail::after{left:85px;top:56px;animation-delay:.35s}@keyframes sparkTrail{0%,100%{opacity:0;transform:scale(.4) rotate(0);}50%{opacity:1;transform:scale(1.2) rotate(90deg);}}`);
+    addEffect("Fire Trail", "Warm fire cursor trail.", "cursor-fire-trail", `.cursor-fire-trail i{position:absolute;width:16px;height:16px;border-radius:50%;background:#ff5f57;box-shadow:0 0 20px rgba(255,95,87,.9);left:24px;top:26px;animation:cursorMove 1.8s infinite;} .cursor-fire-trail i:nth-child(2){background:#ff9f0a;animation-delay:.12s;opacity:.65}.cursor-fire-trail i:nth-child(3){background:#ffbd2e;animation-delay:.24s;opacity:.35}`, `<div class="cursor-stage cursor-fire-trail"><span>Fire</span><i></i><i></i><i></i></div>`);
+    addEffect("Ice Trail", "Cool blue cursor trail.", "cursor-ice-trail", `.cursor-ice-trail i{position:absolute;width:14px;height:14px;border-radius:50%;background:#87f7ff;box-shadow:0 0 18px rgba(135,247,255,.85);left:24px;top:26px;animation:cursorMove 1.8s infinite;} .cursor-ice-trail i:nth-child(2){animation-delay:.12s;opacity:.55}.cursor-ice-trail i:nth-child(3){animation-delay:.24s;opacity:.3}`, `<div class="cursor-stage cursor-ice-trail"><span>Ice</span><i></i><i></i><i></i></div>`);
+    addEffect("Particle Trail", "Small particles appear around cursor path.", "cursor-particle-trail", `.cursor-particle-trail .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-particle-trail b{position:absolute;width:5px;height:5px;border-radius:50%;background:white;animation:particleTrail 1.2s infinite;} .cursor-particle-trail b:nth-child(3){left:44px;top:34px}.cursor-particle-trail b:nth-child(4){left:70px;top:52px;animation-delay:.2s}.cursor-particle-trail b:nth-child(5){left:96px;top:61px;animation-delay:.4s}@keyframes particleTrail{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.2)}}`, `<div class="cursor-stage cursor-particle-trail"><span>Particle</span><i class="cursor-dot"></i><b></b><b></b><b></b></div>`);
+    addEffect("Neon Trail", "Neon trail behind cursor.", "cursor-neon-trail", `.cursor-neon-trail i{position:absolute;width:15px;height:15px;border-radius:50%;background:#4f8cff;box-shadow:0 0 12px #4f8cff,0 0 26px #4f8cff;left:24px;top:26px;animation:cursorMove 1.8s infinite;} .cursor-neon-trail i:nth-child(2){animation-delay:.12s;opacity:.55}.cursor-neon-trail i:nth-child(3){animation-delay:.24s;opacity:.25}`, `<div class="cursor-stage cursor-neon-trail"><span>Neon</span><i></i><i></i><i></i></div>`);
+
+    addEffect("Click Ripple", "Click ripple expands from cursor.", "cursor-click-ripple", `.cursor-click-ripple .cursor-dot{left:66px;top:36px;animation:cursorClick 1.2s infinite;} .cursor-click-ripple::after{content:"";position:absolute;left:67px;top:37px;width:16px;height:16px;border-radius:50%;border:2px solid #4f8cff;animation:cursorRipple 1.2s ease-out infinite;}`);
+    addEffect("Double Click Ripple", "Two ripples expand after click.", "cursor-double-ripple", `.cursor-double-ripple .cursor-dot{left:66px;top:36px;} .cursor-double-ripple::before,.cursor-double-ripple::after{content:"";position:absolute;left:67px;top:37px;width:16px;height:16px;border-radius:50%;border:2px solid #4f8cff;animation:cursorRipple 1.2s ease-out infinite;} .cursor-double-ripple::after{animation-delay:.25s;}`);
+    addEffect("Click Press", "Cursor presses down on click.", "cursor-click-press", `.cursor-click-press .cursor-dot{left:66px;top:36px;animation:cursorClick .9s ease-in-out infinite;}`);
+    addEffect("Click Burst", "Particles burst from click point.", "cursor-click-burst", `.cursor-click-burst .cursor-dot{left:66px;top:36px;} .cursor-click-burst b{position:absolute;left:72px;top:42px;width:6px;height:6px;border-radius:50%;background:#4f8cff;animation:burst 1.2s infinite;} .cursor-click-burst b:nth-child(3){--x:28px;--y:0}.cursor-click-burst b:nth-child(4){--x:-28px;--y:0}.cursor-click-burst b:nth-child(5){--x:0;--y:24px}.cursor-click-burst b:nth-child(6){--x:0;--y:-24px}@keyframes burst{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--x),var(--y)) scale(.3)}}`, `<div class="cursor-stage cursor-click-burst"><span>Click</span><i class="cursor-dot"></i><b></b><b></b><b></b><b></b></div>`);
+    addEffect("Click Ring", "Ring appears around clicked cursor.", "cursor-click-ring", `.cursor-click-ring .cursor-dot{left:66px;top:36px;} .cursor-click-ring::after{content:"";position:absolute;left:58px;top:28px;width:32px;height:32px;border-radius:50%;border:2px solid white;animation:ringClick 1s infinite;} @keyframes ringClick{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}`);
+    addEffect("Click Check", "Click turns into check confirmation.", "cursor-click-check", `.cursor-click-check .cursor-dot{left:66px;top:36px;background:#35c759;animation:cursorPulse 1.2s infinite;} .cursor-click-check::after{content:"✓";position:absolute;left:67px;top:32px;color:white;font-size:15px;font-weight:900;z-index:7;}`);
+    addEffect("Click Error", "Click shows red error interaction.", "cursor-click-error", `.cursor-click-error .cursor-dot{left:66px;top:36px;background:#ff5f57;animation:cursorShake .65s infinite;} .cursor-click-error::after{content:"×";position:absolute;left:68px;top:30px;color:white;font-size:18px;z-index:7;}`);
+    addEffect("Click Heart", "Click creates heart reaction.", "cursor-click-heart", `.cursor-click-heart .cursor-dot{left:66px;top:36px;background:#ff5f57;} .cursor-click-heart::after{content:"♥";position:absolute;left:62px;top:20px;color:#ff5f57;font-size:26px;animation:heartFly 1.2s infinite;} @keyframes heartFly{0%{opacity:0;transform:translateY(10px) scale(.5)}45%{opacity:1;transform:translateY(-8px) scale(1.2)}100%{opacity:0;transform:translateY(-28px) scale(.8)}}`);
+    addEffect("Click Star", "Click creates star reaction.", "cursor-click-star", `.cursor-click-star .cursor-dot{left:66px;top:36px;} .cursor-click-star::after{content:"★";position:absolute;left:62px;top:20px;color:#ffbd2e;font-size:26px;animation:starFly 1.2s infinite;} @keyframes starFly{0%{opacity:0;transform:translateY(10px) scale(.5) rotate(0)}45%{opacity:1;transform:translateY(-8px) scale(1.2) rotate(90deg)}100%{opacity:0;transform:translateY(-28px) scale(.8) rotate(180deg)}}`);
+    addEffect("Click Wave", "Wave expands from click point.", "cursor-click-wave", `.cursor-click-wave .cursor-dot{left:66px;top:36px;} .cursor-click-wave::after{content:"";position:absolute;left:55px;top:25px;width:38px;height:38px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.45),transparent 65%);animation:waveClick 1.2s infinite;} @keyframes waveClick{0%{opacity:1;transform:scale(.4)}100%{opacity:0;transform:scale(2)}}`);
+
+    addEffect("Magnetic Cursor", "Cursor pulls nearby button toward it.", "cursor-magnetic", `.cursor-magnetic .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-magnetic .target{position:absolute;right:22px;bottom:20px;width:46px;height:28px;border-radius:999px;background:rgba(79,140,255,.3);border:1px solid rgba(79,140,255,.55);animation:magnetTarget 1.8s ease-in-out infinite;} @keyframes magnetTarget{0%,100%{transform:translate(0,0)}50%{transform:translate(-15px,-9px)}}`, `<div class="cursor-stage cursor-magnetic"><span>Magnet</span><i class="cursor-dot"></i><b class="target"></b></div>`);
+    addEffect("Magnetic Button", "Button moves toward cursor path.", "cursor-magnetic-button", `.cursor-magnetic-button .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-magnetic-button .target{position:absolute;left:72px;top:42px;padding:7px 12px;border-radius:999px;background:#4f8cff;color:white;font-size:10px;font-weight:900;animation:magnetButton 1.8s ease-in-out infinite;} @keyframes magnetButton{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,-8px) scale(1.05)}}`, `<div class="cursor-stage cursor-magnetic-button"><span></span><i class="cursor-dot"></i><b class="target">BTN</b></div>`);
+    addEffect("Cursor Follow Card", "Small card follows the cursor.", "cursor-follow-card", `.cursor-follow-card .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-follow-card .mini{position:absolute;width:36px;height:26px;border-radius:10px;background:rgba(255,255,255,.18);left:10px;top:12px;animation:followMini 1.8s ease-in-out infinite;} @keyframes followMini{0%,100%{transform:translate(0,0)}50%{transform:translate(72px,34px)}}`, `<div class="cursor-stage cursor-follow-card"><span>Follow</span><i class="mini"></i><i class="cursor-dot"></i></div>`);
+    addEffect("Cursor Avoid", "Object avoids the cursor.", "cursor-avoid", `.cursor-avoid .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-avoid .target{position:absolute;right:30px;top:40px;width:34px;height:24px;border-radius:10px;background:#ff5f57;animation:avoidTarget 1.8s infinite;} @keyframes avoidTarget{0%,100%{transform:translate(0,0)}50%{transform:translate(22px,-18px)}}`, `<div class="cursor-stage cursor-avoid"><span>Avoid</span><i class="cursor-dot"></i><b class="target"></b></div>`);
+    addEffect("Cursor Snap", "Cursor snaps to button center.", "cursor-snap", `.cursor-snap .cursor-dot{animation:snapCursor 1.7s ease-in-out infinite;} @keyframes snapCursor{0%,35%,100%{transform:translate(0,0)}55%,75%{transform:translate(63px,22px)}} .cursor-snap .target{position:absolute;left:84px;top:46px;width:34px;height:22px;border-radius:999px;background:#4f8cff;}`, `<div class="cursor-stage cursor-snap"><span>Snap</span><i class="cursor-dot"></i><b class="target"></b></div>`);
+    addEffect("Cursor Dock Zoom", "Dock item zooms as cursor passes.", "cursor-dock-zoom", `.cursor-dock-zoom .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-dock-zoom .dock{position:absolute;bottom:18px;display:flex;gap:8px;} .cursor-dock-zoom .dock i{width:20px;height:20px;border-radius:8px;background:rgba(255,255,255,.16);animation:dockZoom 1.8s ease-in-out infinite;} .cursor-dock-zoom .dock i:nth-child(2){animation-delay:.12s}.cursor-dock-zoom .dock i:nth-child(3){animation-delay:.24s}@keyframes dockZoom{0%,100%{transform:scale(1)}50%{transform:scale(1.65)}}`, `<div class="cursor-stage cursor-dock-zoom"><span></span><i class="cursor-dot"></i><div class="dock"><i></i><i></i><i></i></div></div>`);
+    addEffect("Cursor Tilt Target", "Target tilts toward cursor.", "cursor-tilt-target", `.cursor-tilt-target .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-tilt-target .target{position:absolute;width:56px;height:36px;border-radius:14px;background:rgba(79,140,255,.25);border:1px solid rgba(79,140,255,.5);animation:tiltTarget 1.8s infinite;} @keyframes tiltTarget{0%,100%{transform:rotateX(0) rotateY(0)}50%{transform:rotateX(14deg) rotateY(-20deg)}}`, `<div class="cursor-stage cursor-tilt-target"><span></span><i class="cursor-dot"></i><b class="target"></b></div>`);
+    addEffect("Cursor Parallax", "Background moves opposite to cursor.", "cursor-parallax", `.cursor-parallax{background:radial-gradient(circle at 30% 30%,rgba(79,140,255,.35),transparent 30%),rgba(255,255,255,.08);animation:parallaxBg 1.8s infinite;} .cursor-parallax .cursor-dot{animation:cursorMove 1.8s infinite;} @keyframes parallaxBg{0%,100%{background-position:0 0;}50%{background-position:-18px -12px;}}`);
+    addEffect("Cursor Spotlight", "Spotlight follows cursor movement.", "cursor-spotlight", `.cursor-spotlight::before{content:"";position:absolute;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.4),transparent 65%);left:0;top:0;animation:cursorSpot 1.8s infinite;z-index:1;} .cursor-spotlight .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Cursor Reveal", "Cursor reveals a brighter area.", "cursor-reveal", `.cursor-reveal{background:rgba(255,255,255,.04);} .cursor-reveal::before{content:"";position:absolute;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.16);left:8px;top:6px;animation:cursorMove 1.8s infinite;z-index:1;} .cursor-reveal .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+
+    addEffect("Image Cursor", "Preview uses an image-style custom cursor.", "cursor-image", `.cursor-image .pic{position:absolute;left:22px;top:20px;width:34px;height:34px;border-radius:12px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:cursorMove 1.8s infinite;z-index:5;box-shadow:0 0 18px rgba(79,140,255,.6);}`, `<div class="cursor-stage cursor-image"><span>Image</span><i class="pic"></i></div>`);
+    addEffect("Emoji Cursor", "Emoji cursor moves inside stage.", "cursor-emoji", `.cursor-emoji .emoji{position:absolute;left:22px;top:20px;font-size:28px;animation:cursorMove 1.8s infinite;z-index:5;}`, `<div class="cursor-stage cursor-emoji"><span>Emoji</span><i class="emoji">✨</i></div>`);
+    addEffect("Knife Cursor Demo", "Custom image cursor-style demo box.", "cursor-knife-demo", `.cursor-knife-demo .knife{position:absolute;left:22px;top:20px;font-size:30px;animation:cursorMove 1.8s infinite;z-index:5;filter:drop-shadow(0 0 12px rgba(255,255,255,.5));}`, `<div class="cursor-stage cursor-knife-demo"><span>Custom</span><i class="knife">⌁</i></div>`);
+    addEffect("Circle Outline Cursor", "Outline circle cursor moves smoothly.", "cursor-circle-outline", `.cursor-circle-outline .circle{position:absolute;left:22px;top:20px;width:34px;height:34px;border-radius:50%;border:2px solid #4f8cff;animation:cursorMove 1.8s infinite;z-index:5;}`, `<div class="cursor-stage cursor-circle-outline"><span>Circle</span><i class="circle"></i></div>`);
+    addEffect("Ring Cursor", "Ring cursor with center dot.", "cursor-ring", `.cursor-ring .ring{position:absolute;left:22px;top:20px;width:38px;height:38px;border-radius:50%;border:2px solid #4f8cff;animation:cursorMove 1.8s infinite;z-index:5;} .cursor-ring .ring::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;border-radius:50%;background:#4f8cff;transform:translate(-50%,-50%);}`, `<div class="cursor-stage cursor-ring"><span>Ring</span><i class="ring"></i></div>`);
+    addEffect("Square Cursor", "Square custom cursor moves.", "cursor-square", `.cursor-square .square{position:absolute;left:22px;top:20px;width:28px;height:28px;border-radius:8px;background:#4f8cff;animation:cursorMove 1.8s infinite;z-index:5;}`, `<div class="cursor-stage cursor-square"><span>Square</span><i class="square"></i></div>`);
+    addEffect("Diamond Cursor", "Diamond cursor rotates while moving.", "cursor-diamond", `.cursor-diamond .diamond{position:absolute;left:22px;top:20px;width:26px;height:26px;background:#4f8cff;transform:rotate(45deg);animation:diamondMove 1.8s infinite;z-index:5;} @keyframes diamondMove{0%,100%{transform:translate(0,0) rotate(45deg)}50%{transform:translate(82px,34px) rotate(225deg)}}`, `<div class="cursor-stage cursor-diamond"><span>Diamond</span><i class="diamond"></i></div>`);
+    addEffect("Cross Cursor", "Cross cursor scans across box.", "cursor-cross", `.cursor-cross .cross{position:absolute;left:22px;top:20px;width:30px;height:30px;animation:cursorMove 1.8s infinite;z-index:5;} .cursor-cross .cross::before,.cursor-cross .cross::after{content:"";position:absolute;background:#4f8cff;border-radius:999px;} .cursor-cross .cross::before{left:14px;top:0;width:3px;height:30px;} .cursor-cross .cross::after{left:0;top:14px;height:3px;width:30px;}`, `<div class="cursor-stage cursor-cross"><span>Cross</span><i class="cross"></i></div>`);
+    addEffect("Brush Cursor", "Brush cursor paints a line.", "cursor-brush", `.cursor-brush .brush{position:absolute;left:22px;top:20px;font-size:28px;animation:cursorMove 1.8s infinite;z-index:6;} .cursor-brush::after{content:"";position:absolute;left:34px;top:54px;width:78px;height:6px;border-radius:999px;background:linear-gradient(90deg,#4f8cff,#8d6bff);animation:brushLine 1.8s infinite;} @keyframes brushLine{0%,25%{transform:scaleX(0);transform-origin:left;}70%,100%{transform:scaleX(1);transform-origin:left;}}`, `<div class="cursor-stage cursor-brush"><span>Paint</span><i class="brush">╱</i></div>`);
+    addEffect("Eraser Cursor", "Eraser cursor clears a line.", "cursor-eraser", `.cursor-eraser .eraser{position:absolute;left:22px;top:20px;width:30px;height:20px;border-radius:8px;background:#ff5f57;animation:cursorMove 1.8s infinite;z-index:6;} .cursor-eraser::after{content:"";position:absolute;left:32px;top:56px;width:86px;height:5px;border-radius:999px;background:rgba(255,255,255,.25);animation:eraserLine 1.8s infinite;} @keyframes eraserLine{0%,35%{opacity:1;}75%,100%{opacity:.15;}}`, `<div class="cursor-stage cursor-eraser"><span>Erase</span><i class="eraser"></i></div>`);
+
+    addEffect("No Cursor Zone", "Area hides the default cursor.", "cursor-none-zone", `.cursor-none-zone{cursor:none;} .cursor-none-zone .cursor-dot{left:66px;top:36px;animation:cursorPulse 1.2s infinite;}`);
+    addEffect("Pointer Cursor Zone", "Area uses pointer cursor.", "cursor-pointer-zone", `.cursor-pointer-zone{cursor:pointer;} .cursor-pointer-zone .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Grab Cursor Zone", "Area uses grab cursor.", "cursor-grab-zone", `.cursor-grab-zone{cursor:grab;} .cursor-grab-zone .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Zoom In Cursor Zone", "Area uses zoom-in cursor.", "cursor-zoom-in-zone", `.cursor-zoom-in-zone{cursor:zoom-in;} .cursor-zoom-in-zone .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Zoom Out Cursor Zone", "Area uses zoom-out cursor.", "cursor-zoom-out-zone", `.cursor-zoom-out-zone{cursor:zoom-out;} .cursor-zoom-out-zone .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Help Cursor Zone", "Area uses help cursor.", "cursor-help-zone", `.cursor-help-zone{cursor:help;} .cursor-help-zone .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Wait Cursor Zone", "Area uses wait cursor.", "cursor-wait-zone", `.cursor-wait-zone{cursor:wait;} .cursor-wait-zone .cursor-dot{animation:cursorMove 1.8s infinite,cursorSpin .8s linear infinite;}`);
+    addEffect("Text Cursor Zone", "Area uses text cursor.", "cursor-text-zone", `.cursor-text-zone{cursor:text;} .cursor-text-zone .caret{position:absolute;left:70px;top:31px;width:3px;height:32px;background:#4f8cff;animation:cursorBlink .7s infinite;}`, `<div class="cursor-stage cursor-text-zone"><span>Text</span><i class="caret"></i></div>`);
+    addEffect("Move Cursor Zone", "Area uses move cursor.", "cursor-move-zone", `.cursor-move-zone{cursor:move;} .cursor-move-zone .cursor-dot{animation:cursorMoveWide 2s infinite;}`);
+    addEffect("Not Allowed Cursor", "Area uses not-allowed cursor.", "cursor-not-allowed", `.cursor-not-allowed{cursor:not-allowed;} .cursor-not-allowed .cursor-dot{background:#ff5f57;animation:cursorShake .65s infinite;}`);
+
+    addEffect("Cursor Zoom Hover", "Cursor grows when hovering target.", "cursor-zoom-hover", `.cursor-zoom-hover .cursor-dot{animation:cursorZoomHover 1.8s infinite;} @keyframes cursorZoomHover{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(82px,34px) scale(2.1)}}`);
+    addEffect("Cursor Shrink Hover", "Cursor shrinks on target hover.", "cursor-shrink-hover", `.cursor-shrink-hover .cursor-dot{animation:cursorShrinkHover 1.8s infinite;} @keyframes cursorShrinkHover{0%,100%{transform:translate(0,0) scale(1.4)}50%{transform:translate(82px,34px) scale(.55)}}`);
+    addEffect("Cursor Blend Hover", "Cursor uses blend mode style.", "cursor-blend-hover", `.cursor-blend-hover .cursor-dot{background:white;mix-blend-mode:difference;animation:cursorMove 1.8s infinite;}`);
+    addEffect("Cursor Blur Hover", "Cursor becomes blurred soft blob.", "cursor-blur-hover", `.cursor-blur-hover .cursor-dot{width:32px;height:32px;background:rgba(79,140,255,.45);filter:blur(6px);animation:cursorMove 1.8s infinite;}`);
+    addEffect("Cursor Outline Hover", "Cursor becomes outline ring.", "cursor-outline-hover", `.cursor-outline-hover .cursor-dot{background:transparent;border:2px solid #4f8cff;width:34px;height:34px;animation:cursorMove 1.8s infinite;}`);
+    addEffect("Cursor Invert Hover", "Cursor simulates inverted white dot.", "cursor-invert-hover", `.cursor-invert-hover .cursor-dot{background:white;mix-blend-mode:difference;animation:cursorMove 1.8s infinite,cursorPulse 1s infinite;}`);
+    addEffect("Cursor Label Hover", "Small label follows cursor.", "cursor-label-hover", `.cursor-label-hover .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-label-hover .label{position:absolute;left:46px;top:24px;padding:5px 8px;border-radius:999px;background:white;color:#111;font-size:10px;font-weight:900;animation:labelMove 1.8s infinite;z-index:7;} @keyframes labelMove{0%,100%{transform:translate(0,0)}50%{transform:translate(82px,34px)}}`, `<div class="cursor-stage cursor-label-hover"><span></span><i class="cursor-dot"></i><b class="label">View</b></div>`);
+    addEffect("Cursor Tooltip", "Tooltip follows cursor movement.", "cursor-tooltip", `.cursor-tooltip .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-tooltip .tip{position:absolute;left:44px;top:16px;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.92);color:#111;font-size:10px;font-weight:900;animation:labelMove 1.8s infinite;z-index:7;} @keyframes labelMove{0%,100%{transform:translate(0,0)}50%{transform:translate(70px,34px)}}`, `<div class="cursor-stage cursor-tooltip"><span></span><i class="cursor-dot"></i><b class="tip">Tooltip</b></div>`);
+    addEffect("Cursor Preview Bubble", "Preview bubble opens near cursor.", "cursor-preview-bubble", `.cursor-preview-bubble .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-preview-bubble .bubble{position:absolute;left:46px;top:16px;width:46px;height:32px;border-radius:14px;background:rgba(79,140,255,.35);border:1px solid rgba(79,140,255,.55);animation:bubbleMove 1.8s infinite;z-index:6;} @keyframes bubbleMove{0%,100%{transform:translate(0,0) scale(.8);opacity:.5}50%{transform:translate(70px,32px) scale(1);opacity:1}}`, `<div class="cursor-stage cursor-preview-bubble"><span>Preview</span><i class="cursor-dot"></i><b class="bubble"></b></div>`);
+    addEffect("Cursor Drag Ghost", "Ghost copy appears while dragging.", "cursor-drag-ghost", `.cursor-drag-ghost .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-drag-ghost .ghost{position:absolute;left:40px;top:32px;width:42px;height:28px;border-radius:12px;background:rgba(255,255,255,.18);animation:ghostMove 1.8s infinite;z-index:5;} @keyframes ghostMove{0%,100%{transform:translate(0,0);opacity:.35}50%{transform:translate(62px,20px);opacity:.9}}`, `<div class="cursor-stage cursor-drag-ghost"><span>Ghost</span><i class="cursor-dot"></i><b class="ghost"></b></div>`);
+
+    addEffect("Mac Dock Cursor", "Mac-style cursor zoom on dock row.", "cursor-mac-dock", `.cursor-mac-dock .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-mac-dock .dock{position:absolute;bottom:16px;display:flex;gap:7px;} .cursor-mac-dock .dock i{width:20px;height:20px;border-radius:8px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:macDock 1.8s infinite;} .cursor-mac-dock .dock i:nth-child(2){animation-delay:.1s}.cursor-mac-dock .dock i:nth-child(3){animation-delay:.2s}.cursor-mac-dock .dock i:nth-child(4){animation-delay:.3s}@keyframes macDock{0%,100%{transform:scale(1)}50%{transform:scale(1.75) translateY(-6px)}}`, `<div class="cursor-stage cursor-mac-dock"><span></span><i class="cursor-dot"></i><div class="dock"><i></i><i></i><i></i><i></i></div></div>`);
+    addEffect("Mac Magnifier Cursor", "Cursor magnifier bubble zooms area.", "cursor-magnifier", `.cursor-magnifier .lens{position:absolute;left:18px;top:18px;width:46px;height:46px;border-radius:50%;border:2px solid white;background:rgba(79,140,255,.18);backdrop-filter:blur(4px);animation:cursorMove 1.8s infinite;z-index:6;} .cursor-magnifier .lens::after{content:"";position:absolute;right:-12px;bottom:-8px;width:18px;height:4px;border-radius:999px;background:white;transform:rotate(45deg);}`, `<div class="cursor-stage cursor-magnifier"><span>Zoom</span><i class="lens"></i></div>`);
+    addEffect("Spotlight Cursor", "Large spotlight follows cursor.", "cursor-large-spotlight", `.cursor-large-spotlight::before{content:"";position:absolute;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.2),transparent 70%);left:0;top:0;animation:cursorSpot 1.8s infinite;z-index:1;} .cursor-large-spotlight .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Dark Spotlight Cursor", "Dark overlay with cursor light reveal.", "cursor-dark-spotlight", `.cursor-dark-spotlight{background:rgba(0,0,0,.65);} .cursor-dark-spotlight::before{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.42),transparent 65%);left:0;top:0;animation:cursorSpot 1.8s infinite;z-index:1;} .cursor-dark-spotlight .cursor-dot{animation:cursorMove 1.8s infinite;}`);
+    addEffect("Gradient Cursor", "Cursor itself uses moving gradient.", "cursor-gradient-dot", `.cursor-gradient-dot .cursor-dot{background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:220%;animation:cursorMove 1.8s infinite,cursorGradient 1.5s infinite;}`);
+    addEffect("Rainbow Cursor", "Rainbow cursor dot moves.", "cursor-rainbow-dot", `.cursor-rainbow-dot .cursor-dot{background:linear-gradient(90deg,#ff5f57,#ffbd2e,#35c759,#4f8cff,#8d6bff);background-size:300%;animation:cursorMove 1.8s infinite,cursorGradient 1.5s infinite;}`);
+    addEffect("Holographic Cursor", "Holographic soft cursor style.", "cursor-holo-dot", `.cursor-holo-dot .cursor-dot{width:26px;height:26px;background:linear-gradient(120deg,rgba(255,255,255,.6),rgba(135,247,255,.7),rgba(255,158,231,.7));background-size:260%;animation:cursorMove 1.8s infinite,cursorGradient 1.5s infinite;}`);
+    addEffect("Liquid Cursor", "Liquid blob cursor morphs while moving.", "cursor-liquid", `.cursor-liquid .cursor-dot{width:28px;height:28px;border-radius:42% 58% 63% 37%/38% 42% 58% 62%;animation:liquidMove 1.8s infinite;} @keyframes liquidMove{0%,100%{transform:translate(0,0);border-radius:42% 58% 63% 37%/38% 42% 58% 62%;}50%{transform:translate(82px,34px);border-radius:58% 42% 37% 63%/62% 58% 42% 38%;}}`);
+    addEffect("Blob Cursor", "Blob cursor with blur glow.", "cursor-blob", `.cursor-blob .cursor-dot{width:34px;height:34px;background:rgba(79,140,255,.45);filter:blur(3px);animation:cursorMove 1.8s infinite,cursorPulse 1s infinite;}`);
+    addEffect("Premium Cursor", "Premium cursor with glow, ring, and trail.", "cursor-premium", `.cursor-premium .cursor-dot{width:18px;height:18px;background:white;box-shadow:0 0 18px rgba(255,255,255,.85);animation:cursorMove 1.8s infinite;} .cursor-premium::before{content:"";position:absolute;left:17px;top:19px;width:34px;height:34px;border-radius:50%;border:2px solid rgba(79,140,255,.8);animation:premiumRing 1.8s infinite;z-index:4;} @keyframes premiumRing{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(82px,34px) scale(1.4)}}`);
+
+    addEffect("Scroll Cursor", "Cursor scroll wheel demo.", "cursor-scroll", `.cursor-scroll .wheel{position:absolute;width:34px;height:52px;border-radius:999px;border:2px solid white;animation:cursorFloat 1.8s infinite;} .cursor-scroll .wheel::before{content:"";position:absolute;left:50%;top:10px;width:4px;height:10px;border-radius:999px;background:#4f8cff;transform:translateX(-50%);animation:scrollWheel 1s infinite;} @keyframes scrollWheel{0%{top:9px;opacity:1}100%{top:26px;opacity:0}}`, `<div class="cursor-stage cursor-scroll"><span></span><i class="wheel"></i></div>`);
+    addEffect("Drag Scroll Cursor", "Cursor drags page downward.", "cursor-drag-scroll", `.cursor-drag-scroll .cursor-dot{left:66px;top:26px;animation:dragScroll 1.5s infinite;} @keyframes dragScroll{0%,100%{transform:translateY(0)}50%{transform:translateY(32px)}} .cursor-drag-scroll::after{content:"";position:absolute;right:18px;top:22px;width:4px;height:50px;border-radius:999px;background:rgba(255,255,255,.14);}`, `<div class="cursor-stage cursor-drag-scroll"><span>Scroll</span><i class="cursor-dot"></i></div>`);
+    addEffect("Horizontal Scroll Cursor", "Cursor moves horizontally to show scroll.", "cursor-horizontal-scroll", `.cursor-horizontal-scroll .cursor-dot{left:24px;top:40px;animation:horizontalScroll 1.6s infinite;} @keyframes horizontalScroll{0%,100%{transform:translateX(0)}50%{transform:translateX(86px)}} .cursor-horizontal-scroll::after{content:"↔";position:absolute;bottom:16px;color:#4f8cff;font-size:22px;}`);
+    addEffect("Swipe Cursor", "Swipe gesture cursor movement.", "cursor-swipe", `.cursor-swipe .cursor-dot{left:24px;top:40px;animation:swipeCursor 1.4s infinite;} @keyframes swipeCursor{0%{transform:translateX(0);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateX(88px);opacity:0}} .cursor-swipe::after{content:"Swipe";position:absolute;bottom:14px;color:rgba(255,255,255,.65);font-size:11px;font-weight:900;}`);
+    addEffect("Pinch Cursor", "Two cursors pinch inward.", "cursor-pinch", `.cursor-pinch i{position:absolute;width:14px;height:14px;border-radius:50%;background:#4f8cff;top:39px;animation:pinch 1.4s infinite;} .cursor-pinch i:nth-child(2){animation-direction:reverse;} @keyframes pinch{0%,100%{left:28px}50%{left:64px}}`, `<div class="cursor-stage cursor-pinch"><span>Pinch</span><i></i><i></i></div>`);
+    addEffect("Zoom Gesture Cursor", "Two cursors move apart.", "cursor-zoom-gesture", `.cursor-zoom-gesture i{position:absolute;width:14px;height:14px;border-radius:50%;background:#4f8cff;top:39px;} .cursor-zoom-gesture i:nth-child(1){animation:zoomLeft 1.4s infinite;} .cursor-zoom-gesture i:nth-child(2){animation:zoomRight 1.4s infinite;} @keyframes zoomLeft{0%,100%{left:64px}50%{left:28px}} @keyframes zoomRight{0%,100%{left:72px}50%{left:110px}}`, `<div class="cursor-stage cursor-zoom-gesture"><span>Zoom</span><i></i><i></i></div>`);
+    addEffect("Rotate Gesture", "Cursor rotates around center.", "cursor-rotate-gesture", `.cursor-rotate-gesture .cursor-dot{left:66px;top:36px;animation:rotateGesture 1.5s linear infinite;} @keyframes rotateGesture{0%{transform:rotate(0deg) translateX(28px) rotate(0deg)}100%{transform:rotate(360deg) translateX(28px) rotate(-360deg)}}`);
+    addEffect("Drag Selection", "Cursor creates selection rectangle.", "cursor-drag-selection", `.cursor-drag-selection .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-drag-selection::after{content:"";position:absolute;left:35px;top:32px;width:76px;height:38px;border:2px dashed rgba(79,140,255,.8);background:rgba(79,140,255,.08);animation:selectionBox 1.8s infinite;} @keyframes selectionBox{0%,30%{transform:scale(.2);opacity:.3;transform-origin:left top;}70%,100%{transform:scale(1);opacity:1;transform-origin:left top;}}`);
+    addEffect("Lasso Selection", "Cursor draws lasso circle.", "cursor-lasso", `.cursor-lasso .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-lasso::after{content:"";position:absolute;width:62px;height:40px;border-radius:50%;border:2px dashed #4f8cff;animation:lasso 1.8s infinite;} @keyframes lasso{0%,100%{transform:scale(.7) rotate(0);opacity:.35}50%{transform:scale(1.2) rotate(18deg);opacity:1}}`);
+    addEffect("Drawing Cursor", "Cursor draws a glowing path.", "cursor-drawing", `.cursor-drawing .cursor-dot{animation:cursorMove 1.8s infinite;} .cursor-drawing::after{content:"";position:absolute;left:35px;top:54px;width:78px;height:5px;border-radius:999px;background:#4f8cff;box-shadow:0 0 16px rgba(79,140,255,.8);animation:drawLine 1.8s infinite;} @keyframes drawLine{0%,25%{transform:scaleX(0);transform-origin:left;}70%,100%{transform:scaleX(1);transform-origin:left;}}`);
+    addEffect("Final Premium Cursor", "Premium cursor with gradient glow, ring, and trail.", "cursor-final-premium", `.cursor-final-premium .cursor-dot{width:18px;height:18px;background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:220%;animation:cursorMove 1.8s infinite,cursorGradient 1.2s infinite;box-shadow:0 0 28px rgba(79,140,255,.8);} .cursor-final-premium::before{content:"";position:absolute;left:16px;top:18px;width:38px;height:38px;border-radius:50%;border:2px solid rgba(79,140,255,.75);animation:premiumRing 1.8s infinite;z-index:4;} .cursor-final-premium::after{content:"";position:absolute;left:14px;top:16px;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.35),transparent 70%);animation:premiumRing 1.8s infinite;z-index:1;} @keyframes premiumRing{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(82px,34px) scale(1.35)}}`);
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
+
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = commonKeyframes + "\n\n" + effects.map(effect => effect.css).join("\n\n");
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards() {
+      grid.innerHTML = "";
+
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
+
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseCursorCSS}
+
+${commonKeyframes}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    function applySearch() {
+      const value = searchInput.value.trim().toLowerCase();
+
+      filteredEffects = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value)
+        );
+      });
+
+      visibleCount = batchSize;
+      renderCards();
+    }
+
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
+  </script>
+</body>
+</html>
