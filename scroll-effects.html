@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scroll Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1560px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 760px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      padding-bottom: 35px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+      perspective: 900px;
+    }
+
+    .scroll-demo {
+      position: relative;
+      width: 150px;
+      height: 92px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 950;
+      overflow: hidden;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+    }
+
+    .scroll-demo span {
+      position: relative;
+      z-index: 8;
+      text-shadow: 0 4px 18px rgba(0,0,0,.55);
+    }
+
+    .scroll-demo .panel {
+      position: absolute;
+      width: 72px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(79,140,255,0.24);
+      border: 1px solid rgba(79,140,255,0.45);
+      box-shadow: 0 16px 34px rgba(0,0,0,0.28);
+      z-index: 4;
+    }
+
+    .scroll-demo .line {
+      position: absolute;
+      width: 96px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.16);
+      z-index: 4;
+    }
+
+    .scroll-demo .dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #4f8cff;
+      box-shadow: 0 0 18px rgba(79,140,255,0.8);
+      z-index: 5;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu" id="mainMenu"></nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Scroll Effects</h1>
+          <p>100 scroll reveal, parallax, sticky, progress, snap, horizontal scroll, scroll text, image reveal, timeline, and premium page motion effects.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “reveal”, “parallax”, “sticky”, “progress”, “snap”, “horizontal”, or “timeline”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
+    </main>
+  </div>
+
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
+  <script>
+    const baseScrollCSS = `.scroll-demo {
+  position: relative;
+  width: 150px;
+  height: 92px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 13px;
+  font-weight: 950;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+.scroll-demo span {
+  position: relative;
+  z-index: 8;
+  text-shadow: 0 4px 18px rgba(0,0,0,.55);
+}
+.scroll-demo .panel {
+  position: absolute;
+  width: 72px;
+  height: 46px;
+  border-radius: 16px;
+  background: rgba(79,140,255,0.24);
+  border: 1px solid rgba(79,140,255,0.45);
+  box-shadow: 0 16px 34px rgba(0,0,0,0.28);
+  z-index: 4;
+}
+.scroll-demo .line {
+  position: absolute;
+  width: 96px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.16);
+  z-index: 4;
+}
+.scroll-demo .dot {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #4f8cff;
+  box-shadow: 0 0 18px rgba(79,140,255,0.8);
+  z-index: 5;
+}`;
+
+    const commonKeyframes = `
+@keyframes scrollRevealUp { 0%,100%{opacity:0;transform:translateY(34px);} 45%,75%{opacity:1;transform:translateY(0);} }
+@keyframes scrollRevealDown { 0%,100%{opacity:0;transform:translateY(-34px);} 45%,75%{opacity:1;transform:translateY(0);} }
+@keyframes scrollRevealLeft { 0%,100%{opacity:0;transform:translateX(-48px);} 45%,75%{opacity:1;transform:translateX(0);} }
+@keyframes scrollRevealRight { 0%,100%{opacity:0;transform:translateX(48px);} 45%,75%{opacity:1;transform:translateX(0);} }
+@keyframes scrollFade { 0%,100%{opacity:.2;} 45%,75%{opacity:1;} }
+@keyframes scrollScale { 0%,100%{opacity:.25;transform:scale(.65);} 45%,75%{opacity:1;transform:scale(1);} }
+@keyframes scrollRotate { 0%,100%{opacity:.25;transform:rotate(-18deg) scale(.8);} 45%,75%{opacity:1;transform:rotate(0) scale(1);} }
+@keyframes scrollFlipX { 0%,100%{opacity:.25;transform:rotateX(80deg);} 45%,75%{opacity:1;transform:rotateX(0);} }
+@keyframes scrollFlipY { 0%,100%{opacity:.25;transform:rotateY(80deg);} 45%,75%{opacity:1;transform:rotateY(0);} }
+@keyframes scrollProgress { 0%{transform:scaleX(0);} 85%,100%{transform:scaleX(1);} }
+@keyframes scrollMoveY { 0%,100%{transform:translateY(36px);} 50%{transform:translateY(-36px);} }
+@keyframes scrollMoveX { 0%,100%{transform:translateX(-48px);} 50%{transform:translateX(48px);} }
+@keyframes scrollParallax { 0%,100%{transform:translateY(-18px);} 50%{transform:translateY(18px);} }
+@keyframes scrollBg { 0%,100%{background-position:0 0;} 50%{background-position:0 70px;} }
+@keyframes scrollLine { 0%,100%{height:12px;} 50%{height:76px;} }
+@keyframes scrollDot { 0%,100%{top:14px;} 50%{top:66px;} }
+@keyframes scrollShine { 0%{left:-45%;} 55%,100%{left:130%;} }
+@keyframes scrollGlow { 0%,100%{box-shadow:0 0 0 rgba(79,140,255,0);} 50%{box-shadow:0 0 28px rgba(79,140,255,.7);} }
+@keyframes scrollGradient { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} }
+@keyframes scrollBlur { 0%,100%{filter:blur(10px);opacity:.25;} 45%,75%{filter:blur(0);opacity:1;} }
+@keyframes scrollClip { 0%,100%{clip-path:inset(0 100% 0 0);} 45%,75%{clip-path:inset(0 0 0 0);} }
+@keyframes scrollMask { 0%,100%{clip-path:circle(0% at 50% 50%);} 45%,75%{clip-path:circle(80% at 50% 50%);} }
+`;
+
+    const effectData = [
+      ["Fade In On Scroll", "Element fades in when it enters viewport.", "fade"],
+      ["Fade Out On Scroll", "Element fades out while page scrolls.", "fadeOut"],
+      ["Reveal Up", "Card reveals from bottom to top.", "up"],
+      ["Reveal Down", "Card reveals from top to bottom.", "down"],
+      ["Reveal Left", "Card reveals from left side.", "left"],
+      ["Reveal Right", "Card reveals from right side.", "right"],
+      ["Scale Reveal", "Card scales up while revealing.", "scale"],
+      ["Zoom Out Reveal", "Card zooms out into place.", "zoomOut"],
+      ["Rotate Reveal", "Card rotates into view.", "rotate"],
+      ["Blur Reveal", "Card removes blur while entering.", "blur"],
+
+      ["Clip Reveal", "Content reveals with horizontal clipping.", "clip"],
+      ["Circle Mask Reveal", "Content reveals with circular mask.", "mask"],
+      ["Flip X Reveal", "Card flips on X-axis during scroll.", "flipX"],
+      ["Flip Y Reveal", "Card flips on Y-axis during scroll.", "flipY"],
+      ["Skew Reveal", "Card enters with skew correction.", "skew"],
+      ["Elastic Reveal", "Card enters with elastic scale.", "elastic"],
+      ["Soft Slide Reveal", "Soft slide and opacity reveal.", "softSlide"],
+      ["Premium Reveal", "Premium glow reveal animation.", "premiumReveal"],
+      ["Stagger Reveal", "Multiple small blocks reveal one by one.", "stagger"],
+      ["Cascade Reveal", "Stacked elements cascade upward.", "cascade"],
+
+      ["Scroll Progress Bar", "Top scroll progress bar fills.", "progressTop"],
+      ["Bottom Progress Bar", "Bottom progress bar fills.", "progressBottom"],
+      ["Circular Progress", "Circular progress fills while scrolling.", "circleProgress"],
+      ["Side Scroll Indicator", "Vertical side line grows.", "sideProgress"],
+      ["Dot Scroll Indicator", "Dot moves down on scroll track.", "dotIndicator"],
+      ["Section Progress", "Section progress line fills.", "sectionProgress"],
+      ["Reading Progress", "Reading progress pill fills.", "reading"],
+      ["Timeline Progress", "Timeline line fills down.", "timeline"],
+      ["Step Progress", "Steps activate during scroll.", "steps"],
+      ["Scroll Counter", "Counter changes while scrolling.", "counter"],
+
+      ["Parallax Card", "Foreground card moves slower than background.", "parallaxCard"],
+      ["Parallax Background", "Background moves vertically.", "parallaxBg"],
+      ["Parallax Text", "Text moves with parallax offset.", "parallaxText"],
+      ["Parallax Image", "Image layer slides behind content.", "parallaxImage"],
+      ["Deep Parallax", "Two layers move in opposite directions.", "deepParallax"],
+      ["Mouse + Scroll Parallax", "Premium parallax motion feel.", "mouseScroll"],
+      ["Hero Parallax", "Hero background and card move separately.", "heroParallax"],
+      ["Floating Parallax", "Floating element moves with scroll.", "floatingParallax"],
+      ["Depth Parallax", "Depth card tilts while scrolling.", "depthParallax"],
+      ["3D Parallax", "3D card moves in perspective.", "parallax3D"],
+
+      ["Sticky Header Demo", "Header sticks while content scrolls.", "stickyHeader"],
+      ["Sticky Sidebar Demo", "Sidebar stays while content moves.", "stickySidebar"],
+      ["Sticky Card Stack", "Cards stack like sticky sections.", "stickyStack"],
+      ["Sticky Reveal", "Content reveals behind sticky card.", "stickyReveal"],
+      ["Sticky Image", "Image stays fixed while text moves.", "stickyImage"],
+      ["Sticky Progress", "Sticky progress element changes.", "stickyProgress"],
+      ["Pinned Section", "Section stays pinned before moving.", "pinned"],
+      ["Pinned Text", "Text remains pinned in center.", "pinnedText"],
+      ["Sticky CTA", "CTA sticks at bottom.", "stickyCta"],
+      ["Sticky Timeline", "Timeline marker stays fixed.", "stickyTimeline"],
+
+      ["Horizontal Scroll", "Content moves horizontally while scrolling.", "horizontal"],
+      ["Horizontal Cards", "Cards slide horizontally.", "horizontalCards"],
+      ["Marquee On Scroll", "Text marquee moves on scroll.", "marquee"],
+      ["Image Strip Scroll", "Image strip slides sideways.", "imageStrip"],
+      ["Gallery Scroll", "Gallery moves horizontally.", "gallery"],
+      ["Carousel Scroll", "Carousel snap scroll effect.", "carousel"],
+      ["Snap Scroll", "Sections snap into place.", "snap"],
+      ["Snap Cards", "Cards snap one by one.", "snapCards"],
+      ["Sideways Reveal", "Sideways reveal on scroll.", "sidewaysReveal"],
+      ["Track Scroll", "Scroll track moves like slider.", "track"],
+
+      ["Scroll Text Fill", "Text fills with color during scroll.", "textFill"],
+      ["Scroll Text Blur", "Text sharpens while scrolling.", "textBlur"],
+      ["Scroll Letter Reveal", "Letters reveal one by one.", "letterReveal"],
+      ["Scroll Word Reveal", "Words rise in sequence.", "wordReveal"],
+      ["Scroll Highlight", "Highlight passes under text.", "highlight"],
+      ["Scroll Underline", "Underline grows with scroll.", "underline"],
+      ["Big Text Parallax", "Large text moves behind card.", "bigText"],
+      ["Text Mask Scroll", "Text mask opens with scroll.", "textMask"],
+      ["Number Scroll", "Numbers count during scroll.", "numberScroll"],
+      ["Title Pin Reveal", "Title stays pinned then reveals.", "titlePin"],
+
+      ["Image Zoom Scroll", "Image zooms in on scroll.", "imageZoom"],
+      ["Image Zoom Out", "Image zooms out on scroll.", "imageZoomOut"],
+      ["Image Clip Reveal", "Image reveals with clipping.", "imageClip"],
+      ["Image Mask Reveal", "Image reveals through circle mask.", "imageMask"],
+      ["Image Blur Reveal", "Image clears blur while scrolling.", "imageBlur"],
+      ["Image Pan Scroll", "Image pans sideways.", "imagePan"],
+      ["Image Rotate Scroll", "Image rotates during scroll.", "imageRotate"],
+      ["Image Stack Scroll", "Image cards stack while scrolling.", "imageStack"],
+      ["Before After Scroll", "Before-after slider moves on scroll.", "beforeAfter"],
+      ["Cinematic Image Reveal", "Cinematic wide image reveal.", "cinematic"],
+
+      ["Scroll Glow Background", "Background glow moves with scroll.", "glowBg"],
+      ["Scroll Gradient Shift", "Gradient shifts during scroll.", "gradientShift"],
+      ["Scroll Grid Move", "Grid background scrolls vertically.", "gridMove"],
+      ["Scroll Noise", "Noise texture moves during scroll.", "noise"],
+      ["Scroll Spotlight", "Spotlight moves down the section.", "spotlight"],
+      ["Scroll Wave", "Wave moves upward.", "wave"],
+      ["Scroll Particles", "Particles rise while scrolling.", "particles"],
+      ["Scroll Scanline", "Scan line travels vertically.", "scanline"],
+      ["Scroll Aurora", "Aurora glow shifts on scroll.", "aurora"],
+      ["Scroll Mesh", "Mesh blobs move with scroll.", "mesh"],
+
+      ["Smooth Scroll Button", "Button scrolls to section smoothly.", "smoothButton"],
+      ["Back To Top", "Back-to-top bubble appears.", "backTop"],
+      ["Scroll Hint Arrow", "Arrow hints user to scroll.", "hintArrow"],
+      ["Mouse Wheel Hint", "Mouse wheel indicator animates.", "mouseHint"],
+      ["Scroll Down Label", "Scroll down label moves.", "downLabel"],
+      ["Section Divider Scroll", "Divider line grows on scroll.", "divider"],
+      ["Scroll Shadow", "Shadow appears as page scrolls.", "shadow"],
+      ["Scroll Fade Edge", "Top and bottom fade edges.", "fadeEdge"],
+      ["Scroll Glass Layer", "Glass layer changes with scroll.", "glassLayer"],
+      ["Final Premium Scroll", "Premium scroll reveal, glow, shine, and progress.", "finalPremium"]
+    ];
+
+    function cssFor(kind, className) {
+      const selector = "." + className;
+
+      const map = {
+        fade: `${selector} .panel{animation:scrollFade 2s ease-in-out infinite;}`,
+        fadeOut: `${selector} .panel{animation:scrollFade 2s ease-in-out infinite reverse;}`,
+        up: `${selector} .panel{animation:scrollRevealUp 2s ease-in-out infinite;}`,
+        down: `${selector} .panel{animation:scrollRevealDown 2s ease-in-out infinite;}`,
+        left: `${selector} .panel{animation:scrollRevealLeft 2s ease-in-out infinite;}`,
+        right: `${selector} .panel{animation:scrollRevealRight 2s ease-in-out infinite;}`,
+        scale: `${selector} .panel{animation:scrollScale 2s ease-in-out infinite;}`,
+        zoomOut: `${selector} .panel{animation:scrollScale 2s ease-in-out infinite reverse;}`,
+        rotate: `${selector} .panel{animation:scrollRotate 2s ease-in-out infinite;}`,
+        blur: `${selector} .panel{animation:scrollBlur 2s ease-in-out infinite;}`,
+        clip: `${selector} .panel{animation:scrollClip 2s ease-in-out infinite;}`,
+        mask: `${selector} .panel{animation:scrollMask 2s ease-in-out infinite;}`,
+        flipX: `${selector} .panel{animation:scrollFlipX 2s ease-in-out infinite;transform-style:preserve-3d;}`,
+        flipY: `${selector} .panel{animation:scrollFlipY 2s ease-in-out infinite;transform-style:preserve-3d;}`,
+        skew: `${selector} .panel{animation:${className}Skew 2s ease-in-out infinite;} @keyframes ${className}Skew{0%,100%{opacity:.25;transform:skewX(-18deg) translateY(24px);}45%,75%{opacity:1;transform:skewX(0) translateY(0);}}`,
+        elastic: `${selector} .panel{animation:${className}Elastic 2s cubic-bezier(.2,.9,.2,1.35) infinite;} @keyframes ${className}Elastic{0%,100%{opacity:.2;transform:translateY(28px) scale(.45);}45%,75%{opacity:1;transform:translateY(0) scale(1);}}`,
+        softSlide: `${selector} .panel{animation:scrollRevealUp 2.4s ease-in-out infinite;}`,
+        premiumReveal: `${selector} .panel{animation:scrollRevealUp 2s ease-in-out infinite,scrollGlow 1.8s ease-in-out infinite;}`,
+        stagger: `${selector} i{position:absolute;width:28px;height:22px;border-radius:8px;background:#4f8cff;animation:scrollRevealUp 1.8s ease-in-out infinite;} ${selector} i:nth-child(2){left:30px;animation-delay:.1s;} ${selector} i:nth-child(3){left:62px;animation-delay:.2s;} ${selector} i:nth-child(4){left:94px;animation-delay:.3s;}`,
+        cascade: `${selector} i{position:absolute;width:80px;height:10px;border-radius:999px;background:rgba(255,255,255,.2);animation:scrollRevealRight 1.8s infinite;} ${selector} i:nth-child(2){top:30px;animation-delay:.12s;} ${selector} i:nth-child(3){top:48px;animation-delay:.24s;} ${selector} i:nth-child(4){top:66px;animation-delay:.36s;}`,
+
+        progressTop: `${selector}::before{content:"";position:absolute;left:0;top:0;height:5px;width:100%;background:#4f8cff;transform-origin:left;animation:scrollProgress 2s ease-in-out infinite;}`,
+        progressBottom: `${selector}::before{content:"";position:absolute;left:0;bottom:0;height:5px;width:100%;background:#8d6bff;transform-origin:left;animation:scrollProgress 2s ease-in-out infinite;}`,
+        circleProgress: `${selector}::before{content:"";position:absolute;width:62px;height:62px;border-radius:50%;background:conic-gradient(#4f8cff 0 270deg,rgba(255,255,255,.12) 270deg);animation:scrollRotate 2s infinite;} ${selector}::after{content:"";position:absolute;width:44px;height:44px;border-radius:50%;background:#111;z-index:3;}`,
+        sideProgress: `${selector}::before{content:"";position:absolute;left:16px;top:10px;width:5px;border-radius:999px;background:#4f8cff;animation:scrollLine 2s ease-in-out infinite;}`,
+        dotIndicator: `${selector}::before{content:"";position:absolute;right:18px;top:10px;width:4px;height:72px;border-radius:999px;background:rgba(255,255,255,.18);} ${selector} .dot{right:14px;left:auto;animation:scrollDot 2s infinite;}`,
+        sectionProgress: `${selector} .line{left:26px;bottom:22px;transform-origin:left;animation:scrollProgress 2s infinite;}`,
+        reading: `${selector}::before{content:"";position:absolute;left:26px;right:26px;bottom:24px;height:8px;border-radius:999px;background:rgba(255,255,255,.15);} ${selector}::after{content:"";position:absolute;left:26px;bottom:24px;height:8px;width:96px;border-radius:999px;background:#4f8cff;transform-origin:left;animation:scrollProgress 2s infinite;}`,
+        timeline: `${selector}::before{content:"";position:absolute;left:50%;top:10px;width:4px;border-radius:999px;background:#4f8cff;animation:scrollLine 2s infinite;}`,
+        steps: `${selector} i{position:absolute;width:18px;height:18px;border-radius:50%;background:rgba(255,255,255,.16);animation:scrollScale 2s infinite;} ${selector} i:nth-child(2){left:34px;} ${selector} i:nth-child(3){left:66px;animation-delay:.2s;} ${selector} i:nth-child(4){left:98px;animation-delay:.4s;}`,
+        counter: `${selector} span::after{content:" 0%";animation:${className}Counter 2s steps(5) infinite;} @keyframes ${className}Counter{0%{content:" 0%";}20%{content:" 25%";}40%{content:" 50%";}60%{content:" 75%";}80%,100%{content:" 100%";}}`,
+
+        parallaxCard: `${selector} .panel{animation:scrollParallax 2s ease-in-out infinite;} ${selector}::before{content:"";position:absolute;inset:-20px;background:radial-gradient(circle,rgba(79,140,255,.35),transparent 60%);animation:scrollMoveY 2s infinite reverse;}`,
+        parallaxBg: `${selector}{background-image:linear-gradient(rgba(79,140,255,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(79,140,255,.2) 1px,transparent 1px);background-size:20px 20px;animation:scrollBg 2s infinite;}`,
+        parallaxText: `${selector} span{animation:scrollMoveY 2s infinite;}`,
+        parallaxImage: `${selector}::before{content:"";position:absolute;inset:-30px;background:linear-gradient(120deg,#4f8cff,#8d6bff);animation:scrollParallax 2s infinite;}`,
+        deepParallax: `${selector}::before{content:"";position:absolute;width:110px;height:70px;border-radius:22px;background:rgba(79,140,255,.25);animation:scrollMoveY 2s infinite;} ${selector}::after{content:"";position:absolute;width:70px;height:42px;border-radius:16px;background:rgba(141,107,255,.35);animation:scrollMoveY 2s infinite reverse;}`,
+        mouseScroll: `${selector} .panel{animation:${className}Mouse 2s infinite;} @keyframes ${className}Mouse{0%,100%{transform:perspective(600px) rotateX(0) rotateY(0) translateY(18px);}50%{transform:perspective(600px) rotateX(12deg) rotateY(-16deg) translateY(-18px);}}`,
+        heroParallax: `${selector}::before{content:"";position:absolute;inset:-25px;background:radial-gradient(circle at 30% 20%,rgba(79,140,255,.55),transparent 35%),radial-gradient(circle at 80% 70%,rgba(141,107,255,.45),transparent 35%);animation:scrollMoveY 2s infinite;} ${selector} .panel{animation:scrollParallax 2s infinite reverse;}`,
+        floatingParallax: `${selector} .panel{animation:scrollMoveY 2.2s infinite;}`,
+        depthParallax: `${selector} .panel{animation:${className}Depth 2s infinite;} @keyframes ${className}Depth{0%,100%{transform:translateY(22px) scale(.85);}50%{transform:translateY(-16px) scale(1.08);}}`,
+        parallax3D: `${selector} .panel{animation:${className}3D 2s infinite;transform-style:preserve-3d;} @keyframes ${className}3D{0%,100%{transform:perspective(700px) rotateX(18deg) rotateY(-18deg);}50%{transform:perspective(700px) rotateX(-8deg) rotateY(18deg);}}`,
+
+        stickyHeader: `${selector}::before{content:"";position:absolute;top:10px;width:110px;height:18px;border-radius:999px;background:#4f8cff;z-index:6;} ${selector} .line{animation:scrollMoveY 2s infinite;}`,
+        stickySidebar: `${selector}::before{content:"";position:absolute;left:14px;top:14px;width:24px;height:64px;border-radius:12px;background:#4f8cff;z-index:6;} ${selector} .line{right:18px;left:auto;animation:scrollMoveY 2s infinite;}`,
+        stickyStack: `${selector} i{position:absolute;width:80px;height:48px;border-radius:16px;background:rgba(79,140,255,.24);border:1px solid rgba(79,140,255,.45);animation:stackMove 2s infinite;} ${selector} i:nth-child(2){animation-delay:.15s;} ${selector} i:nth-child(3){animation-delay:.3s;} @keyframes stackMove{0%,100%{transform:translateY(26px) scale(.9);}50%{transform:translateY(-10px) scale(1);}}`,
+        stickyReveal: `${selector}::before{content:"";position:absolute;inset:18px;border-radius:18px;background:#4f8cff;z-index:3;} ${selector}::after{content:"";position:absolute;inset:0;background:#111;animation:scrollRevealUp 2s infinite;z-index:4;}`,
+        stickyImage: `${selector}::before{content:"";position:absolute;width:78px;height:54px;border-radius:16px;background:linear-gradient(135deg,#4f8cff,#8d6bff);z-index:6;} ${selector} .line{animation:scrollMoveY 2s infinite;}`,
+        stickyProgress: `${selector}::before{content:"";position:absolute;top:12px;width:92px;height:8px;border-radius:999px;background:rgba(255,255,255,.16);} ${selector}::after{content:"";position:absolute;top:12px;width:92px;height:8px;border-radius:999px;background:#4f8cff;transform-origin:left;animation:scrollProgress 2s infinite;z-index:5;}`,
+        pinned: `${selector} .panel{animation:scrollScale 2s infinite;} ${selector}::after{content:"PIN";position:absolute;top:12px;right:14px;font-size:10px;color:#4f8cff;z-index:8;}`,
+        pinnedText: `${selector} span{animation:scrollGlow 1.8s infinite;}`,
+        stickyCta: `${selector}::before{content:"CTA";position:absolute;bottom:12px;padding:8px 16px;border-radius:999px;background:#4f8cff;font-size:11px;font-weight:950;z-index:7;animation:scrollRevealUp 2s infinite;}`,
+        stickyTimeline: `${selector}::before{content:"";position:absolute;left:50%;top:8px;width:4px;height:78px;background:rgba(255,255,255,.16);border-radius:999px;} ${selector} .dot{left:69px;animation:scrollDot 2s infinite;}`,
+
+        horizontal: `${selector} .panel{animation:scrollMoveX 2s infinite;}`,
+        horizontalCards: `${selector} i{position:absolute;width:46px;height:42px;border-radius:14px;background:rgba(79,140,255,.25);animation:scrollMoveX 2s infinite;} ${selector} i:nth-child(2){animation-delay:.15s;} ${selector} i:nth-child(3){animation-delay:.3s;}`,
+        marquee: `${selector} span{white-space:nowrap;animation:scrollMoveX 2s infinite;}`,
+        imageStrip: `${selector}::before{content:"";position:absolute;width:220px;height:54px;background:linear-gradient(90deg,#4f8cff 0 30%,#8d6bff 30% 60%,#35c759 60% 100%);animation:scrollMoveX 2s infinite;}`,
+        gallery: `${selector} i{position:absolute;width:44px;height:44px;border-radius:14px;background:#4f8cff;animation:galleryMove 2s infinite;} ${selector} i:nth-child(2){background:#8d6bff;animation-delay:.2s;} ${selector} i:nth-child(3){background:#35c759;animation-delay:.4s;} @keyframes galleryMove{0%,100%{transform:translateX(-55px)}50%{transform:translateX(55px)}}`,
+        carousel: `${selector} .panel{animation:${className}Carousel 2s steps(3) infinite;} @keyframes ${className}Carousel{0%{transform:translateX(-46px)}50%{transform:translateX(0)}100%{transform:translateX(46px)}}`,
+        snap: `${selector} .panel{animation:${className}Snap 2s steps(2) infinite;} @keyframes ${className}Snap{0%{transform:translateY(28px)}50%{transform:translateY(0)}100%{transform:translateY(-28px)}}`,
+        snapCards: `${selector} i{position:absolute;width:80px;height:18px;border-radius:999px;background:rgba(255,255,255,.18);animation:${className}SnapCards 2s steps(3) infinite;} @keyframes ${className}SnapCards{0%{transform:translateY(30px)}50%{transform:translateY(0)}100%{transform:translateY(-30px)}}`,
+        sidewaysReveal: `${selector} .panel{animation:scrollRevealRight 2s infinite;}`,
+        track: `${selector}::before{content:"";position:absolute;left:18px;right:18px;height:6px;border-radius:999px;background:rgba(255,255,255,.16);} ${selector} .dot{top:40px;animation:scrollMoveX 2s infinite;}`,
+
+        textFill: `${selector} span{background:linear-gradient(90deg,#4f8cff 50%,rgba(255,255,255,.35) 50%);background-size:220%;color:transparent;-webkit-background-clip:text;background-clip:text;animation:scrollGradient 2s infinite;}`,
+        textBlur: `${selector} span{animation:scrollBlur 2s infinite;}`,
+        letterReveal: `${selector} span{letter-spacing:.18em;animation:scrollFade 2s infinite;}`,
+        wordReveal: `${selector} span{animation:scrollRevealUp 2s infinite;}`,
+        highlight: `${selector} span::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:8px;background:rgba(79,140,255,.45);z-index:-1;transform-origin:left;animation:scrollProgress 2s infinite;}`,
+        underline: `${selector} span::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:3px;border-radius:999px;background:#4f8cff;transform-origin:left;animation:scrollProgress 2s infinite;}`,
+        bigText: `${selector} span{font-size:24px;animation:scrollMoveX 2s infinite;color:rgba(255,255,255,.75);}`,
+        textMask: `${selector} span{animation:scrollClip 2s infinite;}`,
+        numberScroll: `${selector} span::after{content:" 01";animation:${className}Num 2s steps(4) infinite;} @keyframes ${className}Num{0%{content:" 01";}25%{content:" 02";}50%{content:" 03";}75%,100%{content:" 04";}}`,
+        titlePin: `${selector} span{animation:scrollGlow 2s infinite;}`,
+
+        imageZoom: `${selector}::before{content:"";position:absolute;inset:18px;border-radius:18px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:scrollScale 2s infinite;}`,
+        imageZoomOut: `${selector}::before{content:"";position:absolute;inset:14px;border-radius:18px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:scrollScale 2s infinite reverse;}`,
+        imageClip: `${selector}::before{content:"";position:absolute;inset:18px;border-radius:18px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:scrollClip 2s infinite;}`,
+        imageMask: `${selector}::before{content:"";position:absolute;inset:18px;border-radius:18px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:scrollMask 2s infinite;}`,
+        imageBlur: `${selector}::before{content:"";position:absolute;inset:18px;border-radius:18px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:scrollBlur 2s infinite;}`,
+        imagePan: `${selector}::before{content:"";position:absolute;width:220px;height:70px;background:linear-gradient(90deg,#4f8cff,#8d6bff,#35c759);animation:scrollMoveX 2s infinite;}`,
+        imageRotate: `${selector}::before{content:"";position:absolute;inset:20px;border-radius:18px;background:linear-gradient(135deg,#4f8cff,#8d6bff);animation:scrollRotate 2s infinite;}`,
+        imageStack: `${selector} i{position:absolute;width:76px;height:48px;border-radius:16px;background:rgba(79,140,255,.25);border:1px solid rgba(79,140,255,.45);animation:scrollRevealUp 2s infinite;} ${selector} i:nth-child(2){animation-delay:.16s;} ${selector} i:nth-child(3){animation-delay:.32s;}`,
+        beforeAfter: `${selector}::before{content:"";position:absolute;left:18px;top:18px;bottom:18px;width:56px;border-radius:18px 0 0 18px;background:#4f8cff;} ${selector}::after{content:"";position:absolute;right:18px;top:18px;bottom:18px;width:56px;border-radius:0 18px 18px 0;background:#8d6bff;animation:${className}BA 2s infinite;} @keyframes ${className}BA{0%,100%{width:18px;}50%{width:96px;}}`,
+        cinematic: `${selector}::before{content:"";position:absolute;left:0;right:0;top:0;height:18px;background:#000;z-index:7;} ${selector}::after{content:"";position:absolute;left:0;right:0;bottom:0;height:18px;background:#000;z-index:7;} ${selector} .panel{width:110px;animation:scrollClip 2s infinite;}`,
+
+        glowBg: `${selector}{animation:scrollGlow 2s infinite;}`,
+        gradientShift: `${selector}{background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:220%;animation:scrollGradient 2s infinite;}`,
+        gridMove: `${selector}{background-image:linear-gradient(rgba(79,140,255,.22) 1px,transparent 1px),linear-gradient(90deg,rgba(79,140,255,.22) 1px,transparent 1px);background-size:20px 20px;animation:scrollBg 2s infinite;}`,
+        noise: `${selector}::before{content:"";position:absolute;inset:-20px;background:radial-gradient(circle,rgba(255,255,255,.22) 0 1px,transparent 2px);background-size:8px 8px;animation:scrollMoveX .5s steps(2) infinite;opacity:.45;}`,
+        spotlight: `${selector}::before{content:"";position:absolute;width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.45),transparent 65%);animation:scrollMoveY 2s infinite;}`,
+        wave: `${selector}::before{content:"";position:absolute;left:-30px;right:-30px;bottom:-20px;height:70px;border-radius:50% 50% 0 0;background:rgba(79,140,255,.45);animation:scrollMoveY 2s infinite;}`,
+        particles: `${selector} i{position:absolute;width:6px;height:6px;border-radius:50%;background:#4f8cff;animation:scrollMoveY 2s infinite;} ${selector} i:nth-child(2){left:38px;animation-delay:.2s;} ${selector} i:nth-child(3){left:75px;animation-delay:.4s;} ${selector} i:nth-child(4){left:112px;animation-delay:.6s;}`,
+        scanline: `${selector}::before{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px #4f8cff;animation:scrollDot 2s infinite;}`,
+        aurora: `${selector}::before{content:"";position:absolute;inset:-40px;background:radial-gradient(circle at 20% 30%,rgba(53,199,89,.6),transparent 32%),radial-gradient(circle at 80% 50%,rgba(79,140,255,.6),transparent 32%);filter:blur(14px);animation:scrollMoveY 2.4s infinite;}`,
+        mesh: `${selector}::before{content:"";position:absolute;inset:-40px;background:radial-gradient(circle at 20% 30%,rgba(79,140,255,.6),transparent 32%),radial-gradient(circle at 80% 50%,rgba(141,107,255,.6),transparent 32%);filter:blur(14px);animation:scrollMoveX 2.4s infinite;}`,
+
+        smoothButton: `${selector}::before{content:"Scroll";position:absolute;padding:9px 18px;border-radius:999px;background:#4f8cff;font-size:11px;font-weight:950;animation:scrollRevealUp 2s infinite;z-index:7;}`,
+        backTop: `${selector}::before{content:"↑";position:absolute;right:18px;bottom:14px;width:34px;height:34px;border-radius:50%;background:#4f8cff;display:grid;place-items:center;font-size:20px;font-weight:950;animation:scrollRevealUp 2s infinite;z-index:7;}`,
+        hintArrow: `${selector}::before{content:"↓";position:absolute;font-size:34px;color:#4f8cff;animation:scrollMoveY 1.4s infinite;z-index:7;}`,
+        mouseHint: `${selector}::before{content:"";position:absolute;width:34px;height:52px;border-radius:999px;border:2px solid white;z-index:7;} ${selector}::after{content:"";position:absolute;top:28px;width:4px;height:10px;border-radius:999px;background:#4f8cff;animation:scrollDot 1.4s infinite;z-index:8;}`,
+        downLabel: `${selector} span{animation:scrollMoveY 1.6s infinite;}`,
+        divider: `${selector}::before{content:"";position:absolute;width:110px;height:3px;border-radius:999px;background:#4f8cff;transform-origin:left;animation:scrollProgress 2s infinite;}`,
+        shadow: `${selector} .panel{animation:${className}Shadow 2s infinite;} @keyframes ${className}Shadow{0%,100%{box-shadow:0 0 0 rgba(0,0,0,0);transform:translateY(20px);}50%{box-shadow:0 28px 40px rgba(0,0,0,.65);transform:translateY(-10px);}}`,
+        fadeEdge: `${selector}::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#000,transparent 35%,transparent 65%,#000);z-index:6;} ${selector} .panel{animation:scrollMoveY 2s infinite;}`,
+        glassLayer: `${selector}::before{content:"";position:absolute;inset:16px;border-radius:18px;background:rgba(255,255,255,.13);backdrop-filter:blur(12px);animation:scrollFade 2s infinite;}`,
+        finalPremium: `${selector}{background:linear-gradient(90deg,#050505,#0c1020,#050505);background-size:220%;animation:scrollGradient 2.8s infinite;} ${selector}::before{content:"";position:absolute;inset:-30px;background:radial-gradient(circle at 20% 30%,rgba(79,140,255,.65),transparent 32%),radial-gradient(circle at 80% 60%,rgba(141,107,255,.55),transparent 32%);filter:blur(14px);animation:scrollMoveX 2.5s infinite;} ${selector}::after{content:"";position:absolute;top:-80%;left:-45%;width:34%;height:260%;background:rgba(255,255,255,.45);transform:rotate(25deg);animation:scrollShine 2.4s infinite;z-index:5;} ${selector} .panel{animation:scrollRevealUp 2s infinite,scrollGlow 1.8s infinite;}`
+      };
+
+      return map[kind] || `${selector} .panel{animation:scrollRevealUp 2s infinite;}`;
+    }
+
+    function htmlFor(kind, className, label) {
+      const dotKinds = ["dotIndicator", "track", "particles"];
+      const multiBlockKinds = ["stagger", "cascade", "steps", "horizontalCards", "gallery", "imageStack"];
+
+      if (dotKinds.includes(kind)) {
+        return `<div class="scroll-demo ${className}"><span>${label}</span><i class="dot"></i><i></i><i></i><i></i></div>`;
+      }
+
+      if (multiBlockKinds.includes(kind)) {
+        return `<div class="scroll-demo ${className}"><span>${label}</span><i></i><i></i><i></i><i></i></div>`;
+      }
+
+      if (["sectionProgress"].includes(kind)) {
+        return `<div class="scroll-demo ${className}"><span>${label}</span><i class="line"></i></div>`;
+      }
+
+      if (["stickyHeader", "stickySidebar", "stickyImage", "fadeEdge"].includes(kind)) {
+        return `<div class="scroll-demo ${className}"><span>${label}</span><i class="line"></i></div>`;
+      }
+
+      if (["smoothButton", "backTop", "hintArrow", "mouseHint", "divider", "glassLayer", "gradientShift", "gridMove", "noise", "spotlight", "wave", "scanline", "aurora", "mesh"].includes(kind)) {
+        return `<div class="scroll-demo ${className}"><span>${label}</span></div>`;
+      }
+
+      return `<div class="scroll-demo ${className}"><span>${label}</span><i class="panel"></i></div>`;
+    }
+
+    const effects = effectData.map((item, index) => {
+      const name = item[0];
+      const about = item[1];
+      const kind = item[2];
+      const className = "scroll-effect-" + index;
+
+      return {
+        id: String(index),
+        name,
+        about,
+        kind,
+        className,
+        html: htmlFor(kind, className, name.split(" ")[0]),
+        css: cssFor(kind, className)
+      };
+    });
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
+
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = commonKeyframes + "\n\n" + effects.map(effect => effect.css).join("\n\n");
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards() {
+      grid.innerHTML = "";
+
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className} ${effect.kind}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
+
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseScrollCSS}
+
+${commonKeyframes}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    function applySearch() {
+      const value = searchInput.value.trim().toLowerCase();
+
+      filteredEffects = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value) ||
+          effect.kind.toLowerCase().includes(value)
+        );
+      });
+
+      visibleCount = batchSize;
+      renderCards();
+    }
+
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
+  </script>
+</body>
+</html>
