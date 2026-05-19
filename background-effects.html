@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Background Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1560px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 760px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      padding-bottom: 35px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+      perspective: 900px;
+    }
+
+    .bg-demo {
+      position: relative;
+      width: 150px;
+      height: 92px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: white;
+      font-size: 13px;
+      font-weight: 950;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+    }
+
+    .bg-demo span {
+      position: relative;
+      z-index: 8;
+      text-shadow: 0 4px 18px rgba(0,0,0,.55);
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu" id="mainMenu"></nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Background Effects</h1>
+          <p>100 live background effects for gradient, mesh, particles, grid, glass, aurora, waves, spotlight, noise, cyber, premium hero sections, and app screens.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “gradient”, “mesh”, “grid”, “particle”, “wave”, “aurora”, “noise”, or “glass”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
+    </main>
+  </div>
+
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
+  <script>
+    const effects = [];
+
+    const baseBackgroundCSS = `.bg-demo {
+  position: relative;
+  width: 150px;
+  height: 92px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: white;
+  font-size: 13px;
+  font-weight: 950;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+.bg-demo span {
+  position: relative;
+  z-index: 8;
+  text-shadow: 0 4px 18px rgba(0,0,0,.55);
+}`;
+
+    const commonKeyframes = `
+@keyframes bgGradientMove { 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+@keyframes bgFloat { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(12px,-10px) scale(1.08);} }
+@keyframes bgSpin { to{transform:rotate(360deg);} }
+@keyframes bgPulse { 0%,100%{opacity:.55;transform:scale(1);} 50%{opacity:1;transform:scale(1.12);} }
+@keyframes bgShimmer { 0%{left:-45%;} 55%,100%{left:130%;} }
+@keyframes bgScan { 0%,100%{top:0;} 50%{top:calc(100% - 3px);} }
+@keyframes bgGridMove { to{background-position:40px 40px;} }
+@keyframes bgNoise { 0%,100%{transform:translate(0,0);} 20%{transform:translate(-5px,4px);} 40%{transform:translate(4px,-3px);} 60%{transform:translate(-3px,-4px);} 80%{transform:translate(5px,3px);} }
+@keyframes bgWave { 0%,100%{transform:translateX(-12%) translateY(0);} 50%{transform:translateX(12%) translateY(-10px);} }
+@keyframes bgRain { to{transform:translateY(120px);} }
+@keyframes bgSnow { to{transform:translateY(120px) translateX(24px);} }
+@keyframes bgBlink { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+@keyframes bgZoom { 0%,100%{transform:scale(1);} 50%{transform:scale(1.18);} }
+@keyframes bgHue { to{filter:hue-rotate(360deg);} }
+@keyframes bgSlideX { 0%,100%{transform:translateX(-40px);} 50%{transform:translateX(40px);} }
+@keyframes bgSlideY { 0%,100%{transform:translateY(-30px);} 50%{transform:translateY(30px);} }
+`;
+
+    function addEffect(name, about, className, css, label) {
+      effects.push({
+        id: String(effects.length),
+        name,
+        about,
+        className,
+        html: `<div class="bg-demo ${className}"><span>${label || "BG"}</span></div>`,
+        css
+      });
+    }
+
+    addEffect("Animated Gradient", "Smooth moving blue-purple gradient background.", "bg-animated-gradient", `.bg-animated-gradient{background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:240%;animation:bgGradientMove 2.6s ease-in-out infinite;}`);
+    addEffect("Rainbow Gradient", "Colorful rainbow moving gradient.", "bg-rainbow-gradient", `.bg-rainbow-gradient{background:linear-gradient(90deg,#ff5f57,#ffbd2e,#35c759,#4f8cff,#8d6bff,#ff5f57);background-size:320%;animation:bgGradientMove 3s linear infinite;}`);
+    addEffect("Orange Sunset", "Warm sunset style moving gradient.", "bg-orange-sunset", `.bg-orange-sunset{background:linear-gradient(120deg,#ff5f57,#ff9f0a,#ffbd2e,#ff5f57);background-size:260%;animation:bgGradientMove 3s ease-in-out infinite;}`);
+    addEffect("Ocean Gradient", "Deep ocean blue animated background.", "bg-ocean-gradient", `.bg-ocean-gradient{background:linear-gradient(120deg,#003b73,#0074d9,#00c2ff,#003b73);background-size:260%;animation:bgGradientMove 3s ease-in-out infinite;}`);
+    addEffect("Purple Dream", "Premium purple dreamy gradient.", "bg-purple-dream", `.bg-purple-dream{background:linear-gradient(120deg,#2a0a5e,#8d6bff,#ff8bd1,#2a0a5e);background-size:260%;animation:bgGradientMove 3s ease-in-out infinite;}`);
+    addEffect("Green Aurora", "Green aurora moving gradient background.", "bg-green-aurora", `.bg-green-aurora{background:linear-gradient(120deg,#053b21,#35c759,#00ffc6,#053b21);background-size:260%;animation:bgGradientMove 3s ease-in-out infinite;}`);
+    addEffect("Fire Gradient", "Fire-like warm gradient movement.", "bg-fire-gradient", `.bg-fire-gradient{background:linear-gradient(120deg,#2a0600,#ff5f57,#ff9f0a,#ffbd2e);background-size:260%;animation:bgGradientMove 2.4s ease-in-out infinite;}`);
+    addEffect("Ice Gradient", "Cool icy gradient background.", "bg-ice-gradient", `.bg-ice-gradient{background:linear-gradient(120deg,#0a2338,#87f7ff,#4f8cff,#0a2338);background-size:260%;animation:bgGradientMove 3s ease-in-out infinite;}`);
+    addEffect("Dark Premium Gradient", "Dark luxury background with subtle movement.", "bg-dark-premium", `.bg-dark-premium{background:linear-gradient(120deg,#050505,#191919,#4f8cff,#050505);background-size:260%;animation:bgGradientMove 3.2s ease-in-out infinite;}`);
+    addEffect("Glass Gradient", "Soft frosted glass style background.", "bg-glass-gradient", `.bg-glass-gradient{background:linear-gradient(120deg,rgba(255,255,255,.2),rgba(79,140,255,.28),rgba(255,255,255,.08));backdrop-filter:blur(18px);}`);
+
+    addEffect("Mesh Gradient", "Multiple soft blobs create mesh background.", "bg-mesh-gradient", `.bg-mesh-gradient{background:#080808;} .bg-mesh-gradient::before{content:"";position:absolute;inset:-35px;background:radial-gradient(circle at 25% 25%,#4f8cff,transparent 35%),radial-gradient(circle at 75% 25%,#8d6bff,transparent 35%),radial-gradient(circle at 50% 80%,#35c759,transparent 35%);filter:blur(10px);animation:bgFloat 3s ease-in-out infinite;}`);
+    addEffect("Soft Mesh", "Light soft blurred color mesh.", "bg-soft-mesh", `.bg-soft-mesh{background:#111;} .bg-soft-mesh::before{content:"";position:absolute;inset:-45px;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.45),transparent 34%),radial-gradient(circle at 80% 35%,rgba(79,140,255,.55),transparent 34%),radial-gradient(circle at 55% 85%,rgba(141,107,255,.45),transparent 34%);filter:blur(14px);animation:bgFloat 3.5s infinite;}`);
+    addEffect("Aurora Mesh", "Aurora inspired premium mesh motion.", "bg-aurora-mesh", `.bg-aurora-mesh{background:#02040a;} .bg-aurora-mesh::before{content:"";position:absolute;inset:-50px;background:radial-gradient(ellipse at 30% 20%,rgba(53,199,89,.7),transparent 35%),radial-gradient(ellipse at 70% 45%,rgba(79,140,255,.7),transparent 35%),radial-gradient(ellipse at 45% 90%,rgba(141,107,255,.65),transparent 35%);filter:blur(16px);animation:bgFloat 4s ease-in-out infinite;}`);
+    addEffect("Neon Mesh", "Neon cyber mesh background.", "bg-neon-mesh", `.bg-neon-mesh{background:#03030a;} .bg-neon-mesh::before{content:"";position:absolute;inset:-40px;background:radial-gradient(circle at 20% 20%,#ff5f57,transparent 30%),radial-gradient(circle at 80% 30%,#4f8cff,transparent 30%),radial-gradient(circle at 50% 85%,#8d6bff,transparent 35%);filter:blur(12px);animation:bgHue 4s linear infinite;}`);
+    addEffect("Pastel Mesh", "Pastel blurred premium background.", "bg-pastel-mesh", `.bg-pastel-mesh{background:#111;} .bg-pastel-mesh::before{content:"";position:absolute;inset:-42px;background:radial-gradient(circle at 25% 30%,#ffd1dc,transparent 34%),radial-gradient(circle at 75% 30%,#b9f2ff,transparent 34%),radial-gradient(circle at 50% 85%,#d8c7ff,transparent 34%);filter:blur(16px);animation:bgFloat 4s infinite;}`);
+    addEffect("Warm Mesh", "Orange red soft mesh animation.", "bg-warm-mesh", `.bg-warm-mesh{background:#160600;} .bg-warm-mesh::before{content:"";position:absolute;inset:-45px;background:radial-gradient(circle at 25% 25%,#ff5f57,transparent 34%),radial-gradient(circle at 80% 35%,#ff9f0a,transparent 34%),radial-gradient(circle at 50% 85%,#ffbd2e,transparent 34%);filter:blur(14px);animation:bgFloat 3.2s infinite;}`);
+    addEffect("Cool Mesh", "Blue cyan soft mesh background.", "bg-cool-mesh", `.bg-cool-mesh{background:#030913;} .bg-cool-mesh::before{content:"";position:absolute;inset:-42px;background:radial-gradient(circle at 20% 30%,#4f8cff,transparent 34%),radial-gradient(circle at 75% 35%,#87f7ff,transparent 34%),radial-gradient(circle at 50% 85%,#8d6bff,transparent 34%);filter:blur(14px);animation:bgFloat 3.4s infinite;}`);
+    addEffect("Diagonal Mesh", "Mesh blobs move diagonally.", "bg-diagonal-mesh", `.bg-diagonal-mesh{background:#060606;} .bg-diagonal-mesh::before{content:"";position:absolute;inset:-45px;background:radial-gradient(circle at 20% 20%,#4f8cff,transparent 32%),radial-gradient(circle at 70% 70%,#8d6bff,transparent 36%);filter:blur(12px);animation:bgSlideX 2.6s infinite;}`);
+    addEffect("Radial Mesh", "Radial mesh glow from center.", "bg-radial-mesh", `.bg-radial-mesh{background:radial-gradient(circle,#4f8cff 0%,#8d6bff 28%,#050505 75%);animation:bgZoom 2.5s infinite;}`);
+    addEffect("Premium Mesh", "Apple-like premium mesh with glow.", "bg-premium-mesh", `.bg-premium-mesh{background:#050505;} .bg-premium-mesh::before{content:"";position:absolute;inset:-45px;background:radial-gradient(circle at 15% 25%,rgba(255,255,255,.45),transparent 32%),radial-gradient(circle at 80% 20%,rgba(79,140,255,.7),transparent 32%),radial-gradient(circle at 45% 85%,rgba(141,107,255,.6),transparent 32%);filter:blur(18px);animation:bgFloat 4s infinite;}`);
+
+    addEffect("Moving Grid", "Grid background slowly moves diagonally.", "bg-moving-grid", `.bg-moving-grid{background-color:#080808;background-image:linear-gradient(rgba(79,140,255,.24) 1px,transparent 1px),linear-gradient(90deg,rgba(79,140,255,.24) 1px,transparent 1px);background-size:24px 24px;animation:bgGridMove 2s linear infinite;}`);
+    addEffect("Fine Grid", "Fine technical grid effect.", "bg-fine-grid", `.bg-fine-grid{background-color:#080808;background-image:linear-gradient(rgba(255,255,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.12) 1px,transparent 1px);background-size:14px 14px;animation:bgGridMove 2.2s linear infinite;}`);
+    addEffect("Blueprint Grid", "Blueprint style moving grid.", "bg-blueprint-grid", `.bg-blueprint-grid{background-color:#061324;background-image:linear-gradient(rgba(79,140,255,.28) 1px,transparent 1px),linear-gradient(90deg,rgba(79,140,255,.28) 1px,transparent 1px);background-size:22px 22px;animation:bgGridMove 2.5s linear infinite;}`);
+    addEffect("Dot Grid", "Moving dotted grid background.", "bg-dot-grid", `.bg-dot-grid{background-color:#080808;background-image:radial-gradient(circle,rgba(255,255,255,.24) 1.4px,transparent 1.6px);background-size:18px 18px;animation:bgGridMove 2.5s linear infinite;}`);
+    addEffect("Blue Dot Grid", "Blue glowing dot grid.", "bg-blue-dot-grid", `.bg-blue-dot-grid{background-color:#050505;background-image:radial-gradient(circle,rgba(79,140,255,.55) 1.4px,transparent 1.6px);background-size:18px 18px;animation:bgGridMove 2.3s linear infinite;}`);
+    addEffect("Diagonal Lines", "Diagonal moving stripe background.", "bg-diagonal-lines", `.bg-diagonal-lines{background:repeating-linear-gradient(45deg,rgba(79,140,255,.18) 0 8px,rgba(255,255,255,.04) 8px 16px);background-size:40px 40px;animation:bgGridMove 1.8s linear infinite;}`);
+    addEffect("Horizontal Lines", "Horizontal scan style background.", "bg-horizontal-lines", `.bg-horizontal-lines{background:repeating-linear-gradient(0deg,rgba(255,255,255,.08) 0 2px,transparent 2px 9px),#080808;animation:bgSlideY 2s infinite;}`);
+    addEffect("Vertical Lines", "Vertical animated line pattern.", "bg-vertical-lines", `.bg-vertical-lines{background:repeating-linear-gradient(90deg,rgba(79,140,255,.18) 0 2px,transparent 2px 11px),#080808;animation:bgSlideX 2s infinite;}`);
+    addEffect("Checker Background", "Checkerboard animated background.", "bg-checker", `.bg-checker{background-color:#080808;background-image:linear-gradient(45deg,rgba(255,255,255,.09) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.09) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(255,255,255,.09) 75%),linear-gradient(-45deg,transparent 75%,rgba(255,255,255,.09) 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0;animation:bgGridMove 2.5s linear infinite;}`);
+    addEffect("Isometric Grid", "Isometric diagonal grid look.", "bg-isometric-grid", `.bg-isometric-grid{background-color:#080808;background-image:linear-gradient(30deg,rgba(79,140,255,.18) 12%,transparent 12.5%,transparent 87%,rgba(79,140,255,.18) 87.5%),linear-gradient(150deg,rgba(79,140,255,.18) 12%,transparent 12.5%,transparent 87%,rgba(79,140,255,.18) 87.5%);background-size:32px 54px;animation:bgGridMove 2.8s linear infinite;}`);
+
+    addEffect("Particle Field", "Small glowing particles float in background.", "bg-particles", `.bg-particles{background:#070707;} .bg-particles::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,white 0 2px,transparent 3px),radial-gradient(circle at 80% 20%,#4f8cff 0 2px,transparent 3px),radial-gradient(circle at 60% 70%,#8d6bff 0 2px,transparent 3px),radial-gradient(circle at 30% 80%,white 0 1px,transparent 2px);animation:bgFloat 3s infinite;}`);
+    addEffect("Star Field", "Space-like star background.", "bg-star-field", `.bg-star-field{background:#02030a;} .bg-star-field::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,white 0 1px,transparent 2px),radial-gradient(circle at 40% 60%,white 0 1px,transparent 2px),radial-gradient(circle at 75% 30%,white 0 1px,transparent 2px),radial-gradient(circle at 85% 75%,white 0 1px,transparent 2px);animation:bgBlink 1.8s infinite;}`);
+    addEffect("Floating Bubbles", "Transparent bubbles float upward.", "bg-bubbles", `.bg-bubbles{background:#06121f;} .bg-bubbles::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 80%,rgba(255,255,255,.25) 0 8px,transparent 9px),radial-gradient(circle at 70% 90%,rgba(79,140,255,.3) 0 10px,transparent 11px),radial-gradient(circle at 55% 75%,rgba(255,255,255,.18) 0 6px,transparent 7px);animation:bgSlideY 2.8s infinite;}`);
+    addEffect("Sparkle Background", "Sparkles animate softly.", "bg-sparkles", `.bg-sparkles{background:#080808;} .bg-sparkles::before{content:"✦ ✧ ✦ ✧";position:absolute;color:white;font-size:20px;letter-spacing:20px;opacity:.75;animation:bgPulse 1.6s infinite;}`);
+    addEffect("Confetti Background", "Colorful confetti style background.", "bg-confetti", `.bg-confetti{background:#080808;} .bg-confetti::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,#ff5f57 0 3px,transparent 4px),radial-gradient(circle at 70% 35%,#ffbd2e 0 3px,transparent 4px),radial-gradient(circle at 50% 75%,#35c759 0 3px,transparent 4px),radial-gradient(circle at 85% 80%,#4f8cff 0 3px,transparent 4px);animation:bgFloat 2.4s infinite;}`);
+    addEffect("Fireflies", "Soft floating firefly dots.", "bg-fireflies", `.bg-fireflies{background:#061107;} .bg-fireflies::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 40%,#ffbd2e 0 3px,transparent 5px),radial-gradient(circle at 70% 30%,#ffbd2e 0 2px,transparent 4px),radial-gradient(circle at 55% 80%,#ffbd2e 0 2px,transparent 4px);filter:blur(.5px);animation:bgFloat 2.8s infinite;}`);
+    addEffect("Snow Background", "Snow dots falling down.", "bg-snow", `.bg-snow{background:#09111f;} .bg-snow::before{content:"";position:absolute;inset:-80px 0 0;background:radial-gradient(circle,white 0 2px,transparent 3px);background-size:22px 22px;animation:bgSnow 2.4s linear infinite;}`);
+    addEffect("Rain Background", "Rain streaks falling down.", "bg-rain", `.bg-rain{background:#07101d;} .bg-rain::before{content:"";position:absolute;inset:-100px 0 0;background:repeating-linear-gradient(100deg,transparent 0 12px,rgba(135,247,255,.45) 12px 14px,transparent 14px 28px);animation:bgRain .8s linear infinite;}`);
+    addEffect("Meteor Background", "Diagonal meteor streaks.", "bg-meteor", `.bg-meteor{background:#02030a;} .bg-meteor::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.8) 22%,transparent 26%);animation:bgSlideX 1.2s linear infinite;}`);
+    addEffect("Orbit Particles", "Particles orbit around center.", "bg-orbit-particles", `.bg-orbit-particles{background:#050505;} .bg-orbit-particles::before{content:"";position:absolute;width:70px;height:70px;border-radius:50%;border:1px solid rgba(255,255,255,.16);animation:bgSpin 2s linear infinite;} .bg-orbit-particles::after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:#4f8cff;box-shadow:0 0 18px #4f8cff;top:20px;animation:bgSpin 2s linear infinite;}`);
+
+    addEffect("Wave Background", "Soft wave moves horizontally.", "bg-wave", `.bg-wave{background:#061322;} .bg-wave::before{content:"";position:absolute;left:-30px;right:-30px;bottom:-22px;height:70px;background:rgba(79,140,255,.45);border-radius:50% 50% 0 0;animation:bgWave 2.2s ease-in-out infinite;}`);
+    addEffect("Double Wave", "Two waves overlap with motion.", "bg-double-wave", `.bg-double-wave{background:#061322;} .bg-double-wave::before,.bg-double-wave::after{content:"";position:absolute;left:-35px;right:-35px;bottom:-25px;height:72px;border-radius:50% 50% 0 0;animation:bgWave 2.2s infinite;} .bg-double-wave::before{background:rgba(79,140,255,.45);} .bg-double-wave::after{background:rgba(141,107,255,.35);animation-delay:.4s;}`);
+    addEffect("Liquid Wave", "Liquid wave fills lower half.", "bg-liquid-wave", `.bg-liquid-wave{background:#05111f;} .bg-liquid-wave::before{content:"";position:absolute;left:-30%;right:-30%;bottom:-80%;height:140%;background:#4f8cff;border-radius:45%;animation:bgSpin 4s linear infinite;}`);
+    addEffect("Water Surface", "Water surface shimmer effect.", "bg-water-surface", `.bg-water-surface{background:linear-gradient(180deg,#073552,#03111d);} .bg-water-surface::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(135,247,255,.18) 0 2px,transparent 2px 9px);animation:bgSlideY 2s infinite;}`);
+    addEffect("Lava Flow", "Warm lava moving background.", "bg-lava-flow", `.bg-lava-flow{background:linear-gradient(120deg,#2a0600,#ff5f57,#ff9f0a,#2a0600);background-size:260%;animation:bgGradientMove 2s infinite;}`);
+    addEffect("Smoke Background", "Soft smoke blur movement.", "bg-smoke", `.bg-smoke{background:#050505;} .bg-smoke::before{content:"";position:absolute;inset:-45px;background:radial-gradient(circle at 30% 40%,rgba(255,255,255,.28),transparent 36%),radial-gradient(circle at 70% 60%,rgba(255,255,255,.18),transparent 36%);filter:blur(18px);animation:bgFloat 4s infinite;}`);
+    addEffect("Fog Background", "Fog layer slowly drifts.", "bg-fog", `.bg-fog{background:#081018;} .bg-fog::before{content:"";position:absolute;inset:-30px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);filter:blur(12px);animation:bgSlideX 3s infinite;}`);
+    addEffect("Cloud Background", "Soft cloudy background movement.", "bg-cloud", `.bg-cloud{background:#0c1828;} .bg-cloud::before{content:"";position:absolute;inset:-30px;background:radial-gradient(circle at 25% 60%,rgba(255,255,255,.25),transparent 30%),radial-gradient(circle at 70% 45%,rgba(255,255,255,.18),transparent 34%);filter:blur(10px);animation:bgSlideX 3.4s infinite;}`);
+    addEffect("Dust Background", "Small dust particles with subtle movement.", "bg-dust", `.bg-dust{background:#0a0907;} .bg-dust::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.28) 0 1px,transparent 2px),radial-gradient(circle at 80% 70%,rgba(255,255,255,.2) 0 1px,transparent 2px),radial-gradient(circle at 50% 60%,rgba(255,255,255,.18) 0 1px,transparent 2px);animation:bgFloat 3s infinite;}`);
+    addEffect("Wind Background", "Fast streaks move like wind.", "bg-wind", `.bg-wind{background:#071018;} .bg-wind::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 12px,rgba(255,255,255,.16) 12px 14px,transparent 14px 26px);animation:bgSlideX 1.2s infinite;}`);
+
+    addEffect("Spotlight Background", "Moving spotlight over dark background.", "bg-spotlight", `.bg-spotlight{background:#050505;} .bg-spotlight::before{content:"";position:absolute;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.45),transparent 65%);animation:bgFloat 2.8s infinite;}`);
+    addEffect("Center Glow", "Soft glow from the center.", "bg-center-glow", `.bg-center-glow{background:radial-gradient(circle,rgba(79,140,255,.5),rgba(0,0,0,.95) 70%);animation:bgPulse 2s infinite;}`);
+    addEffect("Corner Glow", "Glow from top-right corner.", "bg-corner-glow", `.bg-corner-glow{background:radial-gradient(circle at 85% 15%,rgba(79,140,255,.65),transparent 45%),#050505;animation:bgPulse 2.2s infinite;}`);
+    addEffect("Multi Glow", "Multiple glow points on background.", "bg-multi-glow", `.bg-multi-glow{background:radial-gradient(circle at 20% 20%,rgba(79,140,255,.6),transparent 38%),radial-gradient(circle at 80% 30%,rgba(141,107,255,.5),transparent 38%),radial-gradient(circle at 50% 85%,rgba(53,199,89,.4),transparent 38%),#050505;animation:bgZoom 3s infinite;}`);
+    addEffect("Radial Pulse", "Radial glow pulses from center.", "bg-radial-pulse", `.bg-radial-pulse{background:#050505;} .bg-radial-pulse::before{content:"";position:absolute;width:80px;height:80px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.6),transparent 70%);animation:bgPulse 1.5s infinite;}`);
+    addEffect("Ring Pulse", "Ring expands from center.", "bg-ring-pulse", `.bg-ring-pulse{background:#050505;} .bg-ring-pulse::before{content:"";position:absolute;width:44px;height:44px;border-radius:50%;border:2px solid #4f8cff;animation:ringPulse 1.4s infinite;} @keyframes ringPulse{0%{transform:scale(.4);opacity:1;}100%{transform:scale(2.4);opacity:0;}}`);
+    addEffect("Vignette Background", "Dark vignette premium background.", "bg-vignette", `.bg-vignette{background:radial-gradient(circle,rgba(79,140,255,.28),rgba(0,0,0,.95) 75%);}`);
+    addEffect("Light Sweep Background", "White light sweep passes over background.", "bg-light-sweep", `.bg-light-sweep{background:#101010;} .bg-light-sweep::after{content:"";position:absolute;top:-80%;left:-45%;width:34%;height:260%;background:rgba(255,255,255,.5);transform:rotate(25deg);animation:bgShimmer 2s linear infinite;}`);
+    addEffect("Gradient Spotlight", "Moving colorful spotlight.", "bg-gradient-spotlight", `.bg-gradient-spotlight{background:#050505;} .bg-gradient-spotlight::before{content:"";position:absolute;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(79,140,255,.45),rgba(141,107,255,.28),transparent 70%);animation:bgFloat 3s infinite;}`);
+    addEffect("Soft Halo", "Soft halo glow background.", "bg-soft-halo", `.bg-soft-halo{background:#050505;} .bg-soft-halo::before{content:"";position:absolute;width:120px;height:70px;border-radius:50%;background:rgba(79,140,255,.32);filter:blur(16px);animation:bgPulse 2s infinite;}`);
+
+    addEffect("Glass Noise", "Subtle noisy glass style background.", "bg-glass-noise", `.bg-glass-noise{background:rgba(255,255,255,.12);backdrop-filter:blur(16px);} .bg-glass-noise::before{content:"";position:absolute;inset:-20px;background:radial-gradient(circle,rgba(255,255,255,.18) 0 1px,transparent 2px);background-size:10px 10px;animation:bgNoise .7s infinite;opacity:.55;}`);
+    addEffect("Film Grain", "Film grain noise movement.", "bg-film-grain", `.bg-film-grain{background:#111;} .bg-film-grain::before{content:"";position:absolute;inset:-25px;background:radial-gradient(circle,rgba(255,255,255,.22) 0 1px,transparent 2px);background-size:8px 8px;animation:bgNoise .45s steps(2) infinite;opacity:.55;}`);
+    addEffect("Paper Texture", "Soft paper-like texture.", "bg-paper-texture", `.bg-paper-texture{background:#141414;} .bg-paper-texture::before{content:"";position:absolute;inset:0;background:radial-gradient(circle,rgba(255,255,255,.16) 0 1px,transparent 2px);background-size:13px 13px;opacity:.35;}`);
+    addEffect("Carbon Texture", "Dark carbon fiber style texture.", "bg-carbon", `.bg-carbon{background:#080808;background-image:linear-gradient(45deg,rgba(255,255,255,.07) 25%,transparent 25%),linear-gradient(-45deg,rgba(255,255,255,.07) 25%,transparent 25%);background-size:14px 14px;animation:bgGridMove 3s linear infinite;}`);
+    addEffect("Metal Texture", "Metal shine moving background.", "bg-metal", `.bg-metal{background:linear-gradient(90deg,#333,#888,#222,#aaa,#333);background-size:260%;animation:bgGradientMove 2.4s linear infinite;}`);
+    addEffect("Chrome Texture", "Chrome-like reflective movement.", "bg-chrome", `.bg-chrome{background:linear-gradient(90deg,#666,#fff,#777,#fff,#666);background-size:260%;color:#111;animation:bgGradientMove 2.5s linear infinite;}`);
+    addEffect("Leather Texture", "Dark leather-like textured background.", "bg-leather", `.bg-leather{background:#130909;background-image:radial-gradient(circle,rgba(255,255,255,.08) 0 1px,transparent 2px);background-size:9px 9px;}`);
+    addEffect("Noise Pulse", "Noise texture pulses opacity.", "bg-noise-pulse", `.bg-noise-pulse{background:#080808;} .bg-noise-pulse::before{content:"";position:absolute;inset:-20px;background:radial-gradient(circle,rgba(255,255,255,.2) 0 1px,transparent 2px);background-size:8px 8px;animation:bgPulse 1s infinite;opacity:.45;}`);
+    addEffect("Static TV", "Fast noisy static style.", "bg-static-tv", `.bg-static-tv{background:#080808;} .bg-static-tv::before{content:"";position:absolute;inset:-20px;background:radial-gradient(circle,rgba(255,255,255,.35) 0 1px,transparent 2px);background-size:6px 6px;animation:bgNoise .25s steps(2) infinite;opacity:.75;}`);
+    addEffect("Retro Grain", "Retro warm grain texture.", "bg-retro-grain", `.bg-retro-grain{background:linear-gradient(120deg,#2b1607,#4b1d14,#0d0d0d);} .bg-retro-grain::before{content:"";position:absolute;inset:-20px;background:radial-gradient(circle,rgba(255,255,255,.18) 0 1px,transparent 2px);background-size:9px 9px;animation:bgNoise .7s infinite;opacity:.5;}`);
+
+    addEffect("Cyber Grid", "Cyberpunk blue grid background.", "bg-cyber-grid", `.bg-cyber-grid{background:#02030a;background-image:linear-gradient(rgba(79,140,255,.32) 1px,transparent 1px),linear-gradient(90deg,rgba(79,140,255,.32) 1px,transparent 1px);background-size:22px 22px;animation:bgGridMove 1.8s linear infinite;}`);
+    addEffect("Matrix Rain", "Green matrix rain style.", "bg-matrix-rain", `.bg-matrix-rain{background:#020804;color:#35c759;text-shadow:0 0 10px rgba(53,199,89,.8);} .bg-matrix-rain::before{content:"0101 1010 0110";position:absolute;inset:-30px;color:rgba(53,199,89,.35);font-size:14px;line-height:20px;animation:bgRain 1.2s linear infinite;}`);
+    addEffect("Glitch Background", "Glitchy RGB background movement.", "bg-glitch", `.bg-glitch{background:#070707;text-shadow:2px 0 #ff5f57,-2px 0 #4f8cff;animation:glitchBg .7s steps(2) infinite;} @keyframes glitchBg{0%,100%{transform:translate(0);}50%{transform:translate(2px,-1px);}}`);
+    addEffect("Scanner Background", "Blue scanning line moves vertically.", "bg-scanner", `.bg-scanner{background:rgba(79,140,255,.10);border-color:rgba(79,140,255,.35);} .bg-scanner::after{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.9);animation:bgScan 1.4s infinite;}`);
+    addEffect("Barcode Background", "Barcode lines with scan beam.", "bg-barcode", `.bg-barcode{background:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 4px,transparent 4px 9px),#080808;} .bg-barcode::after{content:"";position:absolute;top:0;bottom:0;width:4px;background:#4f8cff;box-shadow:0 0 18px #4f8cff;animation:barcodeMove 1.4s infinite;} @keyframes barcodeMove{0%,100%{left:0;}50%{left:calc(100% - 4px);}}`);
+    addEffect("Hacker Terminal", "Terminal green background.", "bg-hacker-terminal", `.bg-hacker-terminal{background:#020804;color:#35c759;text-shadow:0 0 10px rgba(53,199,89,.8);} .bg-hacker-terminal::before{content:"> loading...";position:absolute;left:14px;top:12px;color:rgba(53,199,89,.6);font-family:monospace;animation:bgBlink 1s infinite;}`);
+    addEffect("Neon City", "Neon city-like glowing stripes.", "bg-neon-city", `.bg-neon-city{background:linear-gradient(180deg,#080011,#16002f);} .bg-neon-city::before{content:"";position:absolute;left:0;right:0;bottom:0;height:45px;background:repeating-linear-gradient(90deg,rgba(79,140,255,.5) 0 6px,transparent 6px 14px);box-shadow:0 0 24px rgba(79,140,255,.55);animation:bgSlideX 2s infinite;}`);
+    addEffect("Laser Lines", "Laser lines move across screen.", "bg-laser-lines", `.bg-laser-lines{background:#070707;} .bg-laser-lines::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 45%,#4f8cff 48%,transparent 52%);animation:bgSlideX 1.3s linear infinite;}`);
+    addEffect("Digital Pulse", "Digital blue pulse lines.", "bg-digital-pulse", `.bg-digital-pulse{background:#050505;} .bg-digital-pulse::before{content:"";position:absolute;left:0;right:0;top:48%;height:4px;background:#4f8cff;box-shadow:0 0 18px #4f8cff;animation:bgPulse 1.2s infinite;}`);
+    addEffect("HUD Background", "HUD rings and grid animation.", "bg-hud", `.bg-hud{background:#020712;background-image:linear-gradient(rgba(79,140,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(79,140,255,.15) 1px,transparent 1px);background-size:18px 18px;} .bg-hud::before{content:"";position:absolute;width:70px;height:70px;border-radius:50%;border:2px solid rgba(79,140,255,.55);animation:bgSpin 2s linear infinite;}`);
+
+    addEffect("Shine Sweep", "Bright shine sweeps over background.", "bg-shine-sweep", `.bg-shine-sweep{background:linear-gradient(135deg,#111,#222);} .bg-shine-sweep::after{content:"";position:absolute;top:-80%;left:-45%;width:34%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:bgShimmer 2s linear infinite;}`);
+    addEffect("Golden Premium", "Luxury gold animated background.", "bg-golden-premium", `.bg-golden-premium{background:linear-gradient(90deg,#4b3207,#ffbd2e,#fff4b0,#4b3207);background-size:260%;color:#111;animation:bgGradientMove 3s linear infinite;}`);
+    addEffect("Silver Premium", "Luxury silver chrome background.", "bg-silver-premium", `.bg-silver-premium{background:linear-gradient(90deg,#555,#fff,#888,#fff,#555);background-size:260%;color:#111;animation:bgGradientMove 2.5s linear infinite;}`);
+    addEffect("Diamond Shine", "Diamond-like shine effect.", "bg-diamond-shine", `.bg-diamond-shine{background:linear-gradient(135deg,#111,#222);} .bg-diamond-shine::before{content:"";position:absolute;inset:0;background:linear-gradient(45deg,transparent,rgba(255,255,255,.35),transparent);animation:bgGradientMove 2s infinite;background-size:240%;}`);
+    addEffect("Holographic Background", "Holographic moving pastel background.", "bg-holographic", `.bg-holographic{background:linear-gradient(120deg,rgba(255,255,255,.35),rgba(135,247,255,.45),rgba(255,158,231,.4),rgba(255,255,255,.35));background-size:280%;animation:bgGradientMove 2.7s ease-in-out infinite;}`);
+    addEffect("Pearl Background", "Soft pearl premium background.", "bg-pearl", `.bg-pearl{background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.65),transparent 40%),linear-gradient(120deg,#dfeaff,#b9c7ff,#ffffff);color:#111;animation:bgPulse 2.2s infinite;}`);
+    addEffect("Luxury Black", "Deep black luxury with subtle gold glow.", "bg-luxury-black", `.bg-luxury-black{background:radial-gradient(circle at 75% 20%,rgba(255,189,46,.45),transparent 35%),#050505;animation:bgPulse 2.4s infinite;}`);
+    addEffect("Apple Glass", "Apple-like frosted glass background.", "bg-apple-glass", `.bg-apple-glass{background:linear-gradient(120deg,rgba(255,255,255,.22),rgba(79,140,255,.20),rgba(255,255,255,.10));backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);}`);
+    addEffect("Premium Hero", "Hero-section style premium background.", "bg-premium-hero", `.bg-premium-hero{background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.28),transparent 30%),radial-gradient(circle at 20% 40%,rgba(79,140,255,.45),transparent 35%),radial-gradient(circle at 80% 50%,rgba(141,107,255,.38),transparent 35%),#050505;animation:bgZoom 3s infinite;}`);
+    addEffect("Final Premium Background", "Gradient, mesh, glow, and shine combined.", "bg-final-premium", `.bg-final-premium{background:#050505;} .bg-final-premium::before{content:"";position:absolute;inset:-45px;background:radial-gradient(circle at 20% 25%,rgba(79,140,255,.75),transparent 32%),radial-gradient(circle at 80% 35%,rgba(141,107,255,.65),transparent 32%),radial-gradient(circle at 50% 90%,rgba(255,255,255,.35),transparent 32%);filter:blur(18px);animation:bgFloat 4s infinite;} .bg-final-premium::after{content:"";position:absolute;top:-80%;left:-45%;width:34%;height:260%;background:rgba(255,255,255,.45);transform:rotate(25deg);animation:bgShimmer 2.8s linear infinite;}`);
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
+
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = commonKeyframes + "\n\n" + effects.map(effect => effect.css).join("\n\n");
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards() {
+      grid.innerHTML = "";
+
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
+
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseBackgroundCSS}
+
+${commonKeyframes}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    function applySearch() {
+      const value = searchInput.value.trim().toLowerCase();
+
+      filteredEffects = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value)
+        );
+      });
+
+      visibleCount = batchSize;
+      renderCards();
+    }
+
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
+  </script>
+</body>
+</html>
