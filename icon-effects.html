@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Icon Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1560px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 760px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      padding-bottom: 35px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+      perspective: 900px;
+    }
+
+    .icon-demo {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      border-radius: 22px;
+      display: grid;
+      place-items: center;
+      font-size: 32px;
+      color: white;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      transition: 260ms ease;
+      isolation: isolate;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .icon-demo span {
+      position: relative;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      line-height: 1;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu" id="mainMenu"></nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Icon Effects</h1>
+          <p>100 live icon effects for like, share, save, bell, play, search, mic, settings, verified, premium, upload, download, and app actions.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “spin”, “glow”, “heart”, “bell”, “verified”, “upload”, “download”, or “premium”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
+    </main>
+  </div>
+
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
+  <script>
+    const effects = [];
+
+    const baseIconCSS = `.icon-demo {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  border-radius: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 32px;
+  color: white;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  transition: 260ms ease;
+  isolation: isolate;
+  overflow: hidden;
+  transform-style: preserve-3d;
+}
+.icon-demo span {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}`;
+
+    const commonKeyframes = `
+@keyframes iconSpin { to { transform: rotate(360deg); } }
+@keyframes iconReverseSpin { to { transform: rotate(-360deg); } }
+@keyframes iconPulse { 0%,100%{transform:scale(1);opacity:.75;} 50%{transform:scale(1.18);opacity:1;} }
+@keyframes iconPop { 0%,100%{transform:scale(1);} 50%{transform:scale(1.35);} }
+@keyframes iconBounce { 0%,100%{transform:translateY(0);} 40%{transform:translateY(-12px);} 60%{transform:translateY(4px);} }
+@keyframes iconFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+@keyframes iconShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+@keyframes iconSwing { 0%,100%{transform:rotate(0);} 25%{transform:rotate(10deg);} 75%{transform:rotate(-10deg);} }
+@keyframes iconGlow { 0%,100%{box-shadow:0 0 0 rgba(79,140,255,0);} 50%{box-shadow:0 0 30px rgba(79,140,255,.72);} }
+@keyframes iconRedGlow { 0%,100%{box-shadow:0 0 0 rgba(255,95,87,0);} 50%{box-shadow:0 0 30px rgba(255,95,87,.72);} }
+@keyframes iconGreenGlow { 0%,100%{box-shadow:0 0 0 rgba(53,199,89,0);} 50%{box-shadow:0 0 30px rgba(53,199,89,.72);} }
+@keyframes iconGoldGlow { 0%,100%{box-shadow:0 0 0 rgba(255,189,46,0);} 50%{box-shadow:0 0 30px rgba(255,189,46,.72);} }
+@keyframes iconGradient { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} }
+@keyframes iconShine { 0%{left:-50%;} 55%,100%{left:130%;} }
+@keyframes iconPing { 0%{box-shadow:0 0 0 0 rgba(79,140,255,.7);} 70%{box-shadow:0 0 0 20px rgba(79,140,255,0);} 100%{box-shadow:0 0 0 0 rgba(79,140,255,0);} }
+@keyframes iconHeart { 0%,100%{transform:scale(1);} 35%{transform:scale(1.35);} 55%{transform:scale(.92);} 75%{transform:scale(1.18);} }
+@keyframes iconBell { 0%,100%{transform:rotate(0);} 20%{transform:rotate(-13deg);} 40%{transform:rotate(13deg);} 60%{transform:rotate(-9deg);} 80%{transform:rotate(9deg);} }
+@keyframes iconScan { 0%,100%{top:0;} 50%{top:calc(100% - 3px);} }
+@keyframes iconJelly { 0%,100%{transform:scale(1);} 30%{transform:scale(1.18,.82);} 50%{transform:scale(.9,1.12);} 70%{transform:scale(1.05,.95);} }
+@keyframes iconRubber { 0%,100%{transform:scale(1);} 35%{transform:scaleX(1.22) scaleY(.82);} 55%{transform:scaleX(.9) scaleY(1.12);} 75%{transform:scaleX(1.04) scaleY(.96);} }
+`;
+
+    function addEffect(name, about, className, css, icon) {
+      effects.push({
+        id: String(effects.length),
+        name,
+        about,
+        className,
+        html: `<div class="icon-demo ${className}"><span>${icon || "★"}</span></div>`,
+        css
+      });
+    }
+
+    addEffect("Spin Icon", "Icon rotates continuously.", "icon-spin", `.icon-spin span{animation:iconSpin 1.2s linear infinite;}`, "⚙");
+    addEffect("Reverse Spin Icon", "Icon rotates in reverse direction.", "icon-reverse-spin", `.icon-reverse-spin span{animation:iconReverseSpin 1.2s linear infinite;}`, "↻");
+    addEffect("Slow Spin Icon", "Slow premium rotating icon.", "icon-slow-spin", `.icon-slow-spin span{animation:iconSpin 3s linear infinite;}`, "◌");
+    addEffect("Pulse Icon", "Icon softly scales up and down.", "icon-pulse", `.icon-pulse span{animation:iconPulse 1.4s ease-in-out infinite;}`, "●");
+    addEffect("Pop Icon", "Icon pops like a reaction.", "icon-pop", `.icon-pop span{animation:iconPop 1.2s ease-in-out infinite;}`, "✦");
+    addEffect("Bounce Icon", "Icon bounces vertically.", "icon-bounce", `.icon-bounce span{animation:iconBounce 1.4s ease-in-out infinite;}`, "↑");
+    addEffect("Float Icon", "Icon floats smoothly.", "icon-float", `.icon-float span{animation:iconFloat 2.2s ease-in-out infinite;}`, "☁");
+    addEffect("Shake Icon", "Icon shakes for alert state.", "icon-shake", `.icon-shake{background:rgba(255,95,87,.14);border-color:rgba(255,95,87,.45);} .icon-shake span{animation:iconShake .65s ease-in-out infinite;}`, "!");
+    addEffect("Swing Icon", "Icon swings side to side.", "icon-swing", `.icon-swing span{transform-origin:top center;animation:iconSwing 1.4s ease-in-out infinite;}`, "🔔");
+    addEffect("Jelly Icon", "Icon stretches like jelly.", "icon-jelly", `.icon-jelly span{animation:iconJelly 1.5s ease-in-out infinite;}`, "★");
+
+    addEffect("Rubber Icon", "Icon gets rubber stretch motion.", "icon-rubber", `.icon-rubber span{animation:iconRubber 1.6s ease-in-out infinite;}`, "◆");
+    addEffect("Glow Icon", "Icon container glows blue.", "icon-glow", `.icon-glow{border-color:rgba(79,140,255,.5);animation:iconGlow 1.7s ease-in-out infinite;} .icon-glow span{color:#dbe8ff;text-shadow:0 0 14px rgba(79,140,255,.8);}`, "✦");
+    addEffect("Red Glow Icon", "Red glow icon for alerts.", "icon-red-glow", `.icon-red-glow{background:rgba(255,95,87,.14);border-color:rgba(255,95,87,.45);animation:iconRedGlow 1.6s ease-in-out infinite;} .icon-red-glow span{color:#ff5f57;}`, "●");
+    addEffect("Green Glow Icon", "Green glow icon for success.", "icon-green-glow", `.icon-green-glow{background:rgba(53,199,89,.14);border-color:rgba(53,199,89,.45);animation:iconGreenGlow 1.6s ease-in-out infinite;} .icon-green-glow span{color:#35c759;}`, "✓");
+    addEffect("Gold Glow Icon", "Premium gold glowing icon.", "icon-gold-glow", `.icon-gold-glow{background:rgba(255,189,46,.14);border-color:rgba(255,189,46,.45);animation:iconGoldGlow 1.6s ease-in-out infinite;} .icon-gold-glow span{color:#ffbd2e;}`, "♛");
+    addEffect("Neon Icon", "Neon icon with bright text shadow.", "icon-neon", `.icon-neon{border-color:rgba(79,140,255,.85);box-shadow:0 0 18px rgba(79,140,255,.4),inset 0 0 14px rgba(79,140,255,.15);} .icon-neon span{text-shadow:0 0 18px rgba(255,255,255,.85);animation:iconPulse 1.5s infinite;}`, "⚡");
+    addEffect("Soft Aura Icon", "Soft aura expands behind icon.", "icon-aura", `.icon-aura::before{content:"";position:absolute;inset:-18px;border-radius:inherit;background:radial-gradient(circle,rgba(79,140,255,.45),transparent 65%);animation:iconAura 1.8s ease-in-out infinite;z-index:1;} @keyframes iconAura{0%,100%{opacity:.2;transform:scale(.75);}50%{opacity:1;transform:scale(1.08);}}`, "✦");
+    addEffect("Ping Icon", "Outer ping ring expands from icon.", "icon-ping", `.icon-ping{background:#4f8cff;animation:iconPing 1.3s ease-out infinite;}`, "●");
+    addEffect("Border Glow Icon", "Icon border glows repeatedly.", "icon-border-glow", `.icon-border-glow{border-color:rgba(79,140,255,.55);animation:iconBorderGlow 1.6s ease-in-out infinite;} @keyframes iconBorderGlow{0%,100%{border-color:rgba(79,140,255,.25);}50%{border-color:#4f8cff;box-shadow:0 0 24px rgba(79,140,255,.55);}}`, "○");
+    addEffect("Inset Glow Icon", "Icon glows from inside.", "icon-inset-glow", `.icon-inset-glow{animation:iconInset 1.6s ease-in-out infinite;} @keyframes iconInset{0%,100%{box-shadow:inset 0 0 0 rgba(79,140,255,0);}50%{box-shadow:inset 0 0 24px rgba(79,140,255,.5);}}`, "◆");
+
+    addEffect("Heart Beat Icon", "Heart icon beats like a like button.", "icon-heart-beat", `.icon-heart-beat span{color:#ff5f57;animation:iconHeart 1.1s ease-in-out infinite;}`, "♥");
+    addEffect("Like Pop Icon", "Like icon pops up strongly.", "icon-like-pop", `.icon-like-pop span{color:#ff5f57;animation:iconPop 1s ease-in-out infinite;}`, "❤");
+    addEffect("Heart Glow Icon", "Heart has red glow and pulse.", "icon-heart-glow", `.icon-heart-glow{background:rgba(255,95,87,.14);border-color:rgba(255,95,87,.45);animation:iconRedGlow 1.4s infinite;} .icon-heart-glow span{color:#ff5f57;animation:iconHeart 1.2s infinite;}`, "♥");
+    addEffect("Star Twinkle Icon", "Star twinkles with rotation.", "icon-star-twinkle", `.icon-star-twinkle span{color:#ffbd2e;animation:iconStar 1.2s ease-in-out infinite;} @keyframes iconStar{0%,100%{transform:scale(1) rotate(0);opacity:.7;}50%{transform:scale(1.35) rotate(90deg);opacity:1;}}`, "★");
+    addEffect("Save Bounce Icon", "Save/bookmark icon bounces.", "icon-save-bounce", `.icon-save-bounce span{color:#4f8cff;animation:iconBounce 1.3s ease-in-out infinite;}`, "◆");
+    addEffect("Share Fly Icon", "Share icon flies diagonally.", "icon-share-fly", `.icon-share-fly span{animation:iconShareFly 1.2s ease-in-out infinite;} @keyframes iconShareFly{0%,100%{transform:translate(0,0);}50%{transform:translate(10px,-10px);}}`, "↗");
+    addEffect("Send Icon", "Send icon moves forward.", "icon-send", `.icon-send span{animation:iconSend 1.2s ease-in-out infinite;} @keyframes iconSend{0%,100%{transform:translate(0,0) rotate(0);}50%{transform:translate(12px,-8px) rotate(-10deg);}}`, "➤");
+    addEffect("Comment Pop Icon", "Comment icon pops like chat message.", "icon-comment-pop", `.icon-comment-pop span{animation:iconPop 1.4s ease-in-out infinite;}`, "☰");
+    addEffect("Notification Bell Icon", "Bell rings like notification.", "icon-bell-ring", `.icon-bell-ring span{transform-origin:top center;animation:iconBell 1.2s ease-in-out infinite;}`, "🔔");
+    addEffect("Notification Badge Icon", "Icon has notification count badge.", "icon-notification-badge", `.icon-notification-badge::after{content:"9";position:absolute;right:-5px;top:-5px;width:24px;height:24px;border-radius:50%;background:#ff5f57;display:grid;place-items:center;font-size:12px;font-weight:950;animation:iconPop 1.2s infinite;z-index:7;}`, "✉");
+
+    addEffect("Settings Gear Icon", "Settings gear rotates continuously.", "icon-gear", `.icon-gear span{animation:iconSpin 1.5s linear infinite;}`, "⚙");
+    addEffect("Refresh Icon", "Refresh icon rotates and pulses.", "icon-refresh", `.icon-refresh span{animation:iconRefresh 1.4s ease-in-out infinite;} @keyframes iconRefresh{0%,100%{transform:rotate(0) scale(1);}50%{transform:rotate(180deg) scale(1.2);}}`, "⟳");
+    addEffect("Sync Icon", "Sync icon spins smoothly.", "icon-sync", `.icon-sync span{animation:iconSpin 1s linear infinite;}`, "↻");
+    addEffect("Search Icon", "Search icon expands on hover.", "icon-search", `.icon-search:hover{transform:scale(1.12);box-shadow:0 0 24px rgba(79,140,255,.45);} .icon-search:hover span{color:#4f8cff;}`, "⌕");
+    addEffect("Mic Pulse Icon", "Mic recording pulse icon.", "icon-mic", `.icon-mic{background:rgba(255,95,87,.14);border-color:rgba(255,95,87,.45);animation:iconRedGlow 1.3s infinite;} .icon-mic span{color:#ff5f57;animation:iconPulse 1.1s infinite;}`, "●");
+    addEffect("Camera Flash Icon", "Camera flash overlay effect.", "icon-camera-flash", `.icon-camera-flash::after{content:"";position:absolute;inset:0;background:rgba(255,255,255,.75);opacity:0;animation:iconCameraFlash 1.5s ease-in-out infinite;z-index:6;} @keyframes iconCameraFlash{0%,70%,100%{opacity:0;}75%{opacity:1;}}`, "▣");
+    addEffect("Play Pulse Icon", "Play icon pulses for video UI.", "icon-play-pulse", `.icon-play-pulse span{animation:iconPulse 1.2s ease-in-out infinite;}`, "▶");
+    addEffect("Pause Blink Icon", "Pause icon blinks softly.", "icon-pause-blink", `.icon-pause-blink span{animation:iconBlink 1.1s ease-in-out infinite;} @keyframes iconBlink{0%,100%{opacity:1;}50%{opacity:.35;}}`, "Ⅱ");
+    addEffect("Volume Wave Icon", "Volume icon emits wave rings.", "icon-volume-wave", `.icon-volume-wave::after{content:"";position:absolute;inset:12px;border-radius:50%;border:2px solid rgba(79,140,255,.8);animation:iconWave 1.2s ease-out infinite;} @keyframes iconWave{0%{transform:scale(.4);opacity:1;}100%{transform:scale(1.8);opacity:0;}}`, "♪");
+    addEffect("Mute Shake Icon", "Mute icon shakes for off state.", "icon-mute-shake", `.icon-mute-shake span{animation:iconShake .65s infinite;color:#ff5f57;}`, "×");
+
+    addEffect("Upload Icon", "Upload arrow moves upward.", "icon-upload", `.icon-upload span{animation:iconUpload 1.2s ease-in-out infinite;} @keyframes iconUpload{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}`, "↑");
+    addEffect("Download Icon", "Download arrow moves downward.", "icon-download", `.icon-download span{animation:iconDownload 1.2s ease-in-out infinite;} @keyframes iconDownload{0%,100%{transform:translateY(0);}50%{transform:translateY(12px);}}`, "↓");
+    addEffect("Cloud Upload Icon", "Cloud icon with upload arrow pulse.", "icon-cloud-upload", `.icon-cloud-upload span{animation:iconPulse 1.4s infinite;color:#dbe8ff;} .icon-cloud-upload::after{content:"↑";position:absolute;font-size:20px;color:#4f8cff;animation:iconUpload 1.2s infinite;z-index:6;}`, "☁");
+    addEffect("Cloud Download Icon", "Cloud icon with download arrow.", "icon-cloud-download", `.icon-cloud-download span{animation:iconPulse 1.4s infinite;color:#dbe8ff;} .icon-cloud-download::after{content:"↓";position:absolute;font-size:20px;color:#4f8cff;animation:iconDownload 1.2s infinite;z-index:6;}`, "☁");
+    addEffect("Lock Shake Icon", "Lock icon shakes like locked state.", "icon-lock-shake", `.icon-lock-shake span{animation:iconShake .8s infinite;}`, "🔒");
+    addEffect("Unlock Pop Icon", "Unlock icon pops open.", "icon-unlock-pop", `.icon-unlock-pop span{animation:iconPop 1.3s infinite;color:#35c759;}`, "🔓");
+    addEffect("Shield Scan Icon", "Shield icon has scan line.", "icon-shield-scan", `.icon-shield-scan{color:#4f8cff;} .icon-shield-scan::after{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.9);animation:iconScan 1.4s infinite;z-index:6;}`, "⬟");
+    addEffect("Verified Tick Icon", "Verified tick pops with blue badge.", "icon-verified", `.icon-verified{background:#4f8cff;border-color:#4f8cff;animation:iconPulse 1.4s infinite;} .icon-verified span{font-size:34px;}`, "✓");
+    addEffect("Success Tick Icon", "Green success tick pulse.", "icon-success-tick", `.icon-success-tick{background:rgba(53,199,89,.18);border-color:rgba(53,199,89,.45);animation:iconGreenGlow 1.5s infinite;} .icon-success-tick span{color:#35c759;}`, "✓");
+    addEffect("Error X Icon", "Error X shakes red.", "icon-error-x", `.icon-error-x{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);} .icon-error-x span{color:#ff5f57;animation:iconShake .65s infinite;}`, "×");
+
+    addEffect("Warning Icon", "Warning icon glows yellow.", "icon-warning", `.icon-warning{background:rgba(255,189,46,.16);border-color:rgba(255,189,46,.45);animation:iconGoldGlow 1.5s infinite;} .icon-warning span{color:#ffbd2e;}`, "!");
+    addEffect("Info Icon", "Info icon glows blue.", "icon-info", `.icon-info{background:rgba(79,140,255,.16);border-color:rgba(79,140,255,.45);animation:iconGlow 1.6s infinite;}`, "i");
+    addEffect("Question Icon", "Question icon pulses.", "icon-question", `.icon-question span{animation:iconPulse 1.3s infinite;}`, "?");
+    addEffect("Plus Icon", "Plus icon expands on hover.", "icon-plus", `.icon-plus:hover span{transform:rotate(90deg) scale(1.25);color:#4f8cff;} .icon-plus span{transition:.25s ease;}`, "+");
+    addEffect("Close Icon", "Close icon rotates on hover.", "icon-close", `.icon-close:hover span{transform:rotate(180deg) scale(1.2);color:#ff5f57;} .icon-close span{transition:.25s ease;}`, "×");
+    addEffect("Menu Morph Icon", "Hamburger menu morphs into close.", "icon-menu-morph", `.icon-menu-morph span{width:34px;height:22px;position:relative;font-size:0;} .icon-menu-morph span::before,.icon-menu-morph span::after,.icon-menu-morph i{content:"";position:absolute;left:0;width:34px;height:4px;border-radius:999px;background:white;} .icon-menu-morph span::before{top:0;animation:menuTop 1.8s infinite;} .icon-menu-morph i{top:9px;animation:menuMid 1.8s infinite;} .icon-menu-morph span::after{top:18px;animation:menuBot 1.8s infinite;} @keyframes menuTop{0%,100%{transform:none;}50%{transform:rotate(45deg) translate(7px,7px);}} @keyframes menuMid{0%,100%{opacity:1;}50%{opacity:0;}} @keyframes menuBot{0%,100%{transform:none;}50%{transform:rotate(-45deg) translate(7px,-7px);}}`, "<i></i>");
+    addEffect("Kebab Icon", "Three-dot icon rotates.", "icon-kebab", `.icon-kebab span{font-size:26px;animation:iconSpin 1.8s linear infinite;}`, "⋮");
+    addEffect("Meatball Icon", "Horizontal dots pulse.", "icon-meatball", `.icon-meatball span{font-size:28px;animation:iconPulse 1.2s infinite;}`, "⋯");
+    addEffect("Arrow Right Icon", "Arrow moves right on hover.", "icon-arrow-right", `.icon-arrow-right:hover span{transform:translateX(10px);color:#4f8cff;} .icon-arrow-right span{transition:.25s ease;}`, "→");
+    addEffect("Arrow Left Icon", "Arrow moves left on hover.", "icon-arrow-left", `.icon-arrow-left:hover span{transform:translateX(-10px);color:#4f8cff;} .icon-arrow-left span{transition:.25s ease;}`, "←");
+
+    addEffect("Cart Icon", "Cart icon moves forward.", "icon-cart", `.icon-cart span{animation:iconCart 1.2s ease-in-out infinite;} @keyframes iconCart{0%,100%{transform:translateX(0);}50%{transform:translateX(10px);}}`, "▰");
+    addEffect("Bag Icon", "Shopping bag bounces.", "icon-bag", `.icon-bag span{animation:iconBounce 1.3s infinite;color:#ffbd2e;}`, "▣");
+    addEffect("Gift Icon", "Gift icon pops repeatedly.", "icon-gift", `.icon-gift span{animation:iconPop 1.3s infinite;color:#ffbd2e;}`, "◆");
+    addEffect("Coin Icon", "Coin rotates in 3D.", "icon-coin", `.icon-coin span{color:#ffbd2e;animation:iconCoin 1.4s linear infinite;} @keyframes iconCoin{to{transform:rotateY(360deg);}}`, "◉");
+    addEffect("Token Icon", "Token spins with gold glow.", "icon-token", `.icon-token{background:rgba(255,189,46,.14);border-color:rgba(255,189,46,.45);animation:iconGoldGlow 1.5s infinite;} .icon-token span{color:#ffbd2e;animation:iconSpin 1.5s linear infinite;}`, "●");
+    addEffect("Crown Icon", "Crown bounces with premium glow.", "icon-crown", `.icon-crown{background:rgba(255,189,46,.14);border-color:rgba(255,189,46,.45);animation:iconGoldGlow 1.6s infinite;} .icon-crown span{color:#ffbd2e;animation:iconBounce 1.3s infinite;}`, "♛");
+    addEffect("Fire Icon", "Fire-style icon glows warm.", "icon-fire", `.icon-fire{background:linear-gradient(135deg,rgba(255,95,87,.25),rgba(255,159,10,.25));border-color:rgba(255,159,10,.45);animation:iconRedGlow 1.5s infinite;} .icon-fire span{animation:iconPulse 1.1s infinite;}`, "▲");
+    addEffect("Rocket Icon", "Rocket launches upward.", "icon-rocket", `.icon-rocket span{animation:iconRocket 1.2s ease-in-out infinite;} @keyframes iconRocket{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-14px) rotate(-12deg);}}`, "↗");
+    addEffect("Lightning Icon", "Electric flicker icon.", "icon-lightning", `.icon-lightning span{color:#dbe8ff;text-shadow:0 0 18px rgba(79,140,255,.9);animation:iconElectric .7s steps(2) infinite;} @keyframes iconElectric{0%,100%{transform:translate(0);filter:brightness(1);}50%{transform:translate(2px,-2px);filter:brightness(1.7);}}`, "⚡");
+    addEffect("Sparkle Icon", "Sparkle rotates and scales.", "icon-sparkle", `.icon-sparkle span{animation:iconStar 1.2s ease-in-out infinite;} @keyframes iconStar{0%,100%{transform:scale(1) rotate(0);opacity:.7;}50%{transform:scale(1.35) rotate(90deg);opacity:1;}}`, "✦");
+
+    addEffect("Gradient Icon", "Icon container has animated gradient.", "icon-gradient", `.icon-gradient{background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:220%;border:0;animation:iconGradient 2.2s ease-in-out infinite;}`, "★");
+    addEffect("Rainbow Icon", "Rainbow gradient icon container.", "icon-rainbow", `.icon-rainbow{background:linear-gradient(90deg,#ff5f57,#ffbd2e,#35c759,#4f8cff,#8d6bff);background-size:300%;border:0;animation:iconGradient 2.5s linear infinite;}`, "✦");
+    addEffect("Holographic Icon", "Holographic pastel icon card.", "icon-holo", `.icon-holo{background:linear-gradient(120deg,rgba(255,255,255,.22),rgba(135,247,255,.32),rgba(255,158,231,.28),rgba(255,255,255,.22));background-size:260%;animation:iconGradient 2.4s ease-in-out infinite;}`, "◇");
+    addEffect("Chrome Icon", "Chrome metallic shine icon.", "icon-chrome", `.icon-chrome{background:linear-gradient(90deg,#666,#fff,#777,#fff,#666);background-size:250%;color:#111;border:0;animation:iconGradient 2.4s linear infinite;}`, "◆");
+    addEffect("Glass Icon", "Frosted glass icon container.", "icon-glass", `.icon-glass{background:rgba(255,255,255,.12);backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 14px 34px rgba(0,0,0,.28);animation:iconPulse 2s infinite;}`, "○");
+    addEffect("Shine Icon", "White shine passes over icon.", "icon-shine", `.icon-shine::after{content:"";position:absolute;top:-80%;left:-50%;width:35%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:iconShine 2.2s linear infinite;z-index:6;}`, "★");
+    addEffect("Scan Icon", "Scan line moves through icon.", "icon-scan", `.icon-scan::after{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.9);animation:iconScan 1.4s infinite;z-index:6;}`, "▣");
+    addEffect("Ripple Icon", "Ripple expands inside icon card.", "icon-ripple", `.icon-ripple::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:rgba(79,140,255,.55);animation:iconRipple 1.4s ease-out infinite;z-index:1;} @keyframes iconRipple{0%{transform:scale(0);opacity:1;}100%{transform:scale(8);opacity:0;}}`, "●");
+    addEffect("Liquid Icon", "Liquid wave fills icon card.", "icon-liquid", `.icon-liquid::before{content:"";position:absolute;left:-25%;right:-25%;bottom:-150%;height:180%;background:rgba(79,140,255,.65);border-radius:45%;animation:iconLiquid 2s linear infinite;z-index:1;} @keyframes iconLiquid{to{transform:rotate(360deg);}}`, "↓");
+    addEffect("Spotlight Icon", "Spotlight moves across icon card.", "icon-spotlight", `.icon-spotlight::before{content:"";position:absolute;inset:-60%;background:radial-gradient(circle,rgba(255,255,255,.38),transparent 35%);animation:iconSpot 1.8s ease-in-out infinite;z-index:1;} @keyframes iconSpot{0%,100%{transform:translate(-35%,-35%);}50%{transform:translate(25%,25%);}}`, "✦");
+
+    addEffect("Hover Lift Icon", "Icon lifts when hovered.", "icon-hover-lift", `.icon-hover-lift:hover{transform:translateY(-10px);box-shadow:0 26px 55px rgba(0,0,0,.45);}`, "↑");
+    addEffect("Hover Scale Icon", "Icon scales on hover.", "icon-hover-scale", `.icon-hover-scale:hover{transform:scale(1.16);background:rgba(79,140,255,.24);}`, "★");
+    addEffect("Hover Rotate Icon", "Icon rotates on hover.", "icon-hover-rotate", `.icon-hover-rotate:hover{transform:rotate(-8deg) scale(1.08);background:rgba(79,140,255,.24);}`, "◆");
+    addEffect("Hover Flip Icon", "Icon flips in 3D on hover.", "icon-hover-flip", `.icon-hover-flip:hover{transform:rotateY(180deg);}`, "↔");
+    addEffect("Hover Tilt Icon", "Icon tilts in 3D on hover.", "icon-hover-tilt", `.icon-hover-tilt:hover{transform:perspective(600px) rotateX(15deg) rotateY(-18deg);}`, "▣");
+    addEffect("Hover Glow Icon", "Glow appears on hover.", "icon-hover-glow", `.icon-hover-glow:hover{border-color:#4f8cff;box-shadow:0 0 30px rgba(79,140,255,.65);}`, "✦");
+    addEffect("Hover Border Icon", "Gradient border appears on hover.", "icon-hover-border", `.icon-hover-border::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:.25s ease;z-index:6;} .icon-hover-border:hover::after{opacity:1;}`, "○");
+    addEffect("Hover Color Icon", "Icon changes color on hover.", "icon-hover-color", `.icon-hover-color:hover span{color:#4f8cff;transform:scale(1.18);} .icon-hover-color span{transition:.25s ease;}`, "★");
+    addEffect("Hover Background Icon", "Background fills on hover.", "icon-hover-bg", `.icon-hover-bg::before{content:"";position:absolute;inset:0;background:#4f8cff;transform:scale(0);border-radius:50%;transition:.3s ease;z-index:1;} .icon-hover-bg:hover::before{transform:scale(2);}`, "+");
+    addEffect("Hover Final Icon", "Premium hover with glow and shine.", "icon-hover-final", `.icon-hover-final:hover{background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:240%;border:0;box-shadow:0 0 30px rgba(79,140,255,.65);animation:iconGradient 1.4s ease-in-out infinite;} .icon-hover-final:hover::after{content:"";position:absolute;top:-80%;left:-50%;width:35%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:iconShine 1.3s linear infinite;z-index:6;}`, "✦");
+
+    addEffect("AI Icon", "AI-style glowing icon.", "icon-ai", `.icon-ai{background:rgba(79,140,255,.16);border-color:rgba(79,140,255,.45);animation:iconGlow 1.6s infinite;} .icon-ai span{color:#dbe8ff;text-shadow:0 0 18px rgba(79,140,255,.8);}`, "AI");
+    addEffect("Prompt Icon", "Prompt sparkle icon effect.", "icon-prompt", `.icon-prompt span{animation:iconPulse 1.5s infinite;text-shadow:0 0 18px rgba(79,140,255,.8);}`, "✎");
+    addEffect("Magic Wand Icon", "Magic wand sparkle animation.", "icon-magic", `.icon-magic span{animation:iconSwing 1.3s infinite;} .icon-magic::after{content:"✦";position:absolute;right:10px;top:8px;font-size:14px;animation:iconPop 1s infinite;z-index:6;}`, "╱");
+    addEffect("Bot Icon", "Bot icon pulses with AI glow.", "icon-bot", `.icon-bot{background:rgba(79,140,255,.14);border-color:rgba(79,140,255,.45);animation:iconGlow 1.7s infinite;}`, "☻");
+    addEffect("Analytics Icon", "Analytics bars move inside icon.", "icon-analytics", `.icon-analytics span{font-size:0;display:flex;gap:4px;align-items:end;height:34px;} .icon-analytics span::before,.icon-analytics span::after,.icon-analytics i{content:"";width:7px;border-radius:999px;background:#4f8cff;animation:analyticsBar 1s infinite;} .icon-analytics span::before{height:18px;} .icon-analytics i{height:30px;animation-delay:.15s;} .icon-analytics span::after{height:24px;animation-delay:.3s;} @keyframes analyticsBar{0%,100%{transform:scaleY(.5);opacity:.5;}50%{transform:scaleY(1);opacity:1;}}`, "<i></i>");
+    addEffect("Chart Icon", "Chart line draws repeatedly.", "icon-chart", `.icon-chart span{font-size:0;width:36px;height:28px;border-left:3px solid rgba(255,255,255,.4);border-bottom:3px solid rgba(255,255,255,.4);} .icon-chart span::after{content:"";position:absolute;left:18px;top:35px;width:34px;height:18px;border-top:4px solid #4f8cff;border-right:4px solid #4f8cff;transform:skew(-25deg);animation:iconPulse 1.3s infinite;}`, "");
+    addEffect("Location Icon", "Location pin bounces.", "icon-location", `.icon-location span{animation:iconBounce 1.3s infinite;color:#ff5f57;}`, "◆");
+    addEffect("Map Icon", "Map icon floats.", "icon-map", `.icon-map span{animation:iconFloat 2s infinite;color:#35c759;}`, "▤");
+    addEffect("Calendar Icon", "Calendar icon pops.", "icon-calendar", `.icon-calendar span{animation:iconPop 1.4s infinite;}`, "▦");
+    addEffect("Clock Icon", "Clock hand rotates inside icon.", "icon-clock", `.icon-clock span{font-size:0;width:42px;height:42px;border-radius:50%;border:3px solid white;} .icon-clock span::after{content:"";position:absolute;width:3px;height:18px;background:#4f8cff;border-radius:999px;bottom:50%;left:50%;transform-origin:bottom;animation:iconSpin 1.2s linear infinite;}`, "");
+
+    addEffect("Final Premium Icon", "Gradient, glow, shine, and pulse together.", "icon-final-premium", `.icon-final-premium{background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:240%;border:0;animation:iconGradient 2.3s ease-in-out infinite,iconGlow 1.8s ease-in-out infinite;} .icon-final-premium span{animation:iconPulse 1.4s infinite;} .icon-final-premium::after{content:"";position:absolute;top:-80%;left:-50%;width:35%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:iconShine 2.4s linear infinite;z-index:6;}`, "✦");
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
+
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = commonKeyframes + "\n\n" + effects.map(effect => effect.css).join("\n\n");
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards() {
+      grid.innerHTML = "";
+
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
+
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseIconCSS}
+
+${commonKeyframes}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    function applySearch() {
+      const value = searchInput.value.trim().toLowerCase();
+
+      filteredEffects = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value)
+        );
+      });
+
+      visibleCount = batchSize;
+      renderCards();
+    }
+
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
+  </script>
+</body>
+</html>
