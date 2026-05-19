@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input Focus Effects</title>
+
+  <style>
+    :root {
+      --bg: #000;
+      --border: rgba(255,255,255,0.14);
+      --text: #fff;
+      --muted: rgba(255,255,255,0.58);
+      --blue: #4f8cff;
+      --purple: #8d6bff;
+      --green: #35c759;
+      --red: #ff5f57;
+      --yellow: #ffbd2e;
+      --orange: #ff9f0a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15), transparent 24%),
+        radial-gradient(circle at 18% 28%, rgba(79,140,255,0.11), transparent 28%),
+        linear-gradient(180deg, #000, #050505 55%, #090909);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+      background-size: 70px 70px;
+      mask-image: radial-gradient(circle at center, black, transparent 75%);
+      z-index: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      width: min(100%, 1560px);
+      margin: 0 auto;
+      padding: 22px;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 16px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px;
+      border-radius: 24px;
+      background: rgba(20,20,20,0.78);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(26px);
+      box-shadow: 0 20px 70px rgba(0,0,0,0.46);
+      margin-bottom: 30px;
+    }
+
+    .search-box {
+      width: 280px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.12);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      flex: 0 0 auto;
+    }
+
+    .search-box svg {
+      color: rgba(255,255,255,0.58);
+      flex: 0 0 auto;
+    }
+
+    .search-box input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: white;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .search-box input::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex: 1;
+    }
+
+    .menu::-webkit-scrollbar {
+      display: none;
+    }
+
+    .menu a {
+      height: 46px;
+      padding: 0 16px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.68);
+      font-size: 14px;
+      font-weight: 850;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: 180ms ease;
+    }
+
+    .menu a:hover,
+    .menu a.active {
+      background: rgba(255,255,255,0.11);
+      border-color: rgba(255,255,255,0.12);
+      color: white;
+    }
+
+    .menu a.active {
+      background: rgba(79,140,255,0.22);
+      border-color: rgba(79,140,255,0.38);
+    }
+
+    .content-header {
+      margin-bottom: 24px;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .title-block h1 {
+      font-size: clamp(34px, 4.8vw, 64px);
+      line-height: 0.95;
+      letter-spacing: -0.065em;
+      font-weight: 950;
+      margin-bottom: 10px;
+    }
+
+    .title-block p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      font-weight: 650;
+      max-width: 760px;
+    }
+
+    .count-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.74);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+      padding-bottom: 35px;
+    }
+
+    .card {
+      min-height: 238px;
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.12), transparent 50%),
+        linear-gradient(180deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04));
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: 220ms ease;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.25);
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.24);
+      box-shadow: 0 28px 80px rgba(0,0,0,0.44);
+    }
+
+    .preview {
+      height: 138px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.09);
+      background: rgba(0,0,0,0.20);
+      overflow: hidden;
+      position: relative;
+      perspective: 900px;
+    }
+
+    .input-wrap {
+      position: relative;
+      width: 150px;
+    }
+
+    .input-demo {
+      width: 100%;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.10);
+      color: white;
+      outline: none;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 800;
+      transition: 260ms ease;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+    }
+
+    .input-demo::placeholder {
+      color: rgba(255,255,255,0.45);
+    }
+
+    .input-demo:focus {
+      border-color: rgba(79,140,255,0.95);
+    }
+
+    .fake-input {
+      position: relative;
+      width: 150px;
+      min-height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.10);
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 850;
+      transition: 260ms ease;
+      overflow: hidden;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+    }
+
+    .fake-input span {
+      position: relative;
+      z-index: 5;
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+
+    .name-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .name-row h3 {
+      font-size: 16px;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      font-weight: 900;
+    }
+
+    .copy-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.085);
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex: 0 0 auto;
+      transition: 180ms ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(79,140,255,0.95);
+      border-color: rgba(79,140,255,0.95);
+      transform: translateY(-2px);
+    }
+
+    .card-body p {
+      color: rgba(255,255,255,0.55);
+      font-size: 12.5px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .empty {
+      padding: 24px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      font-weight: 750;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 30px;
+      transform: translateX(-50%) translateY(18px);
+      padding: 13px 18px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.93);
+      color: #111;
+      font-size: 13px;
+      font-weight: 850;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: 220ms ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    @media (max-width: 1100px) {
+      .grid { grid-template-columns: repeat(3, 1fr); }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .search-box { width: 100%; }
+      .menu { width: 100%; }
+    }
+
+    @media (max-width: 760px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .content-header { display: block; }
+      .count-pill { display: inline-block; margin-top: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .page { padding: 12px; }
+      .topbar { top: 10px; border-radius: 20px; }
+      .menu a { height: 42px; padding: 0 13px; font-size: 13px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="search-box">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/>
+          <path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+        <input id="searchInput" type="text" placeholder="Search effect..." />
+      </div>
+
+      <nav class="menu" id="mainMenu"></nav>
+    </header>
+
+    <main>
+      <header class="content-header">
+        <div class="title-block">
+          <h1>Input Focus Effects</h1>
+          <p>100 live input, search, textarea, form, focus, validation, floating label, and premium field effects.</p>
+        </div>
+
+        <div class="count-pill" id="countPill">0 Effects</div>
+      </header>
+
+      <div id="emptyState" class="empty">
+        No effect found. Try searching “glow”, “floating”, “search”, “error”, “success”, “password”, or “textarea”.
+      </div>
+
+      <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
+    </main>
+  </div>
+
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
+  <script>
+    const effects = [];
+
+    const baseInputCSS = `.input-wrap {
+  position: relative;
+  width: 150px;
+}
+.input-demo {
+  width: 100%;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  color: white;
+  outline: none;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 800;
+  transition: 260ms ease;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+}
+.input-demo::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+.input-demo:focus {
+  border-color: rgba(79,140,255,0.95);
+}`;
+
+    const baseFakeCSS = `.fake-input {
+  position: relative;
+  width: 150px;
+  min-height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.10);
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 850;
+  transition: 260ms ease;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+}
+.fake-input span {
+  position: relative;
+  z-index: 5;
+}`;
+
+    const commonKeyframes = `
+@keyframes inputGlow { 0%,100%{box-shadow:0 0 0 rgba(79,140,255,0);} 50%{box-shadow:0 0 26px rgba(79,140,255,.65);} }
+@keyframes inputRedGlow { 0%,100%{box-shadow:0 0 0 rgba(255,95,87,0);} 50%{box-shadow:0 0 24px rgba(255,95,87,.65);} }
+@keyframes inputGreenGlow { 0%,100%{box-shadow:0 0 0 rgba(53,199,89,0);} 50%{box-shadow:0 0 24px rgba(53,199,89,.65);} }
+@keyframes inputGoldGlow { 0%,100%{box-shadow:0 0 0 rgba(255,189,46,0);} 50%{box-shadow:0 0 24px rgba(255,189,46,.65);} }
+@keyframes inputShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+@keyframes inputPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
+@keyframes inputFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-7px);} }
+@keyframes inputShimmer { to{background-position:-220% center;} }
+@keyframes inputGradient { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} }
+@keyframes inputScan { 0%,100%{top:0;} 50%{top:calc(100% - 3px);} }
+@keyframes inputTypingDots { 0%{content:"";} 25%{content:".";} 50%{content:"..";} 75%,100%{content:"...";} }
+@keyframes inputSpin { to{transform:rotate(360deg);} }
+@keyframes inputDotWave { 0%,100%{transform:translateY(0);opacity:.45;} 50%{transform:translateY(-7px);opacity:1;} }
+`;
+
+    function addEffect(name, about, type, className, css, html) {
+      effects.push({
+        id: String(effects.length),
+        name,
+        about,
+        type,
+        className,
+        html: html || `<div class="input-wrap ${className}"><input class="input-demo" placeholder="Focus me" /></div>`,
+        css
+      });
+    }
+
+    addEffect("Blue Focus Glow", "Input gets blue glow when focused.", "input", "input-blue-focus", `.input-blue-focus .input-demo:focus{box-shadow:0 0 26px rgba(79,140,255,.65);border-color:#4f8cff;}`);
+    addEffect("Soft Focus Glow", "Input gets soft white glow on focus.", "input", "input-soft-focus", `.input-soft-focus .input-demo:focus{box-shadow:0 0 24px rgba(255,255,255,.28);border-color:rgba(255,255,255,.5);}`);
+    addEffect("Green Focus Glow", "Success-style green focus state.", "input", "input-green-focus", `.input-green-focus .input-demo:focus{box-shadow:0 0 24px rgba(53,199,89,.65);border-color:#35c759;}`);
+    addEffect("Red Focus Glow", "Error-style red focus state.", "input", "input-red-focus", `.input-red-focus .input-demo:focus{box-shadow:0 0 24px rgba(255,95,87,.65);border-color:#ff5f57;}`);
+    addEffect("Gold Focus Glow", "Premium gold focus state.", "input", "input-gold-focus", `.input-gold-focus .input-demo:focus{box-shadow:0 0 24px rgba(255,189,46,.65);border-color:#ffbd2e;}`);
+    addEffect("Inset Focus", "Input glows from inside on focus.", "input", "input-inset-focus", `.input-inset-focus .input-demo:focus{box-shadow:inset 0 0 18px rgba(79,140,255,.45),0 0 20px rgba(79,140,255,.25);border-color:#4f8cff;}`);
+    addEffect("Border Grow Focus", "Border becomes thicker on focus.", "input", "input-border-grow", `.input-border-grow .input-demo:focus{border-width:2px;border-color:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.35);}`);
+    addEffect("Lift Focus", "Input lifts upward on focus.", "input", "input-lift-focus", `.input-lift-focus .input-demo:focus{transform:translateY(-6px);box-shadow:0 24px 48px rgba(0,0,0,.45);}`);
+    addEffect("Scale Focus", "Input scales slightly on focus.", "input", "input-scale-focus", `.input-scale-focus .input-demo:focus{transform:scale(1.06);border-color:#4f8cff;box-shadow:0 0 22px rgba(79,140,255,.45);}`);
+    addEffect("Press Focus", "Input presses inward on focus.", "input", "input-press-focus", `.input-press-focus .input-demo:focus{transform:translateY(4px) scale(.98);box-shadow:inset 0 8px 16px rgba(0,0,0,.35);}`);
+
+    addEffect("Underline Focus", "Underline expands when input is focused.", "input", "input-underline-focus", `.input-underline-focus .input-demo{border-color:transparent;border-radius:0;background:transparent;box-shadow:none;border-bottom:2px solid rgba(255,255,255,.18);} .input-underline-focus::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:#4f8cff;transform:scaleX(0);transform-origin:left;transition:.28s ease;} .input-underline-focus:focus-within::after{transform:scaleX(1);}`);
+    addEffect("Center Underline", "Underline expands from center.", "input", "input-center-underline", `.input-center-underline .input-demo{border-color:transparent;border-radius:0;background:transparent;box-shadow:none;border-bottom:2px solid rgba(255,255,255,.18);} .input-center-underline::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:#4f8cff;transform:scaleX(0);transform-origin:center;transition:.28s ease;} .input-center-underline:focus-within::after{transform:scaleX(1);}`);
+    addEffect("Double Underline", "Two underline layers animate on focus.", "input", "input-double-underline", `.input-double-underline .input-demo{border-color:transparent;border-radius:0;background:transparent;box-shadow:none;border-bottom:2px solid rgba(255,255,255,.18);} .input-double-underline::before,.input-double-underline::after{content:"";position:absolute;left:0;right:0;height:2px;background:#4f8cff;transform:scaleX(0);transition:.28s ease;} .input-double-underline::before{bottom:0;transform-origin:left;} .input-double-underline::after{bottom:-5px;transform-origin:right;background:#8d6bff;} .input-double-underline:focus-within::before,.input-double-underline:focus-within::after{transform:scaleX(1);}`);
+    addEffect("Top Border Focus", "Top border slides in on focus.", "input", "input-top-border", `.input-top-border::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:#4f8cff;transform:scaleX(0);transition:.28s ease;} .input-top-border:focus-within::before{transform:scaleX(1);}`);
+    addEffect("Left Border Focus", "Left border grows on focus.", "input", "input-left-border", `.input-left-border::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#4f8cff;transform:scaleY(0);transition:.28s ease;border-radius:999px;} .input-left-border:focus-within::before{transform:scaleY(1);}`);
+    addEffect("Right Border Focus", "Right border grows on focus.", "input", "input-right-border", `.input-right-border::after{content:"";position:absolute;right:0;top:0;bottom:0;width:3px;background:#8d6bff;transform:scaleY(0);transition:.28s ease;border-radius:999px;} .input-right-border:focus-within::after{transform:scaleY(1);}`);
+    addEffect("Full Border Draw", "Border draws around input on focus.", "input", "input-border-draw", `.input-border-draw .input-demo:focus{border-color:transparent;} .input-border-draw::after{content:"";position:absolute;inset:0;border-radius:14px;padding:2px;background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:.25s ease;} .input-border-draw:focus-within::after{opacity:1;}`);
+    addEffect("Rotating Border", "Animated rotating border around input.", "input", "input-rotating-border", `.input-rotating-border{overflow:hidden;border-radius:14px;} .input-rotating-border::before{content:"";position:absolute;inset:-80%;background:conic-gradient(from 0deg,transparent,#4f8cff,transparent,#8d6bff,transparent);opacity:0;animation:inputSpin 2s linear infinite;} .input-rotating-border:focus-within::before{opacity:1;} .input-rotating-border .input-demo{position:relative;z-index:2;background:#111;}`);
+    addEffect("Dashed Focus", "Dashed border appears on focus.", "input", "input-dashed-focus", `.input-dashed-focus .input-demo:focus{border:2px dashed #4f8cff;box-shadow:0 0 22px rgba(79,140,255,.35);}`);
+    addEffect("Gradient Border Focus", "Gradient border appears on focus.", "input", "input-gradient-border", `.input-gradient-border::after{content:"";position:absolute;inset:0;border-radius:14px;padding:2px;background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:.25s ease;} .input-gradient-border:focus-within::after{opacity:1;}`);
+
+    addEffect("Floating Label", "Label floats above input on focus.", "input", "input-floating-label", `.input-floating-label label{position:absolute;left:14px;top:13px;color:rgba(255,255,255,.48);font-size:13px;font-weight:850;transition:.25s ease;pointer-events:none;} .input-floating-label .input-demo{padding-top:12px;} .input-floating-label:focus-within label{top:5px;font-size:10px;color:#4f8cff;}`, `<div class="input-wrap input-floating-label"><input class="input-demo" /><label>Email</label></div>`);
+    addEffect("Floating Label Glow", "Floating label with focus glow.", "input", "input-floating-glow", `.input-floating-glow label{position:absolute;left:14px;top:13px;color:rgba(255,255,255,.48);font-size:13px;font-weight:850;transition:.25s ease;pointer-events:none;} .input-floating-glow .input-demo{padding-top:12px;} .input-floating-glow:focus-within label{top:5px;font-size:10px;color:#4f8cff;text-shadow:0 0 12px rgba(79,140,255,.8);} .input-floating-glow .input-demo:focus{box-shadow:0 0 24px rgba(79,140,255,.5);}`, `<div class="input-wrap input-floating-glow"><input class="input-demo" /><label>Name</label></div>`);
+    addEffect("Floating Label Slide", "Label slides to top-left on focus.", "input", "input-floating-slide", `.input-floating-slide label{position:absolute;left:14px;top:13px;color:rgba(255,255,255,.48);font-size:13px;font-weight:850;transition:.25s ease;pointer-events:none;} .input-floating-slide:focus-within label{top:-18px;left:4px;font-size:11px;color:#4f8cff;}`, `<div class="input-wrap input-floating-slide"><input class="input-demo" placeholder="" /><label>Search</label></div>`);
+    addEffect("Label Pop", "Label pops upward on focus.", "input", "input-label-pop", `.input-label-pop label{position:absolute;left:14px;top:13px;color:rgba(255,255,255,.48);font-size:13px;font-weight:850;transition:.25s ease;pointer-events:none;} .input-label-pop:focus-within label{transform:translateY(-28px) scale(.82);color:#4f8cff;}`, `<div class="input-wrap input-label-pop"><input class="input-demo" /><label>Label</label></div>`);
+    addEffect("Label Highlight", "Label gets small highlight pill.", "input", "input-label-highlight", `.input-label-highlight label{position:absolute;left:12px;top:12px;color:rgba(255,255,255,.48);font-size:13px;font-weight:850;transition:.25s ease;pointer-events:none;padding:3px 7px;border-radius:999px;} .input-label-highlight:focus-within label{top:-13px;background:#4f8cff;color:white;font-size:10px;}`, `<div class="input-wrap input-label-highlight"><input class="input-demo" /><label>Label</label></div>`);
+    addEffect("Icon Focus", "Search icon changes color on focus.", "input", "input-icon-focus", `.input-icon-focus .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.45);transition:.25s ease;z-index:3;} .input-icon-focus .input-demo{padding-left:38px;} .input-icon-focus:focus-within .icon{color:#4f8cff;filter:drop-shadow(0 0 8px rgba(79,140,255,.8));}`, `<div class="input-wrap input-icon-focus"><span class="icon">⌕</span><input class="input-demo" placeholder="Search" /></div>`);
+    addEffect("Icon Slide", "Icon slides right on focus.", "input", "input-icon-slide", `.input-icon-slide .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.45);transition:.25s ease;z-index:3;} .input-icon-slide .input-demo{padding-left:38px;} .input-icon-slide:focus-within .icon{transform:translate(6px,-50%);color:#4f8cff;}`, `<div class="input-wrap input-icon-slide"><span class="icon">⌕</span><input class="input-demo" placeholder="Search" /></div>`);
+    addEffect("Right Icon Focus", "Right icon pops on focus.", "input", "input-right-icon", `.input-right-icon .icon{position:absolute;right:13px;top:50%;transform:translateY(-50%) scale(.8);opacity:.45;transition:.25s ease;z-index:3;} .input-right-icon .input-demo{padding-right:38px;} .input-right-icon:focus-within .icon{opacity:1;transform:translateY(-50%) scale(1.1);color:#4f8cff;}`, `<div class="input-wrap input-right-icon"><input class="input-demo" placeholder="Type" /><span class="icon">✓</span></div>`);
+    addEffect("Clear Button Focus", "Clear button appears on focus.", "input", "input-clear-btn", `.input-clear-btn .clear{position:absolute;right:11px;top:50%;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center;transform:translateY(-50%) scale(.4);opacity:0;transition:.25s ease;z-index:4;font-size:13px;} .input-clear-btn:focus-within .clear{opacity:1;transform:translateY(-50%) scale(1);}`, `<div class="input-wrap input-clear-btn"><input class="input-demo" placeholder="Type" /><span class="clear">×</span></div>`);
+    addEffect("Password Eye", "Eye icon appears in password field.", "input", "input-password-eye", `.input-password-eye .eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);opacity:.45;transition:.25s ease;z-index:4;} .input-password-eye .input-demo{padding-right:40px;} .input-password-eye:focus-within .eye{opacity:1;color:#4f8cff;}`, `<div class="input-wrap input-password-eye"><input class="input-demo" type="password" placeholder="Password" /><span class="eye">◉</span></div>`);
+
+    addEffect("Search Expand", "Search bar expands on focus.", "input", "input-search-expand", `.input-search-expand{width:92px;transition:.28s ease;} .input-search-expand:focus-within{width:170px;} .input-search-expand .input-demo{border-radius:999px;padding-left:36px;} .input-search-expand .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);z-index:3;color:rgba(255,255,255,.45);}`, `<div class="input-wrap input-search-expand"><span class="icon">⌕</span><input class="input-demo" placeholder="Search" /></div>`);
+    addEffect("Search Pill Glow", "Search pill glows on focus.", "input", "input-search-pill", `.input-search-pill .input-demo{border-radius:999px;padding-left:38px;} .input-search-pill .icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:3;} .input-search-pill:focus-within .input-demo{box-shadow:0 0 24px rgba(79,140,255,.55);border-color:#4f8cff;}`, `<div class="input-wrap input-search-pill"><span class="icon">⌕</span><input class="input-demo" placeholder="Search" /></div>`);
+    addEffect("Search Loading", "Search field shows mini spinner.", "input", "input-search-loading", `.input-search-loading .spinner{position:absolute;right:13px;top:50%;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.18);border-top-color:#4f8cff;transform:translateY(-50%);animation:inputSpin .8s linear infinite;z-index:4;} .input-search-loading .input-demo{padding-right:40px;}`, `<div class="input-wrap input-search-loading"><input class="input-demo" placeholder="Searching" /><span class="spinner"></span></div>`);
+    addEffect("Search Scan", "Scanning line moves inside search input.", "input", "input-search-scan", `.input-search-scan{overflow:hidden;border-radius:14px;} .input-search-scan::after{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.9);animation:inputScan 1.4s ease-in-out infinite;z-index:3;}`);
+    addEffect("AI Search", "AI prompt-style glowing search.", "input", "input-ai-search", `.input-ai-search .input-demo{color:#dbe8ff;text-shadow:0 0 12px rgba(79,140,255,.6);} .input-ai-search:focus-within .input-demo{border-color:#4f8cff;box-shadow:0 0 28px rgba(79,140,255,.65);}`);
+    addEffect("Command Search", "Command palette style input.", "input", "input-command", `.input-command::before{content:"⌘";position:absolute;left:13px;top:50%;transform:translateY(-50%);z-index:3;color:rgba(255,255,255,.5);} .input-command .input-demo{padding-left:39px;background:rgba(255,255,255,.08);border-radius:16px;} .input-command:focus-within .input-demo{box-shadow:0 0 0 4px rgba(79,140,255,.18);}`);
+    addEffect("Spotlight Search", "Mac spotlight style focus.", "input", "input-spotlight", `.input-spotlight{width:170px;} .input-spotlight .input-demo{height:50px;border-radius:18px;background:rgba(255,255,255,.14);backdrop-filter:blur(18px);} .input-spotlight:focus-within .input-demo{box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 28px rgba(79,140,255,.35);}`);
+    addEffect("Search Suggestion", "Suggestion pill appears below input.", "input", "input-suggestion", `.input-suggestion::after{content:"Suggestion";position:absolute;left:0;right:0;top:52px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);opacity:0;transform:translateY(-8px);transition:.25s ease;font-size:11px;font-weight:800;} .input-suggestion:focus-within::after{opacity:1;transform:translateY(0);}`);
+    addEffect("Search Result Count", "Result count badge appears on focus.", "input", "input-result-count", `.input-result-count::after{content:"12";position:absolute;right:-8px;top:-8px;width:24px;height:24px;border-radius:50%;background:#4f8cff;display:grid;place-items:center;font-size:11px;font-weight:950;opacity:0;transform:scale(.5);transition:.25s ease;z-index:4;} .input-result-count:focus-within::after{opacity:1;transform:scale(1);}`);
+    addEffect("Search Highlight", "Input background highlight fills on focus.", "input", "input-search-highlight", `.input-search-highlight .input-demo{background:linear-gradient(90deg,rgba(255,255,255,.1) 50%,rgba(79,140,255,.2) 50%);background-size:220%;background-position:0%;} .input-search-highlight:focus-within .input-demo{background-position:-100%;}`);
+
+    addEffect("Success Input", "Green valid input state.", "fake", "fake-success-input", `.fake-success-input{background:rgba(53,199,89,.16);border-color:rgba(53,199,89,.45);animation:inputGreenGlow 1.7s ease-in-out infinite;} .fake-success-input::after{content:"✓";position:absolute;right:12px;color:#35c759;}`, `<div class="fake-input fake-success-input"><span>Valid</span></div>`);
+    addEffect("Error Input", "Red invalid input state with shake.", "fake", "fake-error-input", `.fake-error-input{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:inputShake .65s ease-in-out infinite;} .fake-error-input::after{content:"×";position:absolute;right:12px;color:#ff5f57;font-size:18px;}`, `<div class="fake-input fake-error-input"><span>Error</span></div>`);
+    addEffect("Warning Input", "Yellow warning input state.", "fake", "fake-warning-input", `.fake-warning-input{background:rgba(255,189,46,.16);border-color:rgba(255,189,46,.45);animation:inputGoldGlow 1.7s ease-in-out infinite;} .fake-warning-input::after{content:"!";position:absolute;right:14px;color:#ffbd2e;}`, `<div class="fake-input fake-warning-input"><span>Warning</span></div>`);
+    addEffect("Loading Input", "Input loading shimmer state.", "fake", "fake-loading-input", `.fake-loading-input{background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.23),rgba(255,255,255,.07));background-size:220%;animation:inputShimmer 1.4s linear infinite;} .fake-loading-input span{color:transparent;}`, `<div class="fake-input fake-loading-input"><span>Loading</span></div>`);
+    addEffect("Skeleton Input", "Skeleton input placeholder.", "fake", "fake-skeleton-input", `.fake-skeleton-input{background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.23),rgba(255,255,255,.07));background-size:220%;animation:inputShimmer 1.4s linear infinite;border-color:transparent;} .fake-skeleton-input span{color:transparent;}`, `<div class="fake-input fake-skeleton-input"><span>Input</span></div>`);
+    addEffect("Typing Input", "Typing cursor animation inside input.", "fake", "fake-typing-input", `.fake-typing-input span{width:6ch;overflow:hidden;border-right:2px solid #4f8cff;animation:fakeTyping 1.8s steps(6) infinite,fakeCursor .65s step-end infinite;} @keyframes fakeTyping{0%{width:0;}60%,80%{width:6ch;}100%{width:0;}} @keyframes fakeCursor{50%{border-color:transparent;}}`, `<div class="fake-input fake-typing-input"><span>Typing</span></div>`);
+    addEffect("Dots Input", "Loading dots appear after text.", "fake", "fake-dots-input", `.fake-dots-input .dots::after{content:"";animation:inputTypingDots 1.2s steps(4) infinite;}`, `<div class="fake-input fake-dots-input"><span>Typing<span class="dots"></span></span></div>`);
+    addEffect("Saving Input", "Saving state with progress line.", "fake", "fake-saving-input", `.fake-saving-input::after{content:"";position:absolute;left:0;bottom:0;height:3px;width:42%;background:#4f8cff;animation:fakeProgress 1.2s ease-in-out infinite;} @keyframes fakeProgress{0%{transform:translateX(-120%);}50%{transform:translateX(80%);}100%{transform:translateX(260%);}}`, `<div class="fake-input fake-saving-input"><span>Saving</span></div>`);
+    addEffect("Verifying Input", "Verification spinner inside input.", "fake", "fake-verifying-input", `.fake-verifying-input::after{content:"";position:absolute;right:12px;width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.2);border-top-color:#4f8cff;animation:inputSpin .8s linear infinite;}`, `<div class="fake-input fake-verifying-input"><span>Verify</span></div>`);
+    addEffect("Verified Input", "Verified tick with blue glow.", "fake", "fake-verified-input", `.fake-verified-input{border-color:rgba(79,140,255,.55);animation:inputGlow 1.7s infinite;} .fake-verified-input::after{content:"✓";position:absolute;right:12px;width:20px;height:20px;border-radius:50%;background:#4f8cff;display:grid;place-items:center;font-size:12px;}`, `<div class="fake-input fake-verified-input"><span>Verified</span></div>`);
+
+    addEffect("Textarea Focus", "Textarea grows on focus.", "input", "input-textarea-grow", `.input-textarea-grow textarea{height:54px;resize:none;padding:12px 14px;} .input-textarea-grow:focus-within textarea{height:80px;box-shadow:0 0 24px rgba(79,140,255,.45);border-color:#4f8cff;}`, `<div class="input-wrap input-textarea-grow"><textarea class="input-demo" placeholder="Message"></textarea></div>`);
+    addEffect("Textarea Glow", "Textarea gets blue focus glow.", "input", "input-textarea-glow", `.input-textarea-glow textarea{height:64px;resize:none;padding:12px 14px;} .input-textarea-glow textarea:focus{box-shadow:0 0 24px rgba(79,140,255,.55);border-color:#4f8cff;}`, `<div class="input-wrap input-textarea-glow"><textarea class="input-demo" placeholder="Message"></textarea></div>`);
+    addEffect("Textarea Counter", "Counter badge appears with textarea.", "input", "input-textarea-counter", `.input-textarea-counter textarea{height:64px;resize:none;padding:12px 14px;} .input-textarea-counter::after{content:"120";position:absolute;right:8px;bottom:7px;font-size:10px;color:rgba(255,255,255,.45);transition:.25s ease;} .input-textarea-counter:focus-within::after{color:#4f8cff;}`, `<div class="input-wrap input-textarea-counter"><textarea class="input-demo" placeholder="Message"></textarea></div>`);
+    addEffect("Textarea Line", "Textarea underline focus effect.", "input", "input-textarea-line", `.input-textarea-line textarea{height:64px;resize:none;padding:12px 14px;border-color:transparent;border-radius:0;background:transparent;box-shadow:none;border-bottom:2px solid rgba(255,255,255,.18);} .input-textarea-line::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:#4f8cff;transform:scaleX(0);transition:.28s ease;} .input-textarea-line:focus-within::after{transform:scaleX(1);}`, `<div class="input-wrap input-textarea-line"><textarea class="input-demo" placeholder="Message"></textarea></div>`);
+    addEffect("Textarea AI", "AI writing-style textarea.", "input", "input-textarea-ai", `.input-textarea-ai textarea{height:64px;resize:none;padding:12px 14px;color:#dbe8ff;text-shadow:0 0 10px rgba(79,140,255,.55);} .input-textarea-ai textarea:focus{box-shadow:0 0 28px rgba(79,140,255,.65);border-color:#4f8cff;}`, `<div class="input-wrap input-textarea-ai"><textarea class="input-demo" placeholder="AI Prompt"></textarea></div>`);
+    addEffect("Select Focus", "Select field with focus glow.", "input", "input-select-focus", `.input-select-focus select{appearance:none;} .input-select-focus::after{content:"⌄";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.55);transition:.25s ease;} .input-select-focus:focus-within::after{color:#4f8cff;transform:translateY(-50%) rotate(180deg);} .input-select-focus select:focus{box-shadow:0 0 24px rgba(79,140,255,.45);}`, `<div class="input-wrap input-select-focus"><select class="input-demo"><option>Select</option></select></div>`);
+    addEffect("Select Pill", "Rounded select pill effect.", "input", "input-select-pill", `.input-select-pill select{appearance:none;border-radius:999px;} .input-select-pill::after{content:"⌄";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.55);} .input-select-pill select:focus{box-shadow:0 0 24px rgba(79,140,255,.45);}`, `<div class="input-wrap input-select-pill"><select class="input-demo"><option>Category</option></select></div>`);
+    addEffect("Date Input Focus", "Date input premium focus style.", "input", "input-date-focus", `.input-date-focus .input-demo:focus{border-color:#8d6bff;box-shadow:0 0 24px rgba(141,107,255,.5);}`, `<div class="input-wrap input-date-focus"><input class="input-demo" type="date" /></div>`);
+    addEffect("Number Stepper", "Number input with focus glow.", "input", "input-number-focus", `.input-number-focus .input-demo:focus{border-color:#35c759;box-shadow:0 0 24px rgba(53,199,89,.45);}`, `<div class="input-wrap input-number-focus"><input class="input-demo" type="number" placeholder="100" /></div>`);
+    addEffect("OTP Input", "OTP boxes pulse together.", "fake", "fake-otp-input", `.fake-otp-input{width:150px;gap:7px;justify-content:center;background:transparent;border:0;box-shadow:none;padding:0;} .fake-otp-input i{width:28px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);animation:inputPulse 1.2s ease-in-out infinite;} .fake-otp-input i:nth-child(2){animation-delay:.12s;} .fake-otp-input i:nth-child(3){animation-delay:.24s;} .fake-otp-input i:nth-child(4){animation-delay:.36s;}`, `<div class="fake-input fake-otp-input"><i></i><i></i><i></i><i></i></div>`);
+
+    addEffect("OTP Focus Box", "OTP active box gets blue glow.", "fake", "fake-otp-focus", `.fake-otp-focus{width:150px;gap:7px;justify-content:center;background:transparent;border:0;box-shadow:none;padding:0;} .fake-otp-focus i{width:28px;height:38px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);} .fake-otp-focus i:nth-child(2){border-color:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.55);}`, `<div class="fake-input fake-otp-focus"><i></i><i></i><i></i><i></i></div>`);
+    addEffect("OTP Success", "OTP boxes turn green.", "fake", "fake-otp-success", `.fake-otp-success{width:150px;gap:7px;justify-content:center;background:transparent;border:0;box-shadow:none;padding:0;} .fake-otp-success i{width:28px;height:38px;border-radius:10px;background:rgba(53,199,89,.18);border:1px solid rgba(53,199,89,.45);animation:inputGreenGlow 1.6s infinite;}`, `<div class="fake-input fake-otp-success"><i></i><i></i><i></i><i></i></div>`);
+    addEffect("OTP Error", "OTP boxes shake red.", "fake", "fake-otp-error", `.fake-otp-error{width:150px;gap:7px;justify-content:center;background:transparent;border:0;box-shadow:none;padding:0;animation:inputShake .65s infinite;} .fake-otp-error i{width:28px;height:38px;border-radius:10px;background:rgba(255,95,87,.16);border:1px solid rgba(255,95,87,.45);}`, `<div class="fake-input fake-otp-error"><i></i><i></i><i></i><i></i></div>`);
+    addEffect("Credit Card Input", "Credit card field shine effect.", "fake", "fake-card-input", `.fake-card-input{background:linear-gradient(90deg,rgba(79,140,255,.18),rgba(141,107,255,.16));border-color:rgba(79,140,255,.45);} .fake-card-input::after{content:"";position:absolute;top:-80%;left:-45%;width:34%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:cardInputShine 2s linear infinite;z-index:4;} @keyframes cardInputShine{0%{left:-45%;}55%,100%{left:130%;}}`, `<div class="fake-input fake-card-input"><span>•••• 4242</span></div>`);
+    addEffect("Price Input", "Price field with currency badge.", "input", "input-price", `.input-price::before{content:"₹";position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#ffbd2e;z-index:3;} .input-price .input-demo{padding-left:34px;} .input-price:focus-within .input-demo{border-color:#ffbd2e;box-shadow:0 0 24px rgba(255,189,46,.45);}`, `<div class="input-wrap input-price"><input class="input-demo" placeholder="999" /></div>`);
+    addEffect("Phone Input", "Phone field with country badge.", "input", "input-phone", `.input-phone::before{content:"+91";position:absolute;left:8px;top:50%;transform:translateY(-50%);padding:4px 6px;border-radius:999px;background:rgba(255,255,255,.1);font-size:10px;z-index:3;} .input-phone .input-demo{padding-left:48px;} .input-phone:focus-within .input-demo{box-shadow:0 0 24px rgba(79,140,255,.45);}`, `<div class="input-wrap input-phone"><input class="input-demo" placeholder="Mobile" /></div>`);
+    addEffect("Email Input", "Email input verified feel.", "input", "input-email", `.input-email::before{content:"@";position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.5);z-index:3;} .input-email .input-demo{padding-left:36px;} .input-email:focus-within::before{color:#4f8cff;} .input-email:focus-within .input-demo{box-shadow:0 0 24px rgba(79,140,255,.45);}`, `<div class="input-wrap input-email"><input class="input-demo" placeholder="Email" /></div>`);
+    addEffect("Username Input", "Username field with handle icon.", "input", "input-username", `.input-username::before{content:"@";position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#8d6bff;z-index:3;} .input-username .input-demo{padding-left:36px;} .input-username:focus-within .input-demo{border-color:#8d6bff;box-shadow:0 0 24px rgba(141,107,255,.45);}`, `<div class="input-wrap input-username"><input class="input-demo" placeholder="Username" /></div>`);
+    addEffect("Password Strength", "Strength bar appears below password.", "input", "input-strength", `.input-strength::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:4px;border-radius:999px;background:linear-gradient(90deg,#ff5f57,#ffbd2e,#35c759);transform:scaleX(.65);transform-origin:left;opacity:0;transition:.25s ease;} .input-strength:focus-within::after{opacity:1;}`, `<div class="input-wrap input-strength"><input class="input-demo" type="password" placeholder="Password" /></div>`);
+    addEffect("Password Dots", "Password dots pulse in fake field.", "fake", "fake-password-dots", `.fake-password-dots{gap:7px;justify-content:center;} .fake-password-dots i{width:8px;height:8px;border-radius:50%;background:white;animation:inputDotWave 1.2s infinite;} .fake-password-dots i:nth-child(2){animation-delay:.15s;} .fake-password-dots i:nth-child(3){animation-delay:.3s;} .fake-password-dots i:nth-child(4){animation-delay:.45s;}`, `<div class="fake-input fake-password-dots"><i></i><i></i><i></i><i></i></div>`);
+
+    addEffect("Glass Input", "Frosted glass input effect.", "input", "input-glass", `.input-glass .input-demo{background:rgba(255,255,255,.1);backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 14px 34px rgba(0,0,0,.28);} .input-glass .input-demo:focus{background:rgba(255,255,255,.18);}`);
+    addEffect("Blur Input", "Input blurs then sharpens on focus.", "input", "input-blur-focus", `.input-blur-focus .input-demo{filter:blur(2px);opacity:.65;} .input-blur-focus .input-demo:focus{filter:blur(0);opacity:1;}`);
+    addEffect("Gradient Input", "Input has animated gradient background.", "input", "input-gradient", `.input-gradient .input-demo{background:linear-gradient(90deg,rgba(79,140,255,.18),rgba(141,107,255,.18),rgba(79,140,255,.18));background-size:220%;animation:inputGradient 2.2s ease-in-out infinite;border-color:transparent;}`);
+    addEffect("Rainbow Input", "Rainbow input background moves.", "input", "input-rainbow", `.input-rainbow .input-demo{background:linear-gradient(90deg,rgba(255,95,87,.22),rgba(255,189,46,.22),rgba(53,199,89,.22),rgba(79,140,255,.22),rgba(141,107,255,.22));background-size:300%;animation:inputGradient 2.4s linear infinite;border-color:transparent;}`);
+    addEffect("Holographic Input", "Holographic input style.", "input", "input-holo", `.input-holo .input-demo{background:linear-gradient(120deg,rgba(255,255,255,.12),rgba(135,247,255,.22),rgba(255,158,231,.2),rgba(255,255,255,.12));background-size:260%;animation:inputGradient 2.4s ease-in-out infinite;}`);
+    addEffect("Chrome Input", "Metallic input shine.", "fake", "fake-chrome-input", `.fake-chrome-input{background:linear-gradient(90deg,#777,#fff,#777,#fff,#777);background-size:250%;color:#111;border:0;animation:inputGradient 2.4s linear infinite;}`, `<div class="fake-input fake-chrome-input"><span>Chrome</span></div>`);
+    addEffect("Terminal Input", "Terminal green input style.", "input", "input-terminal", `.input-terminal .input-demo{background:rgba(53,199,89,.08);border-color:rgba(53,199,89,.35);color:#35c759;text-shadow:0 0 10px rgba(53,199,89,.6);font-family:monospace;} .input-terminal .input-demo:focus{box-shadow:0 0 24px rgba(53,199,89,.4);}`);
+    addEffect("Cyber Input", "Cyber glitch input style.", "fake", "fake-cyber-input", `.fake-cyber-input{text-shadow:2px 0 #ff5f57,-2px 0 #4f8cff;animation:cyberInput .8s steps(2) infinite;} @keyframes cyberInput{0%,100%{transform:translate(0);}50%{transform:translate(2px,-1px);}}`, `<div class="fake-input fake-cyber-input"><span>Cyber</span></div>`);
+    addEffect("Matrix Input", "Matrix style green field.", "fake", "fake-matrix-input", `.fake-matrix-input{background:rgba(53,199,89,.08);border-color:rgba(53,199,89,.35);color:#35c759;text-shadow:0 0 10px rgba(53,199,89,.7);animation:matrixInput .9s steps(2) infinite;} @keyframes matrixInput{0%,100%{opacity:1;}50%{opacity:.55;}}`, `<div class="fake-input fake-matrix-input"><span>0101</span></div>`);
+    addEffect("Neon Input", "Neon edge input style.", "input", "input-neon", `.input-neon .input-demo{border-color:rgba(79,140,255,.75);text-shadow:0 0 12px rgba(255,255,255,.8);box-shadow:0 0 16px rgba(79,140,255,.35),inset 0 0 12px rgba(79,140,255,.12);} .input-neon .input-demo:focus{filter:brightness(1.3);}`);
+
+    addEffect("Rounded Morph Input", "Input radius morphs on focus.", "input", "input-radius-morph", `.input-radius-morph .input-demo:focus{border-radius:28px 10px 28px 10px;}`);
+    addEffect("Pill Morph Input", "Input turns into pill on focus.", "input", "input-pill-morph", `.input-pill-morph .input-demo:focus{border-radius:999px;}`);
+    addEffect("Expand Width Input", "Input expands wider on focus.", "input", "input-width-expand", `.input-width-expand{width:118px;transition:.28s ease;} .input-width-expand:focus-within{width:170px;}`);
+    addEffect("Collapse Width Input", "Input narrows and returns on focus.", "input", "input-width-collapse", `.input-width-collapse{width:170px;transition:.28s ease;} .input-width-collapse:focus-within{width:118px;}`);
+    addEffect("Slide Up Input", "Input slides upward on focus.", "input", "input-slide-up", `.input-slide-up .input-demo:focus{transform:translateY(-9px);}`);
+    addEffect("Slide Right Input", "Input moves slightly right on focus.", "input", "input-slide-right", `.input-slide-right .input-demo:focus{transform:translateX(10px);}`);
+    addEffect("Rotate Input", "Input rotates slightly on focus.", "input", "input-rotate-focus", `.input-rotate-focus .input-demo:focus{transform:rotate(-2deg) scale(1.03);}`);
+    addEffect("Skew Input", "Input skews on focus.", "input", "input-skew-focus", `.input-skew-focus .input-demo:focus{transform:skewX(-6deg);}`);
+    addEffect("3D Tilt Input", "Input tilts in 3D on focus.", "input", "input-3d-tilt", `.input-3d-tilt .input-demo:focus{transform:perspective(600px) rotateX(12deg) rotateY(-14deg);}`);
+    addEffect("Float Input", "Input gently floats continuously.", "input", "input-float", `.input-float{animation:inputFloat 2.2s ease-in-out infinite;}`);
+
+    addEffect("Auto Glow Input", "Input glows automatically.", "fake", "fake-auto-glow", `.fake-auto-glow{border-color:rgba(79,140,255,.5);animation:inputGlow 1.7s ease-in-out infinite;}`, `<div class="fake-input fake-auto-glow"><span>Focus</span></div>`);
+    addEffect("Auto Pulse Input", "Input pulses softly.", "fake", "fake-auto-pulse", `.fake-auto-pulse{animation:inputPulse 1.6s ease-in-out infinite;}`, `<div class="fake-input fake-auto-pulse"><span>Pulse</span></div>`);
+    addEffect("Auto Float Input", "Input floats automatically.", "fake", "fake-auto-float", `.fake-auto-float{animation:inputFloat 2.2s ease-in-out infinite;}`, `<div class="fake-input fake-auto-float"><span>Float</span></div>`);
+    addEffect("Auto Shake Input", "Input shakes as warning.", "fake", "fake-auto-shake", `.fake-auto-shake{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:inputShake .65s infinite;}`, `<div class="fake-input fake-auto-shake"><span>Invalid</span></div>`);
+    addEffect("Scan Input", "Scanline moves inside field.", "fake", "fake-scan-input", `.fake-scan-input::after{content:"";position:absolute;left:0;right:0;height:3px;background:#4f8cff;box-shadow:0 0 18px rgba(79,140,255,.9);animation:inputScan 1.4s infinite;z-index:4;}`, `<div class="fake-input fake-scan-input"><span>Scan</span></div>`);
+    addEffect("Light Sweep Input", "Light sweep passes over field.", "fake", "fake-light-sweep", `.fake-light-sweep::after{content:"";position:absolute;top:-80%;left:-45%;width:34%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:inputSweep 2s linear infinite;z-index:4;} @keyframes inputSweep{0%{left:-45%;}55%,100%{left:130%;}}`, `<div class="fake-input fake-light-sweep"><span>Shine</span></div>`);
+    addEffect("Ripple Input", "Ripple expands inside field.", "fake", "fake-ripple-input", `.fake-ripple-input::after{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:rgba(79,140,255,.55);animation:inputRipple 1.4s ease-out infinite;z-index:1;} @keyframes inputRipple{0%{transform:scale(0);opacity:1;}100%{transform:scale(8);opacity:0;}}`, `<div class="fake-input fake-ripple-input"><span>Ripple</span></div>`);
+    addEffect("Liquid Input", "Liquid wave inside field.", "fake", "fake-liquid-input", `.fake-liquid-input::before{content:"";position:absolute;left:-20%;right:-20%;bottom:-160%;height:190%;background:rgba(79,140,255,.65);border-radius:45%;animation:inputLiquid 2s linear infinite;z-index:1;} @keyframes inputLiquid{to{transform:rotate(360deg);}}`, `<div class="fake-input fake-liquid-input"><span>Liquid</span></div>`);
+    addEffect("Highlight Input", "Highlight background slides through input.", "fake", "fake-highlight-input", `.fake-highlight-input{background:linear-gradient(90deg,rgba(255,255,255,.1) 50%,rgba(79,140,255,.24) 50%);background-size:220%;animation:inputHighlight 1.8s ease-in-out infinite;} @keyframes inputHighlight{0%,100%{background-position:0%;}50%{background-position:-100%;}}`, `<div class="fake-input fake-highlight-input"><span>Highlight</span></div>`);
+    addEffect("Final Premium Input", "Premium gradient border, glow, and shine input.", "fake", "fake-final-premium", `.fake-final-premium{background:linear-gradient(90deg,#4f8cff,#8d6bff,#4f8cff);background-size:240%;border:0;animation:inputGradient 2.4s ease-in-out infinite,inputGlow 1.8s ease-in-out infinite;} .fake-final-premium::after{content:"";position:absolute;top:-80%;left:-45%;width:32%;height:260%;background:rgba(255,255,255,.55);transform:rotate(25deg);animation:inputSweep 2.4s linear infinite;z-index:4;}`, `<div class="fake-input fake-final-premium"><span>Premium</span></div>`);
+
+    const grid = document.getElementById("grid");
+    const searchInput = document.getElementById("searchInput");
+    const countPill = document.getElementById("countPill");
+    const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
+
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = commonKeyframes + "\n\n" + effects.map(effect => effect.css).join("\n\n");
+
+    function copyIcon() {
+      return `
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+          <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <rect x="5" y="5" width="10" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      `;
+    }
+
+    function renderCards() {
+      grid.innerHTML = "";
+
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.search = `${effect.name} ${effect.about} ${effect.className} ${effect.type}`.toLowerCase();
+
+        card.innerHTML = `
+          <div class="preview">${effect.html}</div>
+          <div class="card-body">
+            <div class="name-row">
+              <h3>${effect.name}</h3>
+              <button class="copy-btn" data-id="${effect.id}" title="Copy code">
+                ${copyIcon()}
+              </button>
+            </div>
+            <p>${effect.about}</p>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      document.querySelectorAll(".copy-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          copyCode(btn.dataset.id);
+        });
+      });
+
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
+
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
+    }
+
+    function baseCSSFor(type) {
+      if (type === "fake") return baseFakeCSS;
+      return baseInputCSS;
+    }
+
+    function copyCode(id) {
+      const effect = effects.find(item => item.id === id);
+
+      if (!effect) {
+        showToast("Code not found");
+        return;
+      }
+
+      const code = `${effect.html}
+
+<style>
+${baseCSSFor(effect.type)}
+
+${commonKeyframes}
+
+${effect.css}
+</style>`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(code).then(() => {
+          showToast("Code copied");
+        }).catch(() => {
+          fallbackCopy(code);
+        });
+      } else {
+        fallbackCopy(code);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      textarea.style.top = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand("copy");
+        showToast("Code copied");
+      } catch (err) {
+        showToast("Copy failed");
+      }
+
+      document.body.removeChild(textarea);
+    }
+
+    function showToast(message) {
+      const oldToast = document.querySelector(".toast");
+      if (oldToast) oldToast.remove();
+
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      requestAnimationFrame(() => {
+        toast.classList.add("show");
+      });
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 250);
+      }, 1500);
+    }
+
+    function applySearch() {
+      const value = searchInput.value.trim().toLowerCase();
+
+      filteredEffects = effects.filter(effect => {
+        return (
+          effect.name.toLowerCase().includes(value) ||
+          effect.about.toLowerCase().includes(value) ||
+          effect.className.toLowerCase().includes(value) ||
+          effect.type.toLowerCase().includes(value)
+        );
+      });
+
+      visibleCount = batchSize;
+      renderCards();
+    }
+
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
+  </script>
+</body>
+</html>
