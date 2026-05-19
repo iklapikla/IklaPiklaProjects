@@ -16,12 +16,17 @@
       --green: #35c759;
       --red: #ff5f57;
       --yellow: #ffbd2e;
+      --orange: #ff9f0a;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
     }
 
     body {
@@ -61,7 +66,7 @@
     .page {
       position: relative;
       z-index: 1;
-      width: min(100%, 1480px);
+      width: min(100%, 1560px);
       margin: 0 auto;
       padding: 22px;
       min-height: 100vh;
@@ -176,7 +181,7 @@
       font-size: 15px;
       line-height: 1.55;
       font-weight: 650;
-      max-width: 680px;
+      max-width: 760px;
     }
 
     .count-pill {
@@ -192,9 +197,9 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 16px;
-      padding-bottom: 70px;
+      padding-bottom: 35px;
     }
 
     .card {
@@ -224,6 +229,31 @@
       background: rgba(0,0,0,0.20);
       overflow: hidden;
       position: relative;
+      perspective: 900px;
+    }
+
+    .ui-demo {
+      position: relative;
+      width: 128px;
+      height: 82px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+      border: 1px solid rgba(255,255,255,.16);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 13px;
+      font-weight: 900;
+      overflow: hidden;
+      transition: 260ms ease;
+      box-shadow: 0 14px 34px rgba(0,0,0,.28);
+      isolation: isolate;
+      transform-style: preserve-3d;
+    }
+
+    .ui-demo span {
+      position: relative;
+      z-index: 5;
     }
 
     .card-body {
@@ -284,6 +314,18 @@
       display: none;
     }
 
+    .load-status {
+      margin: 0 auto 70px;
+      width: fit-content;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(255,255,255,0.65);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
     .toast {
       position: fixed;
       left: 50%;
@@ -307,394 +349,8 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Demo Base */
-    .ui-demo {
-      position: relative;
-      width: 128px;
-      height: 82px;
-      border-radius: 20px;
-      background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
-      border: 1px solid rgba(255,255,255,.16);
-      display: grid;
-      place-items: center;
-      color: white;
-      font-size: 13px;
-      font-weight: 900;
-      overflow: hidden;
-      transition: 260ms ease;
-      box-shadow: 0 14px 34px rgba(0,0,0,.28);
-      isolation: isolate;
-    }
-
-    .ui-demo span {
-      position: relative;
-      z-index: 5;
-    }
-
-    /* UI Motion Effects */
-    .modal-fade {
-      animation: modalFade 2.1s ease-in-out infinite;
-    }
-    @keyframes modalFade {
-      0% { opacity: 0; transform: scale(.96); }
-      45%, 75% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(.96); }
-    }
-
-    .modal-scale {
-      animation: modalScale 2s cubic-bezier(.2,.8,.2,1) infinite;
-    }
-    @keyframes modalScale {
-      0% { opacity: 0; transform: scale(.65); }
-      45%, 75% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(.85); }
-    }
-
-    .modal-slide-up {
-      animation: modalSlideUp 2.1s ease-in-out infinite;
-    }
-    @keyframes modalSlideUp {
-      0% { opacity: 0; transform: translateY(42px); }
-      45%, 75% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(22px); }
-    }
-
-    .modal-slide-down {
-      animation: modalSlideDown 2.1s ease-in-out infinite;
-    }
-    @keyframes modalSlideDown {
-      0% { opacity: 0; transform: translateY(-42px); }
-      45%, 75% { opacity: 1; transform: translateY(0); }
-      100% { opacity: 0; transform: translateY(-22px); }
-    }
-
-    .toast-slide {
-      width: 132px;
-      height: 48px;
-      border-radius: 16px;
-      animation: toastSlide 2.2s ease-in-out infinite;
-    }
-    @keyframes toastSlide {
-      0% { opacity: 0; transform: translateX(60px); }
-      35%, 75% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(60px); }
-    }
-
-    .drawer-left {
-      width: 46px;
-      height: 90px;
-      justify-self: start;
-      margin-left: 12px;
-      animation: drawerLeft 2.2s ease-in-out infinite;
-    }
-    @keyframes drawerLeft {
-      0% { opacity: 0; transform: translateX(-60px); }
-      45%, 75% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(-60px); }
-    }
-
-    .drawer-right {
-      width: 46px;
-      height: 90px;
-      justify-self: end;
-      margin-right: 12px;
-      animation: drawerRight 2.2s ease-in-out infinite;
-    }
-    @keyframes drawerRight {
-      0% { opacity: 0; transform: translateX(60px); }
-      45%, 75% { opacity: 1; transform: translateX(0); }
-      100% { opacity: 0; transform: translateX(60px); }
-    }
-
-    .bottom-sheet {
-      width: 132px;
-      height: 52px;
-      align-self: end;
-      animation: bottomSheet 2.2s ease-in-out infinite;
-    }
-    @keyframes bottomSheet {
-      0% { opacity: 0; transform: translateY(70px); }
-      45%, 75% { opacity: 1; transform: translateY(18px); }
-      100% { opacity: 0; transform: translateY(70px); }
-    }
-
-    .dropdown-motion {
-      height: 34px;
-      animation: dropdownMotion 2s ease-in-out infinite;
-      transform-origin: top;
-    }
-    @keyframes dropdownMotion {
-      0% { opacity: 0; transform: scaleY(.25); }
-      40%, 75% { opacity: 1; transform: scaleY(1); }
-      100% { opacity: 0; transform: scaleY(.25); }
-    }
-
-    .accordion-expand {
-      animation: accordionExpand 2.1s ease-in-out infinite;
-      transform-origin: top;
-    }
-    @keyframes accordionExpand {
-      0% { height: 28px; }
-      45%, 75% { height: 82px; }
-      100% { height: 28px; }
-    }
-
-    .tab-indicator {
-      width: 136px;
-      height: 48px;
-      display: block;
-      padding: 6px;
-    }
-    .tab-indicator::before {
-      content: "";
-      display: block;
-      width: 38px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--blue);
-      animation: tabMove 1.7s ease-in-out infinite;
-    }
-    @keyframes tabMove {
-      0%, 100% { transform: translateX(0); }
-      50% { transform: translateX(78px); }
-    }
-
-    .hamburger-morph {
-      width: 68px;
-      height: 56px;
-      background: transparent;
-      border: 0;
-      box-shadow: none;
-    }
-    .hamburger-morph::before,
-    .hamburger-morph::after,
-    .hamburger-morph span {
-      content: "";
-      position: absolute;
-      left: 12px;
-      width: 44px;
-      height: 4px;
-      border-radius: 999px;
-      background: white;
-      transition: .3s ease;
-    }
-    .hamburger-morph::before {
-      top: 16px;
-      animation: hamTop 1.8s ease-in-out infinite;
-    }
-    .hamburger-morph span {
-      top: 26px;
-      animation: hamMid 1.8s ease-in-out infinite;
-    }
-    .hamburger-morph::after {
-      top: 36px;
-      animation: hamBot 1.8s ease-in-out infinite;
-    }
-    @keyframes hamTop {
-      0%, 100% { transform: rotate(0) translate(0,0); }
-      50% { transform: rotate(45deg) translate(7px,7px); }
-    }
-    @keyframes hamMid {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-    @keyframes hamBot {
-      0%, 100% { transform: rotate(0) translate(0,0); }
-      50% { transform: rotate(-45deg) translate(7px,-7px); }
-    }
-
-    .switch-motion {
-      width: 86px;
-      height: 44px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.12);
-      display: block;
-      padding: 5px;
-    }
-    .switch-motion::before {
-      content: "";
-      display: block;
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: white;
-      animation: switchMove 1.8s ease-in-out infinite;
-    }
-    @keyframes switchMove {
-      0%, 100% { transform: translateX(0); background: white; }
-      50% { transform: translateX(42px); background: var(--green); }
-    }
-
-    .checkbox-motion {
-      width: 54px;
-      height: 54px;
-      border-radius: 16px;
-      background: transparent;
-      animation: checkboxBox 1.8s ease-in-out infinite;
-    }
-    .checkbox-motion::after {
-      content: "✓";
-      font-size: 30px;
-      color: white;
-      opacity: 0;
-      animation: checkboxTick 1.8s ease-in-out infinite;
-    }
-    @keyframes checkboxBox {
-      0%, 100% { border-color: rgba(255,255,255,.25); background: transparent; }
-      50% { border-color: rgba(53,199,89,.9); background: rgba(53,199,89,.8); }
-    }
-    @keyframes checkboxTick {
-      0%, 30%, 100% { opacity: 0; transform: scale(.4); }
-      50%, 75% { opacity: 1; transform: scale(1); }
-    }
-
-    .radio-motion {
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: transparent;
-      animation: radioRing 1.8s ease-in-out infinite;
-    }
-    .radio-motion::after {
-      content: "";
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background: var(--blue);
-      transform: scale(0);
-      animation: radioDot 1.8s ease-in-out infinite;
-    }
-    @keyframes radioRing {
-      0%, 100% { border-color: rgba(255,255,255,.25); }
-      50% { border-color: rgba(79,140,255,.9); }
-    }
-    @keyframes radioDot {
-      0%, 30%, 100% { transform: scale(0); }
-      50%, 75% { transform: scale(1); }
-    }
-
-    .copy-success {
-      width: 112px;
-      height: 48px;
-      border-radius: 16px;
-      animation: copyPop 1.8s ease-in-out infinite;
-    }
-    .copy-success::after {
-      content: "Copied";
-    }
-    @keyframes copyPop {
-      0%, 100% { opacity: 0; transform: translateY(20px) scale(.9); }
-      40%, 75% { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .counter-motion::after {
-      content: "0";
-      font-size: 26px;
-      font-weight: 950;
-      animation: counterChange 2s steps(5) infinite;
-    }
-    @keyframes counterChange {
-      0% { content: "0"; }
-      20% { content: "12"; }
-      40% { content: "48"; }
-      60% { content: "89"; }
-      80%, 100% { content: "100"; }
-    }
-
-    .progress-ring {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      background:
-        conic-gradient(var(--blue) 0deg, var(--blue) 260deg, rgba(255,255,255,.15) 260deg);
-      animation: ringSpin 1.8s ease-in-out infinite;
-    }
-    .progress-ring::after {
-      content: "";
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: #101010;
-      position: absolute;
-    }
-    @keyframes ringSpin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .stepper-motion {
-      width: 126px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: transparent;
-      border: 0;
-      box-shadow: none;
-      overflow: visible;
-    }
-    .stepper-motion i {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.18);
-      animation: stepActive 2s ease-in-out infinite;
-    }
-    .stepper-motion i:nth-child(2) { animation-delay: .35s; }
-    .stepper-motion i:nth-child(3) { animation-delay: .7s; }
-    @keyframes stepActive {
-      0%, 100% { background: rgba(255,255,255,.18); transform: scale(1); }
-      40%, 65% { background: var(--blue); transform: scale(1.25); }
-    }
-
-    .notification-bell {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      animation: bellShake 1.3s ease-in-out infinite;
-    }
-    .notification-bell::after {
-      content: "🔔";
-      font-size: 30px;
-    }
-    @keyframes bellShake {
-      0%, 100% { transform: rotate(0); }
-      20% { transform: rotate(-12deg); }
-      40% { transform: rotate(12deg); }
-      60% { transform: rotate(-8deg); }
-      80% { transform: rotate(8deg); }
-    }
-
-    .alert-shake {
-      background: rgba(255,95,87,.16);
-      border-color: rgba(255,95,87,.45);
-      animation: alertShake .6s ease-in-out infinite;
-    }
-    @keyframes alertShake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-
-    .skeleton-motion {
-      background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.22), rgba(255,255,255,.07));
-      background-size: 220%;
-      animation: skeletonMove 1.4s linear infinite;
-    }
-    @keyframes skeletonMove {
-      to { background-position: -220% center; }
-    }
-
-    .dynamic-island {
-      width: 112px;
-      height: 34px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.13);
-      animation: islandExpand 2.1s ease-in-out infinite;
-    }
-    @keyframes islandExpand {
-      0%, 100% { width: 90px; height: 32px; }
-      50% { width: 132px; height: 54px; }
+    @media (max-width: 1280px) {
+      .grid { grid-template-columns: repeat(4, 1fr); }
     }
 
     @media (max-width: 1100px) {
@@ -730,491 +386,246 @@
         <input id="searchInput" type="text" placeholder="Search effect..." />
       </div>
 
-      <nav class="menu">
-        <a href="text-animation.html">Text</a>
-        <a href="button-animation.html">Button</a>
-        <a href="hover-effects.html">Hover</a>
-        <a href="card-effects.html">Card</a>
-        <a class="active" href="ui-motion.html">UI Motion</a>
-        <a href="loader-effects.html">Loader</a>
-        <a href="input-focus-effects.html">Input</a>
-        <a href="cursor-effects.html">Cursor</a>
-        <a href="background-effects.html">Background</a>
-      </nav>
+      <nav class="menu" id="mainMenu"></nav>
     </header>
 
     <main>
       <header class="content-header">
         <div class="title-block">
           <h1>UI Motion</h1>
-          <p>Modal, drawer, toast, tab, dropdown, toggle, checkbox, notification, and modern app micro-motion effects.</p>
+          <p>100 live UI motion effects for modals, drawers, toast, dropdown, tabs, toggles, alerts, menus, and app micro-motion.</p>
         </div>
 
         <div class="count-pill" id="countPill">0 Effects</div>
       </header>
 
       <div id="emptyState" class="empty">
-        No effect found. Try searching “modal”, “toast”, “drawer”, “toggle”, or “dropdown”.
+        No effect found. Try searching “modal”, “toast”, “drawer”, “toggle”, “dropdown”, “tabs”, or “notification”.
       </div>
 
       <section id="grid" class="grid"></section>
+
+      <div id="loadStatus" class="load-status">Showing 0 of 100 effects</div>
     </main>
   </div>
 
+  <style id="dynamicEffectStyles"></style>
+
+  <script src="nav.js"></script>
+
   <script>
-    const effects = [
-      {
-        name: "Modal Fade",
-        about: "Modal fades in and out softly.",
-        className: "modal-fade",
-        html: '<div class="ui-demo modal-fade"><span>Modal</span></div>',
-        css: `.modal-fade { animation: modalFade 2.1s ease-in-out infinite; }
-@keyframes modalFade {
-  0% { opacity: 0; transform: scale(.96); }
-  45%, 75% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(.96); }
-}`
-      },
-      {
-        name: "Modal Scale",
-        about: "Modal opens with a premium scale-in motion.",
-        className: "modal-scale",
-        html: '<div class="ui-demo modal-scale"><span>Modal</span></div>',
-        css: `.modal-scale { animation: modalScale 2s cubic-bezier(.2,.8,.2,1) infinite; }
-@keyframes modalScale {
-  0% { opacity: 0; transform: scale(.65); }
-  45%, 75% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(.85); }
-}`
-      },
-      {
-        name: "Modal Slide Up",
-        about: "Modal slides up from bottom.",
-        className: "modal-slide-up",
-        html: '<div class="ui-demo modal-slide-up"><span>Modal</span></div>',
-        css: `.modal-slide-up { animation: modalSlideUp 2.1s ease-in-out infinite; }
-@keyframes modalSlideUp {
-  0% { opacity: 0; transform: translateY(42px); }
-  45%, 75% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(22px); }
-}`
-      },
-      {
-        name: "Modal Slide Down",
-        about: "Modal slides down from top.",
-        className: "modal-slide-down",
-        html: '<div class="ui-demo modal-slide-down"><span>Modal</span></div>',
-        css: `.modal-slide-down { animation: modalSlideDown 2.1s ease-in-out infinite; }
-@keyframes modalSlideDown {
-  0% { opacity: 0; transform: translateY(-42px); }
-  45%, 75% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-22px); }
-}`
-      },
-      {
-        name: "Toast Slide",
-        about: "Toast notification slides in from right.",
-        className: "toast-slide",
-        html: '<div class="ui-demo toast-slide"><span>Toast</span></div>',
-        css: `.toast-slide { animation: toastSlide 2.2s ease-in-out infinite; }
-@keyframes toastSlide {
-  0% { opacity: 0; transform: translateX(60px); }
-  35%, 75% { opacity: 1; transform: translateX(0); }
-  100% { opacity: 0; transform: translateX(60px); }
-}`
-      },
-      {
-        name: "Drawer Left",
-        about: "Left drawer slides in and out.",
-        className: "drawer-left",
-        html: '<div class="ui-demo drawer-left"><span>Menu</span></div>',
-        css: `.drawer-left { animation: drawerLeft 2.2s ease-in-out infinite; }
-@keyframes drawerLeft {
-  0% { opacity: 0; transform: translateX(-60px); }
-  45%, 75% { opacity: 1; transform: translateX(0); }
-  100% { opacity: 0; transform: translateX(-60px); }
-}`
-      },
-      {
-        name: "Drawer Right",
-        about: "Right drawer slides in and out.",
-        className: "drawer-right",
-        html: '<div class="ui-demo drawer-right"><span>Menu</span></div>',
-        css: `.drawer-right { animation: drawerRight 2.2s ease-in-out infinite; }
-@keyframes drawerRight {
-  0% { opacity: 0; transform: translateX(60px); }
-  45%, 75% { opacity: 1; transform: translateX(0); }
-  100% { opacity: 0; transform: translateX(60px); }
-}`
-      },
-      {
-        name: "Bottom Sheet",
-        about: "Mobile bottom sheet rises from bottom.",
-        className: "bottom-sheet",
-        html: '<div class="ui-demo bottom-sheet"><span>Sheet</span></div>',
-        css: `.bottom-sheet { animation: bottomSheet 2.2s ease-in-out infinite; }
-@keyframes bottomSheet {
-  0% { opacity: 0; transform: translateY(70px); }
-  45%, 75% { opacity: 1; transform: translateY(18px); }
-  100% { opacity: 0; transform: translateY(70px); }
-}`
-      },
-      {
-        name: "Dropdown Motion",
-        about: "Dropdown opens with scale from top.",
-        className: "dropdown-motion",
-        html: '<div class="ui-demo dropdown-motion"><span>Drop</span></div>',
-        css: `.dropdown-motion {
-  transform-origin: top;
-  animation: dropdownMotion 2s ease-in-out infinite;
-}
-@keyframes dropdownMotion {
-  0% { opacity: 0; transform: scaleY(.25); }
-  40%, 75% { opacity: 1; transform: scaleY(1); }
-  100% { opacity: 0; transform: scaleY(.25); }
-}`
-      },
-      {
-        name: "Accordion Expand",
-        about: "Accordion smoothly expands and collapses.",
-        className: "accordion-expand",
-        html: '<div class="ui-demo accordion-expand"><span>Open</span></div>',
-        css: `.accordion-expand {
-  overflow: hidden;
-  transform-origin: top;
-  animation: accordionExpand 2.1s ease-in-out infinite;
-}
-@keyframes accordionExpand {
-  0% { height: 28px; }
-  45%, 75% { height: 82px; }
-  100% { height: 28px; }
-}`
-      },
-      {
-        name: "Tab Indicator",
-        about: "Active tab line moves left and right.",
-        className: "tab-indicator",
-        html: '<div class="ui-demo tab-indicator"></div>',
-        css: `.tab-indicator {
-  width: 136px;
-  height: 48px;
-  padding: 6px;
-}
-.tab-indicator::before {
-  content: "";
-  display: block;
-  width: 38px;
-  height: 8px;
-  border-radius: 999px;
-  background: #4f8cff;
-  animation: tabMove 1.7s ease-in-out infinite;
-}
-@keyframes tabMove {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(78px); }
-}`
-      },
-      {
-        name: "Hamburger Morph",
-        about: "Menu icon morphs into close icon.",
-        className: "hamburger-morph",
-        html: '<div class="ui-demo hamburger-morph"><span></span></div>',
-        css: `.hamburger-morph {
+    const effects = [];
+
+    const baseUICSS = `.ui-demo {
   position: relative;
-  width: 68px;
-  height: 56px;
-}
-.hamburger-morph::before,
-.hamburger-morph::after,
-.hamburger-morph span {
-  content: "";
-  position: absolute;
-  left: 12px;
-  width: 44px;
-  height: 4px;
-  border-radius: 999px;
-  background: white;
-}
-.hamburger-morph::before {
-  top: 16px;
-  animation: hamTop 1.8s ease-in-out infinite;
-}
-.hamburger-morph span {
-  top: 26px;
-  animation: hamMid 1.8s ease-in-out infinite;
-}
-.hamburger-morph::after {
-  top: 36px;
-  animation: hamBot 1.8s ease-in-out infinite;
-}
-@keyframes hamTop {
-  0%, 100% { transform: rotate(0) translate(0,0); }
-  50% { transform: rotate(45deg) translate(7px,7px); }
-}
-@keyframes hamMid {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-@keyframes hamBot {
-  0%, 100% { transform: rotate(0) translate(0,0); }
-  50% { transform: rotate(-45deg) translate(7px,-7px); }
-}`
-      },
-      {
-        name: "Toggle Switch",
-        about: "Switch knob moves between off and on.",
-        className: "switch-motion",
-        html: '<div class="ui-demo switch-motion"></div>',
-        css: `.switch-motion {
-  width: 86px;
-  height: 44px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.12);
-  padding: 5px;
-}
-.switch-motion::before {
-  content: "";
-  display: block;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: white;
-  animation: switchMove 1.8s ease-in-out infinite;
-}
-@keyframes switchMove {
-  0%, 100% { transform: translateX(0); background: white; }
-  50% { transform: translateX(42px); background: #35c759; }
-}`
-      },
-      {
-        name: "Checkbox Tick",
-        about: "Checkbox turns green and tick pops in.",
-        className: "checkbox-motion",
-        html: '<div class="ui-demo checkbox-motion"></div>',
-        css: `.checkbox-motion {
-  width: 54px;
-  height: 54px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.25);
+  width: 128px;
+  height: 82px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+  border: 1px solid rgba(255,255,255,.16);
   display: grid;
   place-items: center;
-  animation: checkboxBox 1.8s ease-in-out infinite;
-}
-.checkbox-motion::after {
-  content: "✓";
-  font-size: 30px;
   color: white;
-  opacity: 0;
-  animation: checkboxTick 1.8s ease-in-out infinite;
+  font-size: 13px;
+  font-weight: 900;
+  overflow: hidden;
+  transition: 260ms ease;
+  box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  isolation: isolate;
+  transform-style: preserve-3d;
 }
-@keyframes checkboxBox {
-  0%, 100% { border-color: rgba(255,255,255,.25); background: transparent; }
-  50% { border-color: rgba(53,199,89,.9); background: rgba(53,199,89,.8); }
-}
-@keyframes checkboxTick {
-  0%, 30%, 100% { opacity: 0; transform: scale(.4); }
-  50%, 75% { opacity: 1; transform: scale(1); }
-}`
-      },
-      {
-        name: "Radio Dot",
-        about: "Radio button dot scales in and out.",
-        className: "radio-motion",
-        html: '<div class="ui-demo radio-motion"></div>',
-        css: `.radio-motion {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,.25);
-  display: grid;
-  place-items: center;
-  animation: radioRing 1.8s ease-in-out infinite;
-}
-.radio-motion::after {
-  content: "";
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #4f8cff;
-  transform: scale(0);
-  animation: radioDot 1.8s ease-in-out infinite;
-}
-@keyframes radioRing {
-  0%, 100% { border-color: rgba(255,255,255,.25); }
-  50% { border-color: rgba(79,140,255,.9); }
-}
-@keyframes radioDot {
-  0%, 30%, 100% { transform: scale(0); }
-  50%, 75% { transform: scale(1); }
-}`
-      },
-      {
-        name: "Copy Success",
-        about: "Small success toast pops up after copy.",
-        className: "copy-success",
-        html: '<div class="ui-demo copy-success"></div>',
-        css: `.copy-success {
-  animation: copyPop 1.8s ease-in-out infinite;
-}
-.copy-success::after {
-  content: "Copied";
-}
-@keyframes copyPop {
-  0%, 100% { opacity: 0; transform: translateY(20px) scale(.9); }
-  40%, 75% { opacity: 1; transform: translateY(0) scale(1); }
-}`
-      },
-      {
-        name: "Counter Motion",
-        about: "Counter number changes in steps.",
-        className: "counter-motion",
-        html: '<div class="ui-demo counter-motion"></div>',
-        css: `.counter-motion::after {
-  content: "0";
-  font-size: 26px;
-  font-weight: 950;
-  animation: counterChange 2s steps(5) infinite;
-}
-@keyframes counterChange {
-  0% { content: "0"; }
-  20% { content: "12"; }
-  40% { content: "48"; }
-  60% { content: "89"; }
-  80%, 100% { content: "100"; }
-}`
-      },
-      {
-        name: "Progress Ring",
-        about: "Circular progress ring rotates smoothly.",
-        className: "progress-ring",
-        html: '<div class="ui-demo progress-ring"></div>',
-        css: `.progress-ring {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: conic-gradient(#4f8cff 0deg, #4f8cff 260deg, rgba(255,255,255,.15) 260deg);
-  animation: ringSpin 1.8s ease-in-out infinite;
-}
-.progress-ring::after {
-  content: "";
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: #101010;
-  position: absolute;
-}
-@keyframes ringSpin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}`
-      },
-      {
-        name: "Stepper Motion",
-        about: "Stepper dots activate one-by-one.",
-        className: "stepper-motion",
-        html: '<div class="ui-demo stepper-motion"><i></i><i></i><i></i></div>',
-        css: `.stepper-motion {
-  width: 126px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: transparent;
-}
-.stepper-motion i {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.18);
-  animation: stepActive 2s ease-in-out infinite;
-}
-.stepper-motion i:nth-child(2) { animation-delay: .35s; }
-.stepper-motion i:nth-child(3) { animation-delay: .7s; }
-@keyframes stepActive {
-  0%, 100% { background: rgba(255,255,255,.18); transform: scale(1); }
-  40%, 65% { background: #4f8cff; transform: scale(1.25); }
-}`
-      },
-      {
-        name: "Notification Bell",
-        about: "Bell shakes like a notification alert.",
-        className: "notification-bell",
-        html: '<div class="ui-demo notification-bell"></div>',
-        css: `.notification-bell {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  animation: bellShake 1.3s ease-in-out infinite;
-}
-.notification-bell::after {
-  content: "🔔";
-  font-size: 30px;
-}
-@keyframes bellShake {
-  0%, 100% { transform: rotate(0); }
-  20% { transform: rotate(-12deg); }
-  40% { transform: rotate(12deg); }
-  60% { transform: rotate(-8deg); }
-  80% { transform: rotate(8deg); }
-}`
-      },
-      {
-        name: "Alert Shake",
-        about: "Alert box shakes with red warning style.",
-        className: "alert-shake",
-        html: '<div class="ui-demo alert-shake"><span>Alert</span></div>',
-        css: `.alert-shake {
-  background: rgba(255,95,87,.16);
-  border-color: rgba(255,95,87,.45);
-  animation: alertShake .6s ease-in-out infinite;
-}
-@keyframes alertShake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}`
-      },
-      {
-        name: "Skeleton Motion",
-        about: "Shimmer loading motion for placeholder UI.",
-        className: "skeleton-motion",
-        html: '<div class="ui-demo skeleton-motion"></div>',
-        css: `.skeleton-motion {
-  background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,255,255,.22), rgba(255,255,255,.07));
-  background-size: 220%;
-  animation: skeletonMove 1.4s linear infinite;
-}
-@keyframes skeletonMove {
-  to { background-position: -220% center; }
-}`
-      },
-      {
-        name: "Dynamic Island",
-        about: "Pill expands like modern app status island.",
-        className: "dynamic-island",
-        html: '<div class="ui-demo dynamic-island"></div>',
-        css: `.dynamic-island {
-  width: 112px;
-  height: 34px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.13);
-  animation: islandExpand 2.1s ease-in-out infinite;
-}
-@keyframes islandExpand {
-  0%, 100% { width: 90px; height: 32px; }
-  50% { width: 132px; height: 54px; }
-}`
-      }
-    ];
+.ui-demo span {
+  position: relative;
+  z-index: 5;
+}`;
+
+    const commonKeyframes = `
+@keyframes uiFade { 0%{opacity:0;} 45%,75%{opacity:1;} 100%{opacity:0;} }
+@keyframes uiScale { 0%{opacity:0;transform:scale(.65);} 45%,75%{opacity:1;transform:scale(1);} 100%{opacity:0;transform:scale(.85);} }
+@keyframes uiSlideUp { 0%{opacity:0;transform:translateY(42px);} 45%,75%{opacity:1;transform:translateY(0);} 100%{opacity:0;transform:translateY(24px);} }
+@keyframes uiSlideDown { 0%{opacity:0;transform:translateY(-42px);} 45%,75%{opacity:1;transform:translateY(0);} 100%{opacity:0;transform:translateY(-24px);} }
+@keyframes uiSlideLeft { 0%{opacity:0;transform:translateX(60px);} 45%,75%{opacity:1;transform:translateX(0);} 100%{opacity:0;transform:translateX(-42px);} }
+@keyframes uiSlideRight { 0%{opacity:0;transform:translateX(-60px);} 45%,75%{opacity:1;transform:translateX(0);} 100%{opacity:0;transform:translateX(42px);} }
+@keyframes uiSpin { to{transform:rotate(360deg);} }
+@keyframes uiPulse { 0%,100%{transform:scale(1);opacity:.75;} 50%{transform:scale(1.08);opacity:1;} }
+@keyframes uiFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-12px);} }
+@keyframes uiGlow { 0%,100%{box-shadow:0 0 0 rgba(79,140,255,0);} 50%{box-shadow:0 0 30px rgba(79,140,255,.75);} }
+@keyframes uiShake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+@keyframes uiBounce { 0%,100%{transform:translateY(0);} 40%{transform:translateY(-14px);} 60%{transform:translateY(4px);} }
+@keyframes uiGradient { 0%,100%{background-position:0% center;} 50%{background-position:100% center;} }
+@keyframes uiShimmer { to{background-position:-220% center;} }
+@keyframes uiScan { 0%,100%{top:0;} 50%{top:calc(100% - 3px);} }
+`;
+
+    function addEffect(name, about, className, css, html) {
+      effects.push({
+        id: String(effects.length),
+        name,
+        about,
+        className,
+        html: html || `<div class="ui-demo ${className}"><span>UI</span></div>`,
+        css
+      });
+    }
+
+    addEffect("Modal Fade", "Modal fades in and out softly.", "ui-modal-fade", `.ui-modal-fade{animation:uiFade 2.1s ease-in-out infinite;}`);
+    addEffect("Modal Scale", "Modal opens with premium scale motion.", "ui-modal-scale", `.ui-modal-scale{animation:uiScale 2s cubic-bezier(.2,.8,.2,1) infinite;}`);
+    addEffect("Modal Slide Up", "Modal slides up from bottom.", "ui-modal-slide-up", `.ui-modal-slide-up{animation:uiSlideUp 2.1s ease-in-out infinite;}`);
+    addEffect("Modal Slide Down", "Modal slides down from top.", "ui-modal-slide-down", `.ui-modal-slide-down{animation:uiSlideDown 2.1s ease-in-out infinite;}`);
+    addEffect("Modal Slide Left", "Modal slides from right to left.", "ui-modal-slide-left", `.ui-modal-slide-left{animation:uiSlideLeft 2.1s ease-in-out infinite;}`);
+    addEffect("Modal Slide Right", "Modal slides from left to right.", "ui-modal-slide-right", `.ui-modal-slide-right{animation:uiSlideRight 2.1s ease-in-out infinite;}`);
+    addEffect("Modal Blur Reveal", "Modal appears from blur into focus.", "ui-modal-blur", `.ui-modal-blur{animation:uiModalBlur 2.2s ease-in-out infinite;} @keyframes uiModalBlur{0%{opacity:0;filter:blur(14px);transform:scale(.95);}45%,75%{opacity:1;filter:blur(0);transform:scale(1);}100%{opacity:0;filter:blur(10px);transform:scale(.98);}}`);
+    addEffect("Modal Elastic", "Modal opens with elastic motion.", "ui-modal-elastic", `.ui-modal-elastic{animation:uiModalElastic 1.8s cubic-bezier(.2,.9,.2,1.45) infinite;} @keyframes uiModalElastic{0%{opacity:0;transform:scale(.35);}45%,75%{opacity:1;transform:scale(1);}100%{opacity:0;transform:scale(.75);}}`);
+    addEffect("Modal Flip", "Modal flips in 3D.", "ui-modal-flip", `.ui-modal-flip{animation:uiModalFlip 2s ease-in-out infinite;} @keyframes uiModalFlip{0%{opacity:0;transform:rotateY(-90deg);}45%,75%{opacity:1;transform:rotateY(0);}100%{opacity:0;transform:rotateY(90deg);}}`);
+    addEffect("Modal Drop", "Modal drops from top with bounce.", "ui-modal-drop", `.ui-modal-drop{animation:uiModalDrop 2s ease-in-out infinite;} @keyframes uiModalDrop{0%{opacity:0;transform:translateY(-70px);}45%{opacity:1;transform:translateY(8px);}60%{transform:translateY(-5px);}75%{transform:translateY(0);}100%{opacity:0;transform:translateY(35px);}}`);
+
+    addEffect("Toast Slide Right", "Toast notification slides from right.", "ui-toast-right", `.ui-toast-right{width:132px;height:48px;border-radius:16px;animation:uiSlideLeft 2.2s ease-in-out infinite;}`);
+    addEffect("Toast Slide Left", "Toast notification slides from left.", "ui-toast-left", `.ui-toast-left{width:132px;height:48px;border-radius:16px;animation:uiSlideRight 2.2s ease-in-out infinite;}`);
+    addEffect("Toast Slide Up", "Toast slides upward from bottom.", "ui-toast-up", `.ui-toast-up{width:132px;height:48px;border-radius:16px;animation:uiSlideUp 2.2s ease-in-out infinite;}`);
+    addEffect("Toast Pop", "Toast pops like success message.", "ui-toast-pop", `.ui-toast-pop{width:132px;height:48px;border-radius:16px;animation:uiScale 1.8s ease-in-out infinite;}`);
+    addEffect("Toast Success", "Green success toast motion.", "ui-toast-success", `.ui-toast-success{width:132px;height:48px;border-radius:16px;background:rgba(53,199,89,.18);border-color:rgba(53,199,89,.45);animation:uiToastSuccess 1.8s ease-in-out infinite;} @keyframes uiToastSuccess{0%,100%{transform:translateY(18px) scale(.92);opacity:0;}45%,75%{transform:translateY(0) scale(1);opacity:1;}}`, `<div class="ui-demo ui-toast-success"><span>Copied</span></div>`);
+    addEffect("Toast Error", "Red error toast shake motion.", "ui-toast-error", `.ui-toast-error{width:132px;height:48px;border-radius:16px;background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:uiShake .7s ease-in-out infinite;}`, `<div class="ui-demo ui-toast-error"><span>Error</span></div>`);
+    addEffect("Toast Warning", "Yellow warning toast glow.", "ui-toast-warning", `.ui-toast-warning{width:132px;height:48px;border-radius:16px;background:rgba(255,189,46,.16);border-color:rgba(255,189,46,.45);animation:uiToastWarn 1.6s ease-in-out infinite;} @keyframes uiToastWarn{0%,100%{box-shadow:0 0 0 rgba(255,189,46,0);}50%{box-shadow:0 0 24px rgba(255,189,46,.65);}}`, `<div class="ui-demo ui-toast-warning"><span>Warning</span></div>`);
+    addEffect("Toast Stack", "Stacked toast shadow movement.", "ui-toast-stack", `.ui-toast-stack{width:132px;height:48px;border-radius:16px;box-shadow:8px 8px 0 rgba(255,255,255,.06),16px 16px 0 rgba(255,255,255,.03);animation:uiFloat 2.4s ease-in-out infinite;}`, `<div class="ui-demo ui-toast-stack"><span>Toast</span></div>`);
+    addEffect("Toast Progress", "Toast with animated progress line.", "ui-toast-progress", `.ui-toast-progress{width:132px;height:48px;border-radius:16px;} .ui-toast-progress::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:100%;background:#4f8cff;transform-origin:left;animation:uiToastProgress 2s linear infinite;} @keyframes uiToastProgress{0%{transform:scaleX(1);}100%{transform:scaleX(0);}}`, `<div class="ui-demo ui-toast-progress"><span>Toast</span></div>`);
+    addEffect("Toast Glow", "Toast with blue glow pulse.", "ui-toast-glow", `.ui-toast-glow{width:132px;height:48px;border-radius:16px;border-color:rgba(79,140,255,.55);animation:uiGlow 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-toast-glow"><span>Toast</span></div>`);
+
+    addEffect("Drawer Left", "Left drawer slides in and out.", "ui-drawer-left", `.ui-drawer-left{width:46px;height:90px;justify-self:start;margin-left:12px;animation:uiDrawerLeft 2.2s ease-in-out infinite;} @keyframes uiDrawerLeft{0%{opacity:0;transform:translateX(-60px);}45%,75%{opacity:1;transform:translateX(0);}100%{opacity:0;transform:translateX(-60px);}}`, `<div class="ui-demo ui-drawer-left"><span>Menu</span></div>`);
+    addEffect("Drawer Right", "Right drawer slides in and out.", "ui-drawer-right", `.ui-drawer-right{width:46px;height:90px;justify-self:end;margin-right:12px;animation:uiDrawerRight 2.2s ease-in-out infinite;} @keyframes uiDrawerRight{0%{opacity:0;transform:translateX(60px);}45%,75%{opacity:1;transform:translateX(0);}100%{opacity:0;transform:translateX(60px);}}`, `<div class="ui-demo ui-drawer-right"><span>Menu</span></div>`);
+    addEffect("Drawer Expand", "Drawer expands width from side.", "ui-drawer-expand", `.ui-drawer-expand{justify-self:start;width:42px;height:90px;animation:uiDrawerExpand 2.2s ease-in-out infinite;} @keyframes uiDrawerExpand{0%,100%{width:42px;}50%{width:122px;}}`);
+    addEffect("Drawer Collapse", "Drawer collapses width.", "ui-drawer-collapse", `.ui-drawer-collapse{justify-self:start;width:122px;height:90px;animation:uiDrawerCollapse 2.2s ease-in-out infinite;} @keyframes uiDrawerCollapse{0%,100%{width:122px;}50%{width:42px;}}`);
+    addEffect("Bottom Sheet", "Mobile bottom sheet rises from bottom.", "ui-bottom-sheet", `.ui-bottom-sheet{width:132px;height:52px;align-self:end;animation:uiBottomSheet 2.2s ease-in-out infinite;} @keyframes uiBottomSheet{0%{opacity:0;transform:translateY(70px);}45%,75%{opacity:1;transform:translateY(18px);}100%{opacity:0;transform:translateY(70px);}}`, `<div class="ui-demo ui-bottom-sheet"><span>Sheet</span></div>`);
+    addEffect("Bottom Sheet Bounce", "Bottom sheet rises with bounce.", "ui-bottom-bounce", `.ui-bottom-bounce{width:132px;height:52px;align-self:end;animation:uiBottomBounce 2.2s ease-in-out infinite;} @keyframes uiBottomBounce{0%{transform:translateY(72px);opacity:0;}45%{transform:translateY(12px);opacity:1;}60%{transform:translateY(24px);}75%{transform:translateY(18px);}100%{transform:translateY(72px);opacity:0;}}`);
+    addEffect("Side Panel Scale", "Side panel scales in.", "ui-side-scale", `.ui-side-scale{width:52px;height:90px;justify-self:end;transform-origin:right;animation:uiSideScale 2s ease-in-out infinite;} @keyframes uiSideScale{0%{opacity:0;transform:scaleX(.2);}45%,75%{opacity:1;transform:scaleX(1);}100%{opacity:0;transform:scaleX(.2);}}`);
+    addEffect("Panel Blur", "Panel appears with blur.", "ui-panel-blur", `.ui-panel-blur{width:132px;height:72px;animation:uiPanelBlur 2s ease-in-out infinite;} @keyframes uiPanelBlur{0%{opacity:0;filter:blur(12px);transform:translateY(20px);}50%,75%{opacity:1;filter:blur(0);transform:translateY(0);}100%{opacity:0;filter:blur(10px);transform:translateY(20px);}}`);
+    addEffect("Panel Glow", "Panel glows while opening.", "ui-panel-glow", `.ui-panel-glow{width:132px;height:72px;border-color:rgba(79,140,255,.55);animation:uiGlow 1.8s ease-in-out infinite;}`);
+    addEffect("Panel Flip", "Panel flips in 3D.", "ui-panel-flip", `.ui-panel-flip{width:132px;height:72px;animation:uiModalFlip 2s ease-in-out infinite;}`);
+
+    addEffect("Dropdown Motion", "Dropdown opens with scale from top.", "ui-dropdown", `.ui-dropdown{height:34px;transform-origin:top;animation:uiDropdown 2s ease-in-out infinite;} @keyframes uiDropdown{0%{opacity:0;transform:scaleY(.25);}40%,75%{opacity:1;transform:scaleY(1);}100%{opacity:0;transform:scaleY(.25);}}`, `<div class="ui-demo ui-dropdown"><span>Drop</span></div>`);
+    addEffect("Dropdown Slide", "Dropdown slides downward.", "ui-dropdown-slide", `.ui-dropdown-slide{height:42px;animation:uiSlideDown 2s ease-in-out infinite;}`, `<div class="ui-demo ui-dropdown-slide"><span>Drop</span></div>`);
+    addEffect("Dropdown Fade", "Dropdown fades in.", "ui-dropdown-fade", `.ui-dropdown-fade{height:42px;animation:uiFade 2s ease-in-out infinite;}`, `<div class="ui-demo ui-dropdown-fade"><span>Drop</span></div>`);
+    addEffect("Dropdown Elastic", "Dropdown expands elastically.", "ui-dropdown-elastic", `.ui-dropdown-elastic{height:42px;transform-origin:top;animation:uiDropElastic 1.9s ease-in-out infinite;} @keyframes uiDropElastic{0%{opacity:0;transform:scaleY(.1);}45%{opacity:1;transform:scaleY(1.12);}60%{transform:scaleY(.92);}75%{transform:scaleY(1);}100%{opacity:0;transform:scaleY(.1);}}`);
+    addEffect("Accordion Expand", "Accordion smoothly expands and collapses.", "ui-accordion", `.ui-accordion{animation:uiAccordion 2.1s ease-in-out infinite;transform-origin:top;} @keyframes uiAccordion{0%,100%{height:28px;}45%,75%{height:82px;}}`, `<div class="ui-demo ui-accordion"><span>Open</span></div>`);
+    addEffect("Accordion Fade", "Accordion expands with opacity fade.", "ui-accordion-fade", `.ui-accordion-fade{animation:uiAccordionFade 2.1s ease-in-out infinite;transform-origin:top;} @keyframes uiAccordionFade{0%,100%{height:28px;opacity:.55;}45%,75%{height:82px;opacity:1;}}`);
+    addEffect("Accordion Glow", "Accordion expands with blue glow.", "ui-accordion-glow", `.ui-accordion-glow{animation:uiAccordionGlow 2.1s ease-in-out infinite;transform-origin:top;border-color:rgba(79,140,255,.45);} @keyframes uiAccordionGlow{0%,100%{height:28px;box-shadow:0 0 0 rgba(79,140,255,0);}50%{height:82px;box-shadow:0 0 24px rgba(79,140,255,.55);}}`);
+    addEffect("Menu Reveal", "Menu list reveals vertically.", "ui-menu-reveal", `.ui-menu-reveal{height:34px;animation:uiMenuReveal 2s ease-in-out infinite;} @keyframes uiMenuReveal{0%,100%{height:34px;opacity:.55;}50%{height:82px;opacity:1;}}`, `<div class="ui-demo ui-menu-reveal"><span>Menu</span></div>`);
+    addEffect("Menu Slide", "Menu slides horizontally.", "ui-menu-slide", `.ui-menu-slide{animation:uiSlideLeft 2s ease-in-out infinite;}`, `<div class="ui-demo ui-menu-slide"><span>Menu</span></div>`);
+    addEffect("Context Menu", "Context menu pops from cursor point.", "ui-context-menu", `.ui-context-menu{transform-origin:top left;animation:uiScale 1.9s ease-in-out infinite;}`, `<div class="ui-demo ui-context-menu"><span>Menu</span></div>`);
+
+    addEffect("Tab Indicator", "Active tab line moves left and right.", "ui-tab-indicator", `.ui-tab-indicator{width:136px;height:48px;display:block;padding:6px;} .ui-tab-indicator::before{content:"";display:block;width:38px;height:8px;border-radius:999px;background:#4f8cff;animation:uiTabMove 1.7s ease-in-out infinite;} @keyframes uiTabMove{0%,100%{transform:translateX(0);}50%{transform:translateX(78px);}}`, `<div class="ui-demo ui-tab-indicator"></div>`);
+    addEffect("Tab Pill", "Pill active state slides.", "ui-tab-pill", `.ui-tab-pill{width:142px;height:46px;display:block;padding:6px;} .ui-tab-pill::before{content:"";display:block;width:58px;height:34px;border-radius:14px;background:rgba(79,140,255,.85);animation:uiTabPill 1.8s ease-in-out infinite;} @keyframes uiTabPill{0%,100%{transform:translateX(0);}50%{transform:translateX(70px);}}`, `<div class="ui-demo ui-tab-pill"></div>`);
+    addEffect("Tab Fade", "Tab item fades between states.", "ui-tab-fade", `.ui-tab-fade{animation:uiFade 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-tab-fade"><span>Tab</span></div>`);
+    addEffect("Tab Lift", "Active tab lifts upward.", "ui-tab-lift", `.ui-tab-lift{animation:uiTabLift 1.8s ease-in-out infinite;} @keyframes uiTabLift{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);background:rgba(79,140,255,.22);}}`, `<div class="ui-demo ui-tab-lift"><span>Tab</span></div>`);
+    addEffect("Segment Control", "Segment control active area moves.", "ui-segment", `.ui-segment{width:144px;height:46px;display:block;padding:6px;} .ui-segment::before{content:"";display:block;width:58px;height:34px;border-radius:13px;background:#4f8cff;animation:uiSegment 1.8s ease-in-out infinite;} @keyframes uiSegment{0%,100%{transform:translateX(0);}50%{transform:translateX(72px);}}`, `<div class="ui-demo ui-segment"></div>`);
+    addEffect("Nav Underline", "Navigation underline slides.", "ui-nav-underline", `.ui-nav-underline{width:138px;height:46px;display:block;padding:8px;} .ui-nav-underline::after{content:"";display:block;width:44px;height:4px;border-radius:999px;background:#4f8cff;animation:uiNavUnderline 1.7s ease-in-out infinite;} @keyframes uiNavUnderline{0%,100%{transform:translateX(0);}50%{transform:translateX(74px);}}`, `<div class="ui-demo ui-nav-underline"></div>`);
+    addEffect("Breadcrumb Motion", "Breadcrumb marker moves forward.", "ui-breadcrumb", `.ui-breadcrumb{animation:uiBreadcrumb 1.8s ease-in-out infinite;} @keyframes uiBreadcrumb{0%,100%{transform:translateX(0);opacity:.7;}50%{transform:translateX(16px);opacity:1;}}`, `<div class="ui-demo ui-breadcrumb"><span>Step</span></div>`);
+    addEffect("Step Active", "Stepper dots activate one by one.", "ui-stepper", `.ui-stepper{width:126px;height:28px;display:flex;align-items:center;justify-content:space-between;background:transparent;border:0;box-shadow:none;overflow:visible;} .ui-stepper i{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.18);animation:uiStepActive 2s ease-in-out infinite;} .ui-stepper i:nth-child(2){animation-delay:.35s;} .ui-stepper i:nth-child(3){animation-delay:.7s;} @keyframes uiStepActive{0%,100%{background:rgba(255,255,255,.18);transform:scale(1);}40%,65%{background:#4f8cff;transform:scale(1.25);}}`, `<div class="ui-demo ui-stepper"><i></i><i></i><i></i></div>`);
+    addEffect("Stepper Line", "Stepper line fills left to right.", "ui-stepper-line", `.ui-stepper-line{width:130px;height:12px;border-radius:999px;background:rgba(255,255,255,.12);display:block;} .ui-stepper-line::before{content:"";display:block;height:100%;border-radius:999px;background:#4f8cff;animation:uiStepLine 2s ease-in-out infinite;} @keyframes uiStepLine{0%,100%{width:20%;}50%{width:100%;}}`, `<div class="ui-demo ui-stepper-line"></div>`);
+    addEffect("Progress Dots", "Dots progress with wave.", "ui-progress-dots", `.ui-progress-dots{display:flex;gap:8px;background:transparent;border:0;box-shadow:none;overflow:visible;} .ui-progress-dots i{width:12px;height:12px;border-radius:50%;background:#4f8cff;animation:uiDotWave 1s ease-in-out infinite;} .ui-progress-dots i:nth-child(2){animation-delay:.15s;} .ui-progress-dots i:nth-child(3){animation-delay:.3s;} @keyframes uiDotWave{0%,100%{transform:translateY(0);opacity:.45;}50%{transform:translateY(-10px);opacity:1;}}`, `<div class="ui-demo ui-progress-dots"><i></i><i></i><i></i></div>`);
+
+    addEffect("Toggle Switch", "Switch knob moves between off and on.", "ui-switch", `.ui-switch{width:86px;height:44px;border-radius:999px;background:rgba(255,255,255,.12);display:block;padding:5px;} .ui-switch::before{content:"";display:block;width:34px;height:34px;border-radius:50%;background:white;animation:uiSwitch 1.8s ease-in-out infinite;} @keyframes uiSwitch{0%,100%{transform:translateX(0);background:white;}50%{transform:translateX(42px);background:#35c759;}}`, `<div class="ui-demo ui-switch"></div>`);
+    addEffect("Toggle Glow", "Switch glows when active.", "ui-switch-glow", `.ui-switch-glow{width:86px;height:44px;border-radius:999px;background:rgba(255,255,255,.12);padding:5px;animation:uiSwitchGlow 1.8s ease-in-out infinite;} .ui-switch-glow::before{content:"";display:block;width:34px;height:34px;border-radius:50%;background:white;animation:uiSwitch 1.8s ease-in-out infinite;} @keyframes uiSwitchGlow{0%,100%{box-shadow:none;}50%{box-shadow:0 0 24px rgba(53,199,89,.6);background:rgba(53,199,89,.24);}}`, `<div class="ui-demo ui-switch-glow"></div>`);
+    addEffect("Checkbox Tick", "Checkbox turns green and tick pops in.", "ui-checkbox", `.ui-checkbox{width:54px;height:54px;border-radius:16px;background:transparent;animation:uiCheckboxBox 1.8s ease-in-out infinite;} .ui-checkbox::after{content:"✓";font-size:30px;color:white;opacity:0;animation:uiCheckboxTick 1.8s ease-in-out infinite;} @keyframes uiCheckboxBox{0%,100%{border-color:rgba(255,255,255,.25);background:transparent;}50%{border-color:rgba(53,199,89,.9);background:rgba(53,199,89,.8);}} @keyframes uiCheckboxTick{0%,30%,100%{opacity:0;transform:scale(.4);}50%,75%{opacity:1;transform:scale(1);}}`, `<div class="ui-demo ui-checkbox"></div>`);
+    addEffect("Radio Dot", "Radio dot scales in and out.", "ui-radio", `.ui-radio{width:56px;height:56px;border-radius:50%;background:transparent;animation:uiRadioRing 1.8s ease-in-out infinite;} .ui-radio::after{content:"";width:24px;height:24px;border-radius:50%;background:#4f8cff;transform:scale(0);animation:uiRadioDot 1.8s ease-in-out infinite;} @keyframes uiRadioRing{0%,100%{border-color:rgba(255,255,255,.25);}50%{border-color:rgba(79,140,255,.9);}} @keyframes uiRadioDot{0%,30%,100%{transform:scale(0);}50%,75%{transform:scale(1);}}`, `<div class="ui-demo ui-radio"></div>`);
+    addEffect("Like Heart", "Heart pops like like button.", "ui-like-heart", `.ui-like-heart::after{content:"♥";font-size:34px;color:#ff5f57;animation:uiLikeHeart 1.2s ease-in-out infinite;} @keyframes uiLikeHeart{0%,100%{transform:scale(1);}40%{transform:scale(1.35);}60%{transform:scale(.95);}}`, `<div class="ui-demo ui-like-heart"></div>`);
+    addEffect("Save Bookmark", "Bookmark icon jumps.", "ui-save-bookmark", `.ui-save-bookmark::after{content:"◆";font-size:30px;color:#4f8cff;animation:uiBounce 1.3s ease-in-out infinite;}`, `<div class="ui-demo ui-save-bookmark"></div>`);
+    addEffect("Star Rating", "Star rating twinkles.", "ui-star-rating", `.ui-star-rating::after{content:"★";font-size:34px;color:#ffbd2e;animation:uiStarRating 1.2s ease-in-out infinite;} @keyframes uiStarRating{0%,100%{transform:scale(1) rotate(0);opacity:.75;}50%{transform:scale(1.35) rotate(90deg);opacity:1;}}`, `<div class="ui-demo ui-star-rating"></div>`);
+    addEffect("Bell Ring", "Notification bell rings.", "ui-bell", `.ui-bell::after{content:"🔔";font-size:30px;} .ui-bell{width:64px;height:64px;border-radius:50%;animation:uiBell 1.3s ease-in-out infinite;} @keyframes uiBell{0%,100%{transform:rotate(0);}20%{transform:rotate(-12deg);}40%{transform:rotate(12deg);}60%{transform:rotate(-8deg);}80%{transform:rotate(8deg);}}`, `<div class="ui-demo ui-bell"></div>`);
+    addEffect("Notification Badge", "Badge count pops.", "ui-notification-badge", `.ui-notification-badge::after{content:"9";position:absolute;right:-5px;top:-5px;width:24px;height:24px;border-radius:50%;background:#ff5f57;display:grid;place-items:center;font-size:12px;font-weight:950;animation:uiPulse 1.2s infinite;z-index:7;}`, `<div class="ui-demo ui-notification-badge"><span>Inbox</span></div>`);
+    addEffect("Copy Success", "Small success toast pops after copy.", "ui-copy-success", `.ui-copy-success{width:112px;height:48px;border-radius:16px;animation:uiCopyPop 1.8s ease-in-out infinite;} .ui-copy-success::after{content:"Copied";} @keyframes uiCopyPop{0%,100%{opacity:0;transform:translateY(20px) scale(.9);}40%,75%{opacity:1;transform:translateY(0) scale(1);}}`, `<div class="ui-demo ui-copy-success"></div>`);
+    addEffect("Delete Shake", "Delete action shakes red.", "ui-delete-shake", `.ui-delete-shake{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:uiShake .65s ease-in-out infinite;}`, `<div class="ui-demo ui-delete-shake"><span>Delete</span></div>`);
+
+    addEffect("Hamburger Morph", "Menu icon morphs into close icon.", "ui-hamburger", `.ui-hamburger{width:68px;height:56px;background:transparent;border:0;box-shadow:none;} .ui-hamburger::before,.ui-hamburger::after,.ui-hamburger span{content:"";position:absolute;left:12px;width:44px;height:4px;border-radius:999px;background:white;} .ui-hamburger::before{top:16px;animation:uiHamTop 1.8s ease-in-out infinite;} .ui-hamburger span{top:26px;animation:uiHamMid 1.8s ease-in-out infinite;} .ui-hamburger::after{top:36px;animation:uiHamBot 1.8s ease-in-out infinite;} @keyframes uiHamTop{0%,100%{transform:none;}50%{transform:rotate(45deg) translate(7px,7px);}} @keyframes uiHamMid{0%,100%{opacity:1;}50%{opacity:0;}} @keyframes uiHamBot{0%,100%{transform:none;}50%{transform:rotate(-45deg) translate(7px,-7px);}}`, `<div class="ui-demo ui-hamburger"><span></span></div>`);
+    addEffect("Kebab Menu", "Three-dot menu rotates.", "ui-kebab", `.ui-kebab{display:flex;gap:6px;align-items:center;justify-content:center;background:transparent;border:0;box-shadow:none;animation:uiSpin 1.8s linear infinite;} .ui-kebab i{width:9px;height:9px;border-radius:50%;background:white;}`, `<div class="ui-demo ui-kebab"><i></i><i></i><i></i></div>`);
+    addEffect("Meatball Menu", "Horizontal three-dot menu pulses.", "ui-meatball", `.ui-meatball{display:flex;gap:7px;background:transparent;border:0;box-shadow:none;} .ui-meatball i{width:10px;height:10px;border-radius:50%;background:#4f8cff;animation:uiPulse 1s ease-in-out infinite;} .ui-meatball i:nth-child(2){animation-delay:.15s;} .ui-meatball i:nth-child(3){animation-delay:.3s;}`, `<div class="ui-demo ui-meatball"><i></i><i></i><i></i></div>`);
+    addEffect("Search Expand", "Search field expands width.", "ui-search-expand", `.ui-search-expand{height:44px;width:64px;border-radius:999px;animation:uiSearchExpand 2s ease-in-out infinite;} @keyframes uiSearchExpand{0%,100%{width:64px;}50%{width:132px;}}`, `<div class="ui-demo ui-search-expand"><span>Search</span></div>`);
+    addEffect("Search Focus Glow", "Search input focus glow.", "ui-search-glow", `.ui-search-glow{width:132px;height:44px;border-radius:999px;animation:uiGlow 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-search-glow"><span>Search</span></div>`);
+    addEffect("Input Focus", "Input border grows on focus.", "ui-input-focus", `.ui-input-focus{width:132px;height:44px;border-radius:14px;animation:uiInputFocus 1.8s ease-in-out infinite;} @keyframes uiInputFocus{0%,100%{border-color:rgba(255,255,255,.16);}50%{border-color:rgba(79,140,255,.9);box-shadow:0 0 24px rgba(79,140,255,.45);}}`, `<div class="ui-demo ui-input-focus"><span>Input</span></div>`);
+    addEffect("Floating Label", "Input floating label motion.", "ui-floating-label", `.ui-floating-label{width:132px;height:54px;display:block;padding:22px 12px 8px;} .ui-floating-label::before{content:"Label";position:absolute;left:16px;top:22px;font-size:13px;color:rgba(255,255,255,.65);animation:uiLabelFloat 1.8s ease-in-out infinite;} @keyframes uiLabelFloat{0%,100%{top:22px;font-size:13px;color:rgba(255,255,255,.65);}50%{top:8px;font-size:10px;color:#4f8cff;}}`, `<div class="ui-demo ui-floating-label"></div>`);
+    addEffect("Password Reveal", "Password dots reveal motion.", "ui-password", `.ui-password{width:132px;height:44px;display:flex;gap:7px;align-items:center;justify-content:center;} .ui-password i{width:8px;height:8px;border-radius:50%;background:white;animation:uiPassword 1.8s ease-in-out infinite;} .ui-password i:nth-child(2){animation-delay:.15s;} .ui-password i:nth-child(3){animation-delay:.3s;} .ui-password i:nth-child(4){animation-delay:.45s;} @keyframes uiPassword{0%,100%{transform:scale(1);opacity:.35;}50%{transform:scale(1.6);opacity:1;}}`, `<div class="ui-demo ui-password"><i></i><i></i><i></i><i></i></div>`);
+    addEffect("Form Submit", "Submit success pulse.", "ui-form-submit", `.ui-form-submit{background:rgba(53,199,89,.18);border-color:rgba(53,199,89,.45);animation:uiPulse 1.5s ease-in-out infinite;}`, `<div class="ui-demo ui-form-submit"><span>Submit</span></div>`);
+    addEffect("Form Error", "Form field error shake.", "ui-form-error", `.ui-form-error{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:uiShake .65s ease-in-out infinite;}`, `<div class="ui-demo ui-form-error"><span>Error</span></div>`);
+    addEffect("Form Loading", "Form loading shimmer.", "ui-form-loading", `.ui-form-loading{background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.23),rgba(255,255,255,.07));background-size:220%;animation:uiShimmer 1.4s linear infinite;} .ui-form-loading span{color:transparent;}`, `<div class="ui-demo ui-form-loading"><span>Input</span></div>`);
+
+    addEffect("Progress Bar", "Progress bar fills from left.", "ui-progress-bar", `.ui-progress-bar{width:132px;height:12px;border-radius:999px;background:rgba(255,255,255,.12);display:block;} .ui-progress-bar::before{content:"";display:block;height:100%;width:42%;border-radius:inherit;background:linear-gradient(90deg,#4f8cff,#8d6bff);animation:uiProgressMove 1.35s ease-in-out infinite;} @keyframes uiProgressMove{0%{transform:translateX(-110%);}50%{transform:translateX(70%);}100%{transform:translateX(240%);}}`, `<div class="ui-demo ui-progress-bar"></div>`);
+    addEffect("Progress Ring", "Circular progress ring rotates.", "ui-progress-ring", `.ui-progress-ring{width:64px;height:64px;border-radius:50%;background:conic-gradient(#4f8cff 0deg,#4f8cff 260deg,rgba(255,255,255,.15) 260deg);animation:uiSpin 1.8s linear infinite;} .ui-progress-ring::after{content:"";width:42px;height:42px;border-radius:50%;background:#101010;position:absolute;}`, `<div class="ui-demo ui-progress-ring"></div>`);
+    addEffect("Circular Load", "Circular load pulse.", "ui-circular-load", `.ui-circular-load{width:62px;height:62px;border-radius:50%;border:5px solid rgba(255,255,255,.15);border-top-color:#4f8cff;animation:uiSpin 1s linear infinite;}`, `<div class="ui-demo ui-circular-load"></div>`);
+    addEffect("Skeleton Motion", "Shimmer loading placeholder.", "ui-skeleton", `.ui-skeleton{width:122px;height:64px;border-radius:18px;background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.23),rgba(255,255,255,.07));background-size:220%;animation:uiShimmer 1.4s linear infinite;} .ui-skeleton span{color:transparent;}`, `<div class="ui-demo ui-skeleton"><span>Load</span></div>`);
+    addEffect("Card Skeleton", "Skeleton card loading state.", "ui-card-skeleton", `.ui-card-skeleton{width:128px;height:82px;background:linear-gradient(90deg,rgba(255,255,255,.07),rgba(255,255,255,.23),rgba(255,255,255,.07));background-size:220%;animation:uiShimmer 1.4s linear infinite;} .ui-card-skeleton span{color:transparent;}`, `<div class="ui-demo ui-card-skeleton"><span>Card</span></div>`);
+    addEffect("Loading Dots", "Three loading dots wave.", "ui-loading-dots", `.ui-loading-dots{display:flex;gap:8px;background:transparent;border:0;box-shadow:none;} .ui-loading-dots i{width:12px;height:12px;border-radius:50%;background:#4f8cff;animation:uiDotWave 1s ease-in-out infinite;} .ui-loading-dots i:nth-child(2){animation-delay:.15s;} .ui-loading-dots i:nth-child(3){animation-delay:.3s;} @keyframes uiDotWave{0%,100%{transform:translateY(0);opacity:.45;}50%{transform:translateY(-10px);opacity:1;}}`, `<div class="ui-demo ui-loading-dots"><i></i><i></i><i></i></div>`);
+    addEffect("Typing Bubble", "Chat typing bubble animation.", "ui-typing-bubble", `.ui-typing-bubble{width:74px;height:34px;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;} .ui-typing-bubble i{width:8px;height:8px;border-radius:50%;background:white;animation:uiTypingBubble 1.2s ease-in-out infinite;} .ui-typing-bubble i:nth-child(2){animation-delay:.18s;} .ui-typing-bubble i:nth-child(3){animation-delay:.36s;} @keyframes uiTypingBubble{0%,100%{transform:translateY(0);opacity:.4;}50%{transform:translateY(-6px);opacity:1;}}`, `<div class="ui-demo ui-typing-bubble"><i></i><i></i><i></i></div>`);
+    addEffect("Loading Text", "Text shimmer loading label.", "ui-loading-text", `.ui-loading-text span{font-size:24px;font-weight:950;background:linear-gradient(90deg,rgba(255,255,255,.25),white,rgba(255,255,255,.25));background-size:220%;color:transparent;-webkit-background-clip:text;background-clip:text;animation:uiShimmer 1.4s linear infinite;}`, `<div class="ui-demo ui-loading-text"><span>Loading</span></div>`);
+    addEffect("Percent Counter", "Percentage changes from 0 to 100.", "ui-percent", `.ui-percent::after{content:"0%";font-size:28px;font-weight:950;animation:uiPercent 2s steps(5) infinite;} @keyframes uiPercent{0%{content:"0%";}20%{content:"25%";}40%{content:"50%";}60%{content:"75%";}80%,100%{content:"100%";}}`, `<div class="ui-demo ui-percent"></div>`);
+    addEffect("Counter Motion", "Counter number changes in steps.", "ui-counter", `.ui-counter::after{content:"0";font-size:28px;font-weight:950;animation:uiCounter 2s steps(5) infinite;} @keyframes uiCounter{0%{content:"0";}20%{content:"12";}40%{content:"48";}60%{content:"89";}80%,100%{content:"100";}}`, `<div class="ui-demo ui-counter"></div>`);
+
+    addEffect("Alert Shake", "Alert box shakes with red warning.", "ui-alert-shake", `.ui-alert-shake{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:uiShake .6s ease-in-out infinite;}`, `<div class="ui-demo ui-alert-shake"><span>Alert</span></div>`);
+    addEffect("Alert Pulse", "Alert pulses red.", "ui-alert-pulse", `.ui-alert-pulse{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:uiPulse 1.2s ease-in-out infinite;}`, `<div class="ui-demo ui-alert-pulse"><span>Alert</span></div>`);
+    addEffect("Success Pop", "Success message pops in.", "ui-success-pop", `.ui-success-pop{background:rgba(53,199,89,.18);border-color:rgba(53,199,89,.45);animation:uiScale 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-success-pop"><span>Success</span></div>`);
+    addEffect("Warning Glow", "Warning card glows yellow.", "ui-warning-glow", `.ui-warning-glow{background:rgba(255,189,46,.16);border-color:rgba(255,189,46,.45);animation:uiWarningGlow 1.6s ease-in-out infinite;} @keyframes uiWarningGlow{0%,100%{box-shadow:0 0 0 rgba(255,189,46,0);}50%{box-shadow:0 0 28px rgba(255,189,46,.65);}}`, `<div class="ui-demo ui-warning-glow"><span>Warn</span></div>`);
+    addEffect("Info Glow", "Info box glows blue.", "ui-info-glow", `.ui-info-glow{background:rgba(79,140,255,.16);border-color:rgba(79,140,255,.45);animation:uiGlow 1.7s ease-in-out infinite;}`, `<div class="ui-demo ui-info-glow"><span>Info</span></div>`);
+    addEffect("Empty State", "Empty state fades softly.", "ui-empty-state", `.ui-empty-state{animation:uiFade 2s ease-in-out infinite;}`, `<div class="ui-demo ui-empty-state"><span>Empty</span></div>`);
+    addEffect("Permission Prompt", "Permission prompt slides up.", "ui-permission", `.ui-permission{animation:uiSlideUp 2.1s ease-in-out infinite;}`, `<div class="ui-demo ui-permission"><span>Allow?</span></div>`);
+    addEffect("Tooltip Pop", "Tooltip pops upward.", "ui-tooltip-pop", `.ui-tooltip-pop{width:112px;height:42px;border-radius:14px;animation:uiTooltipPop 1.8s ease-in-out infinite;} @keyframes uiTooltipPop{0%,100%{opacity:0;transform:translateY(16px) scale(.9);}45%,75%{opacity:1;transform:translateY(0) scale(1);}}`, `<div class="ui-demo ui-tooltip-pop"><span>Tooltip</span></div>`);
+    addEffect("Tooltip Arrow", "Tooltip with arrow bounce.", "ui-tooltip-arrow", `.ui-tooltip-arrow{width:112px;height:42px;border-radius:14px;animation:uiFloat 1.8s ease-in-out infinite;} .ui-tooltip-arrow::after{content:"";position:absolute;bottom:-8px;border-left:8px solid transparent;border-right:8px solid transparent;border-top:8px solid rgba(255,255,255,.16);}`, `<div class="ui-demo ui-tooltip-arrow"><span>Tip</span></div>`);
+    addEffect("Popover Scale", "Popover scales from center.", "ui-popover-scale", `.ui-popover-scale{animation:uiScale 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-popover-scale"><span>Pop</span></div>`);
+
+    addEffect("Dynamic Island", "Pill expands like modern status island.", "ui-dynamic-island", `.ui-dynamic-island{width:112px;height:34px;border-radius:999px;background:rgba(255,255,255,.13);animation:uiIsland 2.1s ease-in-out infinite;} @keyframes uiIsland{0%,100%{width:90px;height:32px;}50%{width:132px;height:54px;}}`, `<div class="ui-demo ui-dynamic-island"></div>`);
+    addEffect("Island Notification", "Island expands and shows notification.", "ui-island-notify", `.ui-island-notify{width:90px;height:32px;border-radius:999px;animation:uiIslandNotify 2.2s ease-in-out infinite;} .ui-island-notify span{opacity:0;animation:uiIslandText 2.2s ease-in-out infinite;} @keyframes uiIslandNotify{0%,100%{width:90px;height:32px;}50%{width:140px;height:54px;}} @keyframes uiIslandText{0%,30%,100%{opacity:0;}50%,75%{opacity:1;}}`, `<div class="ui-demo ui-island-notify"><span>Notify</span></div>`);
+    addEffect("Floating Action", "Floating action button bounces.", "ui-fab", `.ui-fab{width:62px;height:62px;border-radius:50%;background:#4f8cff;animation:uiFloat 2s ease-in-out infinite;} .ui-fab::after{content:"+";font-size:32px;font-weight:800;}`, `<div class="ui-demo ui-fab"></div>`);
+    addEffect("FAB Menu", "Floating menu expands upward.", "ui-fab-menu", `.ui-fab-menu{width:62px;height:62px;border-radius:50%;background:#4f8cff;} .ui-fab-menu::before,.ui-fab-menu::after{content:"";position:absolute;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.22);animation:uiFabMenu 1.8s ease-in-out infinite;} .ui-fab-menu::before{animation-delay:.15s;} @keyframes uiFabMenu{0%,100%{transform:translateY(0) scale(.6);opacity:0;}50%{transform:translateY(-46px) scale(1);opacity:1;}}`, `<div class="ui-demo ui-fab-menu"></div>`);
+    addEffect("Chat Bubble", "Chat bubble pops into view.", "ui-chat-bubble", `.ui-chat-bubble{border-radius:22px 22px 22px 8px;animation:uiScale 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-chat-bubble"><span>Chat</span></div>`);
+    addEffect("Message Slide", "Message slides into chat.", "ui-message-slide", `.ui-message-slide{border-radius:18px;animation:uiSlideLeft 2s ease-in-out infinite;}`, `<div class="ui-demo ui-message-slide"><span>Msg</span></div>`);
+    addEffect("Reaction Pop", "Reaction emoji pops up.", "ui-reaction-pop", `.ui-reaction-pop::after{content:"❤️";font-size:34px;animation:uiReactionPop 1.3s ease-in-out infinite;} @keyframes uiReactionPop{0%,100%{transform:translateY(12px) scale(.6);opacity:0;}45%,75%{transform:translateY(-10px) scale(1.2);opacity:1;}}`, `<div class="ui-demo ui-reaction-pop"></div>`);
+    addEffect("Emoji Picker", "Emoji picker scales in.", "ui-emoji-picker", `.ui-emoji-picker{animation:uiScale 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-emoji-picker"><span>😊</span></div>`);
+    addEffect("Superchat Motion", "Premium superchat shimmer.", "ui-superchat", `.ui-superchat{background:linear-gradient(90deg,rgba(255,189,46,.22),rgba(255,95,87,.25),rgba(255,189,46,.22));background-size:240%;border-color:rgba(255,189,46,.4);animation:uiGradient 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-superchat"><span>₹100</span></div>`);
+    addEffect("Live Chat Pin", "Pinned chat lifts and glows.", "ui-chat-pin", `.ui-chat-pin{background:rgba(79,140,255,.16);border-color:rgba(79,140,255,.45);animation:uiChatPin 1.8s ease-in-out infinite;} @keyframes uiChatPin{0%,100%{transform:translateY(0);box-shadow:none;}50%{transform:translateY(-8px);box-shadow:0 0 24px rgba(79,140,255,.55);}}`, `<div class="ui-demo ui-chat-pin"><span>Pinned</span></div>`);
+
+    addEffect("Page Fade", "Page screen fades in.", "ui-page-fade", `.ui-page-fade{animation:uiFade 2s ease-in-out infinite;}`, `<div class="ui-demo ui-page-fade"><span>Page</span></div>`);
+    addEffect("Page Slide", "Page slides horizontally.", "ui-page-slide", `.ui-page-slide{animation:uiSlideLeft 2.2s ease-in-out infinite;}`, `<div class="ui-demo ui-page-slide"><span>Page</span></div>`);
+    addEffect("Page Scale", "Page scales into view.", "ui-page-scale", `.ui-page-scale{animation:uiScale 2s ease-in-out infinite;}`, `<div class="ui-demo ui-page-scale"><span>Page</span></div>`);
+    addEffect("Page Blur", "Page blur transition.", "ui-page-blur", `.ui-page-blur{animation:uiPageBlur 2.2s ease-in-out infinite;} @keyframes uiPageBlur{0%{opacity:0;filter:blur(14px);}45%,75%{opacity:1;filter:blur(0);}100%{opacity:0;filter:blur(10px);}}`, `<div class="ui-demo ui-page-blur"><span>Page</span></div>`);
+    addEffect("Screen Swipe", "Screen wipe transition.", "ui-screen-swipe", `.ui-screen-swipe::before{content:"";position:absolute;inset:0;background:#4f8cff;transform:translateX(-100%);animation:uiScreenSwipe 2s ease-in-out infinite;z-index:1;} @keyframes uiScreenSwipe{0%{transform:translateX(-100%);}45%,75%{transform:translateX(0);}100%{transform:translateX(100%);}}`, `<div class="ui-demo ui-screen-swipe"><span>Page</span></div>`);
+    addEffect("Screen Curtain", "Curtain open transition.", "ui-screen-curtain", `.ui-screen-curtain{animation:uiScreenCurtain 2s ease-in-out infinite;} @keyframes uiScreenCurtain{0%,100%{clip-path:inset(0 50% 0 50%);}50%{clip-path:inset(0 0 0 0);}}`, `<div class="ui-demo ui-screen-curtain"><span>Page</span></div>`);
+    addEffect("Screen Flip", "Screen flips in 3D.", "ui-screen-flip", `.ui-screen-flip{animation:uiModalFlip 2s ease-in-out infinite;}`, `<div class="ui-demo ui-screen-flip"><span>Page</span></div>`);
+    addEffect("Screen Zoom", "Screen zoom transition.", "ui-screen-zoom", `.ui-screen-zoom{animation:uiScale 2s ease-in-out infinite;}`, `<div class="ui-demo ui-screen-zoom"><span>Page</span></div>`);
+    addEffect("Route Loading", "Route loading progress at bottom.", "ui-route-load", `.ui-route-load::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:42%;background:#4f8cff;animation:uiProgressMove 1.2s ease-in-out infinite;} @keyframes uiProgressMove{0%{transform:translateX(-110%);}50%{transform:translateX(70%);}100%{transform:translateX(260%);}}`, `<div class="ui-demo ui-route-load"><span>Route</span></div>`);
+    addEffect("App Launch", "App launch bounce scale.", "ui-app-launch", `.ui-app-launch{animation:uiAppLaunch 2s ease-in-out infinite;} @keyframes uiAppLaunch{0%{opacity:0;transform:scale(.2);border-radius:32px;}45%,75%{opacity:1;transform:scale(1);border-radius:20px;}100%{opacity:0;transform:scale(1.2);border-radius:12px;}}`, `<div class="ui-demo ui-app-launch"><span>App</span></div>`);
+
+    addEffect("Card Enter", "UI card enters upward.", "ui-card-enter", `.ui-card-enter{animation:uiSlideUp 2s ease-in-out infinite;}`, `<div class="ui-demo ui-card-enter"><span>Card</span></div>`);
+    addEffect("Card Stagger", "Card stagger-like delay motion.", "ui-card-stagger", `.ui-card-stagger{animation:uiCardStagger 2s ease-in-out infinite;} @keyframes uiCardStagger{0%{opacity:0;transform:translateY(24px);}30%{opacity:.45;transform:translateY(14px);}55%,80%{opacity:1;transform:translateY(0);}100%{opacity:0;transform:translateY(-10px);}}`, `<div class="ui-demo ui-card-stagger"><span>Card</span></div>`);
+    addEffect("Card Flip", "UI card flips.", "ui-card-flip", `.ui-card-flip{animation:uiModalFlip 2s ease-in-out infinite;}`, `<div class="ui-demo ui-card-flip"><span>Card</span></div>`);
+    addEffect("Card Expand", "Card expands width.", "ui-card-expand", `.ui-card-expand{animation:uiCardExpand 2s ease-in-out infinite;} @keyframes uiCardExpand{0%,100%{width:82px;}50%{width:132px;}}`, `<div class="ui-demo ui-card-expand"><span>Card</span></div>`);
+    addEffect("Card Collapse", "Card collapses width.", "ui-card-collapse", `.ui-card-collapse{animation:uiCardCollapse 2s ease-in-out infinite;} @keyframes uiCardCollapse{0%,100%{width:132px;}50%{width:82px;}}`, `<div class="ui-demo ui-card-collapse"><span>Card</span></div>`);
+    addEffect("List Item Slide", "List item slides into view.", "ui-list-slide", `.ui-list-slide{animation:uiSlideRight 2s ease-in-out infinite;}`, `<div class="ui-demo ui-list-slide"><span>List</span></div>`);
+    addEffect("List Item Swipe", "List item swipe action.", "ui-list-swipe", `.ui-list-swipe::before{content:"Delete";position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,95,87,.8);transform:translateX(-100%);animation:uiListSwipe 2s ease-in-out infinite;z-index:1;} @keyframes uiListSwipe{0%,100%{transform:translateX(-100%);}50%{transform:translateX(0);}}`, `<div class="ui-demo ui-list-swipe"><span>Item</span></div>`);
+    addEffect("Grid Item Pop", "Grid item pops into place.", "ui-grid-pop", `.ui-grid-pop{animation:uiScale 1.8s ease-in-out infinite;}`, `<div class="ui-demo ui-grid-pop"><span>Grid</span></div>`);
+    addEffect("Grid Sort", "Grid card moves like sorting.", "ui-grid-sort", `.ui-grid-sort{animation:uiGridSort 2s ease-in-out infinite;} @keyframes uiGridSort{0%,100%{transform:translate(0,0);}50%{transform:translate(24px,-12px);}}`, `<div class="ui-demo ui-grid-sort"><span>Sort</span></div>`);
+    addEffect("Drag Ghost", "Dragging ghost opacity motion.", "ui-drag-ghost", `.ui-drag-ghost{animation:uiDragGhost 1.8s ease-in-out infinite;} @keyframes uiDragGhost{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.45;transform:scale(1.08) rotate(4deg);}}`, `<div class="ui-demo ui-drag-ghost"><span>Drag</span></div>`);
+
+    addEffect("Drop Zone", "Drop zone border pulse.", "ui-drop-zone", `.ui-drop-zone{border:2px dashed rgba(79,140,255,.8);animation:uiDropZone 1.4s ease-in-out infinite;} @keyframes uiDropZone{0%,100%{box-shadow:0 0 0 rgba(79,140,255,0);}50%{box-shadow:0 0 24px rgba(79,140,255,.55);}}`, `<div class="ui-demo ui-drop-zone"><span>Drop</span></div>`);
+    addEffect("Upload Motion", "Upload arrow moves up.", "ui-upload", `.ui-upload::after{content:"↑";font-size:34px;animation:uiUpload 1.2s ease-in-out infinite;} @keyframes uiUpload{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}`, `<div class="ui-demo ui-upload"></div>`);
+    addEffect("Download Motion", "Download arrow moves down.", "ui-download", `.ui-download::after{content:"↓";font-size:34px;animation:uiDownload 1.2s ease-in-out infinite;} @keyframes uiDownload{0%,100%{transform:translateY(0);}50%{transform:translateY(10px);}}`, `<div class="ui-demo ui-download"></div>`);
+    addEffect("Sync Motion", "Sync icon rotates.", "ui-sync", `.ui-sync::after{content:"↻";font-size:34px;animation:uiSpin 1s linear infinite;}`, `<div class="ui-demo ui-sync"></div>`);
+    addEffect("Refresh Motion", "Refresh icon rotates and pulses.", "ui-refresh", `.ui-refresh::after{content:"⟳";font-size:34px;animation:uiRefresh 1.4s ease-in-out infinite;} @keyframes uiRefresh{0%,100%{transform:rotate(0) scale(1);}50%{transform:rotate(180deg) scale(1.2);}}`, `<div class="ui-demo ui-refresh"></div>`);
+    addEffect("Settings Gear", "Gear rotates smoothly.", "ui-gear", `.ui-gear::after{content:"⚙";font-size:34px;animation:uiSpin 1.4s linear infinite;}`, `<div class="ui-demo ui-gear"></div>`);
+    addEffect("Mic Pulse", "Mic recording pulse.", "ui-mic", `.ui-mic{background:rgba(255,95,87,.16);border-color:rgba(255,95,87,.45);animation:uiMic 1.2s ease-in-out infinite;} .ui-mic::after{content:"●";font-size:26px;color:#ff5f57;} @keyframes uiMic{0%,100%{box-shadow:0 0 0 rgba(255,95,87,0);}50%{box-shadow:0 0 28px rgba(255,95,87,.7);}}`, `<div class="ui-demo ui-mic"></div>`);
+    addEffect("Camera Flash", "Camera flash effect.", "ui-camera-flash", `.ui-camera-flash::before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.75);opacity:0;animation:uiCameraFlash 1.5s ease-in-out infinite;z-index:5;} @keyframes uiCameraFlash{0%,70%,100%{opacity:0;}75%{opacity:1;}}`, `<div class="ui-demo ui-camera-flash"><span>Cam</span></div>`);
+    addEffect("Play Pulse", "Play icon pulse.", "ui-play", `.ui-play::after{content:"▶";font-size:30px;animation:uiPulse 1.2s ease-in-out infinite;}`, `<div class="ui-demo ui-play"></div>`);
+    addEffect("Pause Blink", "Pause icon blink.", "ui-pause", `.ui-pause::after{content:"Ⅱ";font-size:32px;animation:uiFade 1.2s ease-in-out infinite;}`, `<div class="ui-demo ui-pause"></div>`);
 
     const grid = document.getElementById("grid");
     const searchInput = document.getElementById("searchInput");
     const countPill = document.getElementById("countPill");
     const emptyState = document.getElementById("emptyState");
+    const loadStatus = document.getElementById("loadStatus");
+    const dynamicEffectStyles = document.getElementById("dynamicEffectStyles");
 
-    effects.forEach((effect, index) => {
-      effect.id = String(index);
-    });
+    const batchSize = 20;
+    let visibleCount = batchSize;
+    let filteredEffects = [...effects];
+    let isLoadingMore = false;
+
+    dynamicEffectStyles.textContent = commonKeyframes + "\n\n" + effects.map(effect => effect.css).join("\n\n");
 
     function copyIcon() {
       return `
@@ -1225,10 +636,12 @@
       `;
     }
 
-    function renderCards(list) {
+    function renderCards() {
       grid.innerHTML = "";
 
-      list.forEach(effect => {
+      const visibleEffects = filteredEffects.slice(0, visibleCount);
+
+      visibleEffects.forEach(effect => {
         const card = document.createElement("div");
         card.className = "card";
         card.dataset.search = `${effect.name} ${effect.about} ${effect.className}`.toLowerCase();
@@ -1255,32 +668,17 @@
         });
       });
 
-      countPill.textContent = list.length + " Effects";
-      emptyState.style.display = list.length ? "none" : "block";
-    }
+      emptyState.style.display = filteredEffects.length ? "none" : "block";
+      countPill.textContent = filteredEffects.length + " Effects";
 
-    function baseCSS() {
-      return `.ui-demo {
-  position: relative;
-  width: 128px;
-  height: 82px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
-  border: 1px solid rgba(255,255,255,.16);
-  display: grid;
-  place-items: center;
-  color: white;
-  font-size: 13px;
-  font-weight: 900;
-  overflow: hidden;
-  transition: 260ms ease;
-  box-shadow: 0 14px 34px rgba(0,0,0,.28);
-  isolation: isolate;
-}
-.ui-demo span {
-  position: relative;
-  z-index: 5;
-}`;
+      const shown = Math.min(visibleCount, filteredEffects.length);
+      loadStatus.textContent = `Showing ${shown} of ${filteredEffects.length} effects`;
+
+      if (filteredEffects.length === 0) {
+        loadStatus.style.display = "none";
+      } else {
+        loadStatus.style.display = "block";
+      }
     }
 
     function copyCode(id) {
@@ -1294,7 +692,9 @@
       const code = `${effect.html}
 
 <style>
-${baseCSS()}
+${baseUICSS}
+
+${commonKeyframes}
 
 ${effect.css}
 </style>`;
@@ -1349,10 +749,10 @@ ${effect.css}
       }, 1500);
     }
 
-    searchInput.addEventListener("input", () => {
+    function applySearch() {
       const value = searchInput.value.trim().toLowerCase();
 
-      const filtered = effects.filter(effect => {
+      filteredEffects = effects.filter(effect => {
         return (
           effect.name.toLowerCase().includes(value) ||
           effect.about.toLowerCase().includes(value) ||
@@ -1360,10 +760,31 @@ ${effect.css}
         );
       });
 
-      renderCards(filtered);
-    });
+      visibleCount = batchSize;
+      renderCards();
+    }
 
-    renderCards(effects);
+    function loadMoreOnScroll() {
+      if (isLoadingMore) return;
+      if (visibleCount >= filteredEffects.length) return;
+
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 450;
+
+      if (nearBottom) {
+        isLoadingMore = true;
+
+        setTimeout(() => {
+          visibleCount += batchSize;
+          renderCards();
+          isLoadingMore = false;
+        }, 180);
+      }
+    }
+
+    searchInput.addEventListener("input", applySearch);
+    window.addEventListener("scroll", loadMoreOnScroll);
+
+    renderCards();
   </script>
 </body>
 </html>
