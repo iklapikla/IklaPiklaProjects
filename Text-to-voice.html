@@ -101,19 +101,20 @@ body { color: var(--text); }
 .text-wrap {
   position: absolute;
   left: 50%;
-  top: 138px;
+  top: 56%;
   transform: translateX(-50%);
-  width: min(1050px, calc(100vw - 110px));
-  height: calc(100vh - 330px);
+  width: min(820px, calc(100vw - 110px));
+  height: 150px;
   z-index: 4;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.28s ease, transform 0.28s ease;
+  opacity: 1;
+  pointer-events: auto;
+  transition: top 0.28s ease, width 0.28s ease, height 0.28s ease, transform 0.28s ease;
 }
 
 .app.has-text .text-wrap {
-  opacity: 1;
-  pointer-events: auto;
+  top: 138px;
+  width: min(1050px, calc(100vw - 110px));
+  height: calc(100vh - 330px);
   transform: translateX(-50%) translateY(0);
 }
 
@@ -122,9 +123,9 @@ body { color: var(--text); }
   height: 100%;
   overflow-y: auto;
   outline: none;
-  border: none;
+  border: 1px solid rgba(255,255,255,0.16);
   resize: none;
-  background: transparent;
+  background: rgba(255,255,255,0.08);
   color: #ffffff;
   font-size: clamp(22px, 2.1vw, 38px);
   line-height: 1.35;
@@ -135,9 +136,20 @@ body { color: var(--text); }
   white-space: pre-wrap;
   word-break: break-word;
   text-shadow: 0 10px 28px rgba(0,0,0,0.32);
-  padding: 4px 10px 90px;
+  padding: 28px 34px;
+  border-radius: 28px;
+  box-shadow: 0 28px 90px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.16);
+  backdrop-filter: blur(24px) saturate(1.25);
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+.app.has-text #textInput {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 4px 10px 90px;
 }
 
 #textInput::-webkit-scrollbar { display: none; }
@@ -259,6 +271,44 @@ body { color: var(--text); }
   transition: 0.25s ease;
 }
 
+.auto-chip {
+  cursor: pointer;
+  min-width: 164px;
+  justify-content: space-between;
+}
+
+.toggle-switch {
+  width: 42px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.18);
+  position: relative;
+  flex: 0 0 auto;
+  transition: background 0.22s ease, box-shadow 0.22s ease;
+}
+
+.toggle-switch::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 2px;
+  left: 2px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.24);
+  transition: transform 0.22s ease;
+}
+
+.auto-chip.active .toggle-switch {
+  background: var(--green);
+  box-shadow: 0 0 0 7px rgba(52,199,89,0.12);
+}
+
+.auto-chip.active .toggle-switch::after {
+  transform: translateX(18px);
+}
+
 .auto-chip.active .status-dot {
   background: var(--green);
   box-shadow: 0 0 0 7px rgba(52,199,89,0.14);
@@ -301,6 +351,14 @@ body { color: var(--text); }
   box-shadow:
     0 15px 38px rgba(59,130,246,0.48),
     inset 0 1px 0 rgba(255,255,255,0.32);
+}
+
+.main-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  filter: grayscale(0.25);
+  transform: none !important;
+  box-shadow: none;
 }
 
 .main-btn.speaking {
@@ -454,8 +512,13 @@ svg { width: 16px; height: 16px; display: block; }
 
 @media (max-width: 960px) {
   .text-wrap {
-    top: 96px;
+    top: 54%;
     width: calc(100vw - 56px);
+    height: 145px;
+  }
+
+  .app.has-text .text-wrap {
+    top: 96px;
     height: calc(100vh - 330px);
   }
 
@@ -484,7 +547,8 @@ svg { width: 16px; height: 16px; display: block; }
   .chip-text { display: none; }
   .chip { padding: 0 9px; }
   .control-dock { bottom: 86px; }
-  .text-wrap { top: 76px; height: calc(100vh - 315px); }
+  .text-wrap { top: 54%; height: 142px; width: calc(100vw - 32px); }
+  .app.has-text .text-wrap { top: 76px; height: calc(100vh - 315px); }
   .main-btn { width: 100%; }
 }
 </style>
@@ -551,25 +615,12 @@ svg { width: 16px; height: 16px; display: block; }
     </div>
 
     <div class="chip auto-chip active" id="autoChip" title="Auto Speak On/Off">
-      <div class="chip-icon">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          <path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
       <div class="chip-text"><strong id="autoLabel">Auto Speak On</strong></div>
-      <span class="status-dot"></span>
+      <span class="toggle-switch" aria-hidden="true"></span>
     </div>
 
-    <button class="main-btn" id="speakBtn">Speak</button>
+    <button class="main-btn" id="speakBtn" disabled>Speak</button>
     <button class="main-btn" id="stopBtn">Stop</button>
-
-    <button class="icon-btn" id="copyBtn" title="Copy Text">
-      <svg viewBox="0 0 24 24" fill="none">
-        <rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
-        <path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      </svg>
-    </button>
 
     <button class="icon-btn" id="clearBtn" title="Clear Text">
       <svg viewBox="0 0 24 24" fill="none">
@@ -588,7 +639,6 @@ const app = document.getElementById("app");
 const textInput = document.getElementById("textInput");
 const speakBtn = document.getElementById("speakBtn");
 const stopBtn = document.getElementById("stopBtn");
-const copyBtn = document.getElementById("copyBtn");
 const clearBtn = document.getElementById("clearBtn");
 const toast = document.getElementById("toast");
 const speakingGlow = document.getElementById("speakingGlow");
@@ -700,12 +750,20 @@ document.addEventListener("click", (event) => {
   }
 });
 
-autoChip.addEventListener("click", () => {
-  autoSpeak = !autoSpeak;
+function updateAutoMode(showMessage = true) {
   autoChip.classList.toggle("active", autoSpeak);
   autoLabel.textContent = autoSpeak ? "Auto Speak On" : "Auto Speak Off";
+  speakBtn.disabled = autoSpeak || !("speechSynthesis" in window);
   lastAutoText = textInput.value.trim();
-  showToast(autoSpeak ? "Auto Speak enabled" : "Auto Speak disabled");
+
+  if (showMessage) {
+    showToast(autoSpeak ? "Auto Speak enabled" : "Manual Speak enabled");
+  }
+}
+
+autoChip.addEventListener("click", () => {
+  autoSpeak = !autoSpeak;
+  updateAutoMode(true);
 });
 
 speakBtn.addEventListener("click", () => {
@@ -721,15 +779,6 @@ speakBtn.addEventListener("click", () => {
 });
 
 stopBtn.addEventListener("click", () => stopSpeaking(true));
-
-copyBtn.addEventListener("click", async () => {
-  try {
-    await navigator.clipboard.writeText(textInput.value);
-    showToast("Copied");
-  } catch {
-    showToast("Copy failed");
-  }
-});
 
 clearBtn.addEventListener("click", () => {
   stopSpeaking(false);
@@ -802,6 +851,7 @@ function showToast(message) {
   }, 1800);
 }
 
+updateAutoMode(false);
 updateTextState();
 setTimeout(() => textInput.focus(), 350);
 </script>
