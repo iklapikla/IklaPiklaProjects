@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Text to Voice</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+:root {
+  --text: #ffffff;
+  --muted: rgba(255,255,255,0.48);
+  --dock: rgba(244, 244, 246, 0.94);
+  --dock-border: rgba(255,255,255,0.75);
+  --chip: rgba(255,255,255,0.92);
+  --chip-hover: #ffffff;
+  --chip-border: rgba(0,0,0,0.08);
+  --black-text: #1d1d1f;
+  --grey-text: #7a7a80;
+  --blue: #3b82f6;
+  --blue-dark: #2563eb;
+  --green: #34c759;
+  --red: #ff453a;
+  --orange: #ff9f0a;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+body { color: var(--text); }
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255,255,255,0.09), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.035), transparent 32%),
+    #000;
+  overflow: hidden;
+}
+
+.idle-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+  padding: 40px;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255,255,255,0.09), transparent 22%),
+    radial-gradient(circle at 50% 100%, rgba(255,255,255,0.035), transparent 32%),
+    transparent;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.idle-content {
+  transform: translateY(-60px);
+  animation: fadeUp 0.7s ease both;
+}
+
+.idle-content h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(46px, 5vw, 76px);
+  font-weight: 820;
+  letter-spacing: -3px;
+  line-height: 0.96;
+  text-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  user-select: none;
+}
+
+.idle-content p {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: clamp(15px, 1.5vw, 20px);
+  line-height: 1.45;
+  font-weight: 520;
+  user-select: none;
+}
+
+.app.has-text .idle-overlay {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+}
+
+.text-wrap {
+  position: absolute;
+  left: 50%;
+  top: 138px;
+  transform: translateX(-50%);
+  width: min(1050px, calc(100vw - 110px));
+  height: calc(100vh - 330px);
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+.app.has-text .text-wrap {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+#textInput {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  outline: none;
+  border: none;
+  resize: none;
+  background: transparent;
+  color: #ffffff;
+  font-size: clamp(22px, 2.1vw, 38px);
+  line-height: 1.35;
+  font-weight: 660;
+  letter-spacing: -0.55px;
+  text-align: center;
+  caret-color: #ffffff;
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-shadow: 0 10px 28px rgba(0,0,0,0.32);
+  padding: 4px 10px 90px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#textInput::-webkit-scrollbar { display: none; }
+#textInput:focus { outline: none; }
+#textInput::placeholder { color: rgba(255,255,255,0.35); }
+
+.speaking-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(59,130,246,0.16), transparent 21%),
+    transparent;
+  transition: 0.35s ease;
+}
+
+.speaking-glow.active {
+  opacity: 1;
+  animation: glowPulse 1.4s infinite;
+}
+
+@keyframes glowPulse {
+  0% { opacity: 0.35; }
+  50% { opacity: 1; }
+  100% { opacity: 0.35; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(-32px) scale(0.98); }
+  to { opacity: 1; transform: translateY(-60px) scale(1); }
+}
+
+.control-dock {
+  position: absolute;
+  left: 50%;
+  bottom: 104px;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: min(860px, calc(100vw - 42px));
+  min-height: 70px;
+  padding: 8px;
+  border-radius: 24px;
+  background: var(--dock);
+  border: 1px solid var(--dock-border);
+  box-shadow:
+    0 24px 70px rgba(0,0,0,0.38),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+  backdrop-filter: blur(28px) saturate(1.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  animation: dockIn 0.65s cubic-bezier(.2,.9,.2,1) both;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.control-dock:hover {
+  transform: translateX(-50%) scale(1.012);
+  box-shadow:
+    0 30px 84px rgba(0,0,0,0.46),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+}
+
+@keyframes dockIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+.chip {
+  height: 50px;
+  border-radius: 16px;
+  background: var(--chip);
+  border: 1px solid var(--chip-border);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 11px;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, filter 0.18s ease;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.chip:hover {
+  transform: scale(1.045);
+  background: var(--chip-hover);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.13);
+}
+
+.chip-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  color: #68686f;
+  flex: 0 0 auto;
+}
+
+.chip-text { line-height: 1; min-width: 0; }
+
+.chip-text strong {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 850;
+  color: var(--black-text);
+  white-space: nowrap;
+  letter-spacing: -0.15px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #b8b8bd;
+  flex: 0 0 auto;
+  transition: 0.25s ease;
+}
+
+.auto-chip.active .status-dot {
+  background: var(--green);
+  box-shadow: 0 0 0 7px rgba(52,199,89,0.14);
+  animation: smallPulseGreen 1.2s infinite;
+}
+
+.voice-chip.active .status-dot {
+  background: var(--blue);
+  box-shadow: 0 0 0 7px rgba(59,130,246,0.14);
+}
+
+@keyframes smallPulseGreen {
+  0% { box-shadow: 0 0 0 0 rgba(52,199,89,0.22); }
+  70% { box-shadow: 0 0 0 8px rgba(52,199,89,0); }
+  100% { box-shadow: 0 0 0 0 rgba(52,199,89,0); }
+}
+
+.main-btn {
+  height: 54px;
+  min-width: 144px;
+  border: none;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #4d8ef7 0%, #3478f6 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 850;
+  padding: 0 22px;
+  cursor: pointer;
+  box-shadow:
+    0 12px 30px rgba(59,130,246,0.34),
+    inset 0 1px 0 rgba(255,255,255,0.32);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.main-btn:hover {
+  transform: scale(1.045);
+  background: linear-gradient(180deg, #5a97f7 0%, var(--blue-dark) 100%);
+  box-shadow:
+    0 15px 38px rgba(59,130,246,0.48),
+    inset 0 1px 0 rgba(255,255,255,0.32);
+}
+
+.main-btn.speaking {
+  background: linear-gradient(180deg, #ffb340 0%, var(--orange) 100%);
+  box-shadow:
+    0 12px 30px rgba(255,159,10,0.36),
+    inset 0 1px 0 rgba(255,255,255,0.28);
+  animation: speakPulse 1.3s infinite;
+}
+
+@keyframes speakPulse {
+  0% { box-shadow: 0 12px 30px rgba(255,159,10,0.36), 0 0 0 0 rgba(255,159,10,0.25); }
+  70% { box-shadow: 0 12px 30px rgba(255,159,10,0.36), 0 0 0 12px rgba(255,159,10,0); }
+  100% { box-shadow: 0 12px 30px rgba(255,159,10,0.36), 0 0 0 0 rgba(255,159,10,0); }
+}
+
+.icon-btn {
+  width: 52px;
+  height: 50px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+  color: #1d1d1f;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+  flex-shrink: 0;
+}
+
+.icon-btn:hover {
+  transform: scale(1.07);
+  background: linear-gradient(180deg, #ffffff 0%, #eeeeef 100%);
+  color: #000;
+  box-shadow:
+    0 14px 32px rgba(0,0,0,0.16),
+    inset 0 1px 0 rgba(255,255,255,1);
+}
+
+.voice-popover {
+  position: absolute;
+  left: 50%;
+  bottom: 190px;
+  transform: translateX(-50%) translateY(12px) scale(0.96);
+  width: min(460px, calc(100vw - 48px));
+  border-radius: 24px;
+  background: rgba(244,244,246,0.96);
+  border: 1px solid rgba(255,255,255,0.78);
+  box-shadow:
+    0 26px 76px rgba(0,0,0,0.42),
+    inset 0 1px 0 rgba(255,255,255,0.95);
+  backdrop-filter: blur(28px) saturate(1.45);
+  z-index: 14;
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.24s ease;
+}
+
+.voice-popover.show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.popover-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--black-text);
+  font-size: 13px;
+  font-weight: 850;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+.voice-select {
+  width: 100%;
+  height: 48px;
+  border: 1px solid rgba(0,0,0,0.10);
+  outline: none;
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--black-text);
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95);
+}
+
+.voice-select:focus {
+  border-color: rgba(59,130,246,0.55);
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.12);
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: 58px 1fr 34px;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--black-text);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 0 4px;
+}
+
+.range-row input { width: 100%; accent-color: #3478f6; }
+
+.popover-hint {
+  margin-top: 10px;
+  color: var(--grey-text);
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 650;
+  padding: 0 4px;
+}
+
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 190px;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 12;
+  background: rgba(30,30,32,0.84);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 720;
+  padding: 10px 14px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+  max-width: calc(100vw - 40px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  backdrop-filter: blur(18px);
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+svg { width: 16px; height: 16px; display: block; }
+
+@media (max-width: 960px) {
+  .text-wrap {
+    top: 96px;
+    width: calc(100vw - 56px);
+    height: calc(100vh - 330px);
+  }
+
+  #textInput { font-size: 24px; line-height: 1.45; }
+
+  .control-dock {
+    width: min(560px, calc(100vw - 28px));
+    flex-wrap: wrap;
+    border-radius: 24px;
+    padding: 10px;
+    bottom: 92px;
+  }
+
+  .main-btn {
+    order: 3;
+    width: calc(50% - 4px);
+  }
+
+  .toast,
+  .voice-popover { bottom: 235px; }
+}
+
+@media (max-width: 560px) {
+  .idle-content h1 { font-size: 38px; letter-spacing: -1.8px; }
+  .idle-content p { font-size: 14px; }
+  .chip-text { display: none; }
+  .chip { padding: 0 9px; }
+  .control-dock { bottom: 86px; }
+  .text-wrap { top: 76px; height: calc(100vh - 315px); }
+  .main-btn { width: 100%; }
+}
+</style>
+</head>
+
+<body>
+<div class="app" id="app">
+  <div class="speaking-glow" id="speakingGlow"></div>
+
+  <div class="idle-overlay" id="idleOverlay">
+    <div class="idle-content">
+      <h1>Text to Voice</h1>
+      <p>Type anything — Auto Speak can read it live, or press Speak manually.</p>
+    </div>
+  </div>
+
+  <main class="text-wrap">
+    <textarea id="textInput" spellcheck="false" placeholder="Type here..."></textarea>
+  </main>
+
+  <div class="voice-popover" id="voicePopover">
+    <div class="popover-title">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 10v4a2 2 0 0 0 2 2h3l5 4V4L9 8H6a2 2 0 0 0-2 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M20.5 6.5a8 8 0 0 1 0 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Select voice
+    </div>
+
+    <select class="voice-select" id="voiceSelect">
+      <option value="">Loading voices...</option>
+    </select>
+
+    <div class="range-row">
+      <span>Speed</span>
+      <input id="rateRange" type="range" min="0.5" max="1.8" step="0.1" value="1" />
+      <span id="rateValue">1x</span>
+    </div>
+
+    <div class="range-row">
+      <span>Pitch</span>
+      <input id="pitchRange" type="range" min="0.5" max="1.8" step="0.1" value="1" />
+      <span id="pitchValue">1</span>
+    </div>
+
+    <div class="popover-hint">
+      Hindi voice available hogi ya nahi, ye Chrome/system voices par depend karta hai.
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Ready</div>
+
+  <section class="control-dock">
+    <div class="chip voice-chip" id="voiceChip" title="Select voice">
+      <div class="chip-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 10v4a2 2 0 0 0 2 2h3l5 4V4L9 8H6a2 2 0 0 0-2 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="chip-text"><strong>Voice</strong></div>
+      <span class="status-dot"></span>
+    </div>
+
+    <div class="chip auto-chip active" id="autoChip" title="Auto Speak On/Off">
+      <div class="chip-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="chip-text"><strong id="autoLabel">Auto Speak On</strong></div>
+      <span class="status-dot"></span>
+    </div>
+
+    <button class="main-btn" id="speakBtn">Speak</button>
+    <button class="main-btn" id="stopBtn">Stop</button>
+
+    <button class="icon-btn" id="copyBtn" title="Copy Text">
+      <svg viewBox="0 0 24 24" fill="none">
+        <rect x="8" y="8" width="11" height="11" rx="2" stroke="currentColor" stroke-width="2"/>
+        <path d="M5 15H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <button class="icon-btn" id="clearBtn" title="Clear Text">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M14 11v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M6 7l1 14h10l1-14" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 7V4h6v3" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </section>
+</div>
+
+<script>
+const app = document.getElementById("app");
+const textInput = document.getElementById("textInput");
+const speakBtn = document.getElementById("speakBtn");
+const stopBtn = document.getElementById("stopBtn");
+const copyBtn = document.getElementById("copyBtn");
+const clearBtn = document.getElementById("clearBtn");
+const toast = document.getElementById("toast");
+const speakingGlow = document.getElementById("speakingGlow");
+const voiceChip = document.getElementById("voiceChip");
+const autoChip = document.getElementById("autoChip");
+const autoLabel = document.getElementById("autoLabel");
+const voicePopover = document.getElementById("voicePopover");
+const voiceSelect = document.getElementById("voiceSelect");
+const rateRange = document.getElementById("rateRange");
+const pitchRange = document.getElementById("pitchRange");
+const rateValue = document.getElementById("rateValue");
+const pitchValue = document.getElementById("pitchValue");
+
+let voices = [];
+let autoSpeak = true;
+let typingTimer = null;
+let lastAutoText = "";
+let toastTimer = null;
+
+if (!("speechSynthesis" in window)) {
+  speakBtn.disabled = true;
+  stopBtn.disabled = true;
+  showToast("Text to speech not supported");
+}
+
+function loadVoices() {
+  voices = window.speechSynthesis.getVoices();
+  voiceSelect.innerHTML = "";
+
+  if (!voices.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "Default voice";
+    voiceSelect.appendChild(option);
+    return;
+  }
+
+  const sortedVoices = [...voices].sort((a, b) => {
+    const aScore = /hi-IN|en-IN/i.test(a.lang) ? 0 : 1;
+    const bScore = /hi-IN|en-IN/i.test(b.lang) ? 0 : 1;
+    return aScore - bScore || a.name.localeCompare(b.name);
+  });
+
+  voices = sortedVoices;
+
+  voices.forEach((voice, index) => {
+    const option = document.createElement("option");
+    option.value = index;
+    option.textContent = `${voice.name} (${voice.lang})`;
+    voiceSelect.appendChild(option);
+  });
+
+  const preferredIndex = voices.findIndex(v => /hi-IN|en-IN/i.test(v.lang));
+  if (preferredIndex >= 0) voiceSelect.value = preferredIndex;
+  voiceChip.classList.add("active");
+}
+
+window.speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+setTimeout(loadVoices, 500);
+
+function updateTextState() {
+  const hasText = textInput.value.trim().length > 0;
+  app.classList.toggle("has-text", hasText);
+}
+
+function getNewTypedText(currentText) {
+  if (!lastAutoText) return currentText;
+  if (currentText.startsWith(lastAutoText)) {
+    return currentText.slice(lastAutoText.length).trim();
+  }
+  return currentText.trim();
+}
+
+textInput.addEventListener("input", () => {
+  updateTextState();
+
+  if (!autoSpeak) return;
+
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    const currentText = textInput.value.trim();
+
+    if (!currentText) {
+      lastAutoText = "";
+      stopSpeaking(false);
+      return;
+    }
+
+    const newText = getNewTypedText(currentText);
+
+    if (newText) {
+      speakText(newText, true);
+      lastAutoText = currentText;
+    }
+  }, 450);
+});
+
+textInput.addEventListener("focus", updateTextState);
+
+voiceChip.addEventListener("click", (event) => {
+  event.stopPropagation();
+  voicePopover.classList.toggle("show");
+});
+
+document.addEventListener("click", (event) => {
+  if (!voicePopover.contains(event.target) && !voiceChip.contains(event.target)) {
+    voicePopover.classList.remove("show");
+  }
+});
+
+autoChip.addEventListener("click", () => {
+  autoSpeak = !autoSpeak;
+  autoChip.classList.toggle("active", autoSpeak);
+  autoLabel.textContent = autoSpeak ? "Auto Speak On" : "Auto Speak Off";
+  lastAutoText = textInput.value.trim();
+  showToast(autoSpeak ? "Auto Speak enabled" : "Auto Speak disabled");
+});
+
+speakBtn.addEventListener("click", () => {
+  const text = textInput.value.trim();
+  if (!text) {
+    showToast("Type something first");
+    textInput.focus();
+    return;
+  }
+
+  speakText(text, false);
+  lastAutoText = text;
+});
+
+stopBtn.addEventListener("click", () => stopSpeaking(true));
+
+copyBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(textInput.value);
+    showToast("Copied");
+  } catch {
+    showToast("Copy failed");
+  }
+});
+
+clearBtn.addEventListener("click", () => {
+  stopSpeaking(false);
+  textInput.value = "";
+  lastAutoText = "";
+  updateTextState();
+  textInput.focus();
+  showToast("Cleared");
+});
+
+rateRange.addEventListener("input", () => {
+  rateValue.textContent = rateRange.value + "x";
+});
+
+pitchRange.addEventListener("input", () => {
+  pitchValue.textContent = pitchRange.value;
+});
+
+function speakText(text, isAuto) {
+  if (!("speechSynthesis" in window)) return;
+
+  stopSpeaking(false);
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  const selectedVoice = voices[voiceSelect.value];
+
+  if (selectedVoice) utterance.voice = selectedVoice;
+
+  utterance.rate = Number(rateRange.value) || 1;
+  utterance.pitch = Number(pitchRange.value) || 1;
+  utterance.volume = 1;
+
+  utterance.onstart = () => {
+    speakBtn.classList.add("speaking");
+    speakingGlow.classList.add("active");
+    showToast(isAuto ? "Auto speaking..." : "Speaking...");
+  };
+
+  utterance.onend = () => {
+    speakBtn.classList.remove("speaking");
+    speakingGlow.classList.remove("active");
+  };
+
+  utterance.onerror = () => {
+    speakBtn.classList.remove("speaking");
+    speakingGlow.classList.remove("active");
+    showToast("Voice error");
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking(showMessage) {
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  speakBtn.classList.remove("speaking");
+  speakingGlow.classList.remove("active");
+  if (showMessage) showToast("Stopped");
+}
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  if (toastTimer) clearTimeout(toastTimer);
+
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 1800);
+}
+
+updateTextState();
+setTimeout(() => textInput.focus(), 350);
+</script>
+</body>
+</html>
