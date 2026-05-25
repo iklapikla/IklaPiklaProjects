@@ -851,7 +851,15 @@
     }
 
     function getBestRecorderOptions() {
+      /*
+        Chrome/Chromium usually records WebM from MediaRecorder.
+        Some newer Chromium builds may support MP4/H.264. So we try MP4 first,
+        then safely fall back to WebM if MP4 is not supported on that browser.
+      */
       const preferredTypes = [
+        "video/mp4;codecs=h264,aac",
+        "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
+        "video/mp4",
         "video/webm;codecs=vp9,opus",
         "video/webm;codecs=vp8,opus",
         "video/webm"
@@ -878,6 +886,17 @@
       return options;
     }
 
+    function getRecordingFileExtension() {
+      if (!lastBlob || !lastBlob.type) return "webm";
+
+      const type = lastBlob.type.toLowerCase();
+
+      if (type.includes("mp4")) return "mp4";
+      if (type.includes("webm")) return "webm";
+
+      return "webm";
+    }
+
     function stopRecording() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
         showToast("Saving recording...");
@@ -901,7 +920,7 @@
         String(now.getHours()).padStart(2, "0") + "-" +
         String(now.getMinutes()).padStart(2, "0") + "-" +
         String(now.getSeconds()).padStart(2, "0") +
-        ".webm";
+        "." + getRecordingFileExtension();
 
       const link = document.createElement("a");
       link.href = finalBlobUrl;
