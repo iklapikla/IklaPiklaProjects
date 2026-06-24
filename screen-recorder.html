@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Screen Recorder Pro</title>
+  <title>Screen Recorder Pro (MP4)</title>
 
   <style>
     * {
@@ -25,7 +25,6 @@
       --blue-dark: #2563eb;
       --green: #34c759;
       --red: #ff453a;
-      --download: #1d1d1f;
     }
 
     html, body {
@@ -107,7 +106,7 @@
       margin: 20px 0 0;
       color: var(--muted);
       font-size: clamp(15px, 1.5vw, 20px);
-      line-weight: 1.45;
+      line-height: 1.45;
       font-weight: 520;
     }
 
@@ -356,7 +355,6 @@
     let screenStream = null;
     let micStream = null;
     
-    // Live Toggle control variables
     let desktopTrack = null;
     let micTrack = null;
 
@@ -380,7 +378,6 @@
     const timerText = document.getElementById("timerText");
     const toast = document.getElementById("toast");
 
-    // Dynamic Live Audio Controlling Logic
     desktopAudioToggle.addEventListener("change", () => {
       if (desktopTrack) {
         desktopTrack.enabled = desktopAudioToggle.checked;
@@ -417,19 +414,16 @@
         cleanupBeforeStart();
         const resConfig = getResolutionSettings(resolutionSelect.value);
 
-        // 1. Mic configuration
         try {
           micStream = await navigator.mediaDevices.getUserMedia({
             audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 48000 }
           });
           micTrack = micStream.getAudioTracks()[0];
-          // Initial direct sync with current toggle state
           if(micTrack) micTrack.enabled = micToggle.checked;
         } catch (e) {
-          console.warn("No mic or permission denied.", e);
+          console.warn("No mic found or permission denied.", e);
         }
 
-        // 2. Display screen capture setup
         screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             width: { ideal: resConfig.width },
@@ -453,7 +447,6 @@
           audioTracksToMix.push(micTrack);
         }
 
-        // Audio track mapping context
         if (audioTracksToMix.length > 0) {
           const mixedAudioTrack = await createMixedAudioTrack(audioTracksToMix);
           if (mixedAudioTrack) finalTracks.push(mixedAudioTrack);
@@ -470,7 +463,15 @@
           audioBitsPerSecond: 320000
         };
 
-        const preferredTypes = ["video/mp4;codecs=h264,aac", "video/webm;codecs=vp9,opus", "video/webm"];
+        // MP4 Type prioritization force kiya gaya hai line order me
+        const preferredTypes = [
+          "video/mp4;codecs=h264,aac", 
+          "video/mp4;codecs=avc1,mp4a",
+          "video/mp4",
+          "video/webm;codecs=vp9,opus", 
+          "video/webm"
+        ];
+        
         for (const type of preferredTypes) {
           if (MediaRecorder.isTypeSupported(type)) {
             options.mimeType = type;
@@ -484,8 +485,8 @@
         };
 
         mediaRecorder.onstop = () => {
-          const mimeType = mediaRecorder.mimeType || "video/webm";
-          lastBlob = new Blob(recordedChunks, { type: mimeType });
+          // Force file container to read as video/mp4 format safely
+          lastBlob = new Blob(recordedChunks, { type: "video/mp4" });
           if (finalBlobUrl) URL.revokeObjectURL(finalBlobUrl);
           finalBlobUrl = URL.createObjectURL(lastBlob);
 
@@ -531,7 +532,7 @@
 
         return audioDestination.stream.getAudioTracks()[0];
       } catch (e) {
-        console.error("Audio mixing crash fallback:", e);
+        console.error("Audio mixing error:", e);
         return audioTracks[0];
       }
     }
@@ -546,8 +547,8 @@
     function downloadRecording(isAuto) {
       if (!finalBlobUrl) return;
       const now = new Date();
-      const ext = (lastBlob && lastBlob.type.includes("mp4")) ? "mp4" : "webm";
-      const fileName = `recording-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}-${String(now.getHours()).padStart(2,"0")}${String(now.getMinutes()).padStart(2,"0")}.${ext}`;
+      // Directly locked to .mp4 wrapper
+      const fileName = `recording-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}-${String(now.getHours()).padStart(2,"0")}${String(now.getMinutes()).padStart(2,"0")}.mp4`;
 
       const link = document.createElement("a");
       link.href = finalBlobUrl;
