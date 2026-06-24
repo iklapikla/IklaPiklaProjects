@@ -25,6 +25,7 @@
       --blue-dark: #2563eb;
       --green: #34c759;
       --red: #ff453a;
+      --purple: #a855f7;
     }
 
     html, body {
@@ -120,6 +121,27 @@
       animation: livePulse 1.25s infinite;
     }
 
+    /* Floating Subtitle/Transcription Box */
+    .transcript-box {
+      position: absolute;
+      bottom: 200px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 20px;
+      max-width: 85%;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      backdrop-filter: blur(16px);
+      z-index: 5;
+      display: none;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.5);
+    }
+
     @keyframes livePulse {
       0% { box-shadow: 0 0 0 0 rgba(255,69,58,0.32); }
       70% { box-shadow: 0 0 0 18px rgba(255,69,58,0); }
@@ -134,11 +156,11 @@
     .control-dock {
       position: absolute;
       left: 50%;
-      bottom: 104px;
+      bottom: 50px;
       transform: translateX(-50%);
       z-index: 10;
       width: auto;
-      max-width: min(900px, calc(100vw - 42px));
+      max-width: min(1050px, calc(100vw - 42px));
       min-height: 70px;
       padding: 8px;
       border-radius: 24px;
@@ -222,6 +244,8 @@
     input:checked + .slider { background: linear-gradient(180deg, #63dd74, var(--green)); }
     input:checked + .slider::before { transform: translateX(14px); }
 
+    .transcribe-active input:checked + .slider { background: linear-gradient(180deg, #c084fc, var(--purple)); }
+
     .record-btn {
       height: 54px;
       min-width: 150px;
@@ -257,7 +281,7 @@
     .download-btn:disabled { opacity: 0.38; cursor: not-allowed; }
 
     .toast {
-      position: absolute; left: 50%; bottom: 190px; transform: translateX(-50%) translateY(12px);
+      position: absolute; left: 50%; bottom: 140px; transform: translateX(-50%) translateY(12px);
       z-index: 12; background: rgba(30,30,32,0.84); color: #fff; font-size: 13px; font-weight: 720;
       padding: 10px 14px; border-radius: 999px; opacity: 0; transition: 0.25s ease; backdrop-filter: blur(18px);
     }
@@ -265,9 +289,10 @@
 
     svg { width: 18px; height: 18px; display: block; }
 
-    @media (max-width: 860px) {
-      .control-dock { width: min(520px, calc(100vw - 28px)); flex-wrap: wrap; bottom: 50px; }
+    @media (max-width: 960px) {
+      .control-dock { width: min(520px, calc(100vw - 28px)); flex-wrap: wrap; bottom: 30px; }
       .record-btn { order: 5; width: 100%; }
+      .transcript-box { bottom: 280px; }
     }
   </style>
 </head>
@@ -275,6 +300,8 @@
 <body>
   <div class="app">
     <video id="preview" autoplay muted playsinline></video>
+
+    <div class="transcript-box" id="transcriptBox">Analyzing mixed audio...</div>
 
     <div class="idle-overlay" id="idleOverlay">
       <div class="idle-content">
@@ -337,6 +364,19 @@
         </label>
       </div>
 
+      <div class="chip" id="transcribeChip">
+        <div class="chip-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div class="chip-text"><strong>Live Transcribe</strong></div>
+        <label class="switch transcribe-active">
+          <input type="checkbox" id="transcribeToggle" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
       <button class="record-btn" id="recordBtn">Start Recording</button>
       <div class="chip timer-chip" id="timerText">00:00:00</div>
 
@@ -364,8 +404,11 @@
     let lastBlob = null;
     let timerInterval = null;
     let recordingStartTime = 0;
-    let lastRecordedSeconds = 0;
     let isRecording = false;
+
+    // Speech Recognition Variables
+    let recognition = null;
+    let transcribedText = ""; 
 
     const preview = document.getElementById("preview");
     const idleOverlay = document.getElementById("idleOverlay");
@@ -374,9 +417,42 @@
     const downloadBtn = document.getElementById("downloadBtn");
     const desktopAudioToggle = document.getElementById("desktopAudioToggle");
     const micToggle = document.getElementById("micToggle");
+    const transcribeToggle = document.getElementById("transcribeToggle");
     const resolutionSelect = document.getElementById("resolutionSelect");
     const timerText = document.getElementById("timerText");
     const toast = document.getElementById("toast");
+    const transcriptBox = document.getElementById("transcriptBox");
+
+    // Initialize Webkit/Chrome Native Engine
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'hi-IN'; // English aur Hindi donon mix perfectly detect karega
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            transcribedText += event.results[i][0].transcript + ' ';
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+        transcriptBox.textContent = interimTranscript || "Listening to audio channels...";
+      };
+
+      recognition.onerror = (e) => {
+        console.warn("Recognition error handled:", e);
+        if (e.error === 'no-speech' && isRecording) {
+          try { recognition.start(); } catch(err) {}
+        }
+      };
+    } else {
+      document.getElementById("transcribeChip").style.opacity = "0.4";
+      transcribeToggle.disabled = true;
+    }
 
     desktopAudioToggle.addEventListener("change", () => {
       if (desktopTrack) {
@@ -414,16 +490,18 @@
         cleanupBeforeStart();
         const resConfig = getResolutionSettings(resolutionSelect.value);
 
+        // 1. Capture Mic Track
         try {
           micStream = await navigator.mediaDevices.getUserMedia({
-            audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 48000 }
+            audio: { echoCancellation: false, noiseSuppression: true, sampleRate: 48000 }
           });
           micTrack = micStream.getAudioTracks()[0];
           if(micTrack) micTrack.enabled = micToggle.checked;
         } catch (e) {
-          console.warn("No mic found or permission denied.", e);
+          console.warn("Mic target failed.", e);
         }
 
+        // 2. Capture Display Stream
         screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             width: { ideal: resConfig.width },
@@ -447,9 +525,31 @@
           audioTracksToMix.push(micTrack);
         }
 
+        // 3. Audio Context Loopback Routing
         if (audioTracksToMix.length > 0) {
-          const mixedAudioTrack = await createMixedAudioTrack(audioTracksToMix);
-          if (mixedAudioTrack) finalTracks.push(mixedAudioTrack);
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          await audioContext.resume();
+          audioDestination = audioContext.createMediaStreamDestination();
+
+          audioTracksToMix.forEach(track => {
+            const stream = new MediaStream([track]);
+            const source = audioContext.createMediaStreamSource(stream);
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = 1.0; 
+            source.connect(gainNode);
+            gainNode.connect(audioDestination);
+          });
+
+          const mixedAudioTrack = audioDestination.stream.getAudioTracks()[0];
+          if (mixedAudioTrack) {
+            finalTracks.push(mixedAudioTrack);
+
+            // Bypassing browser silence filter to keep transcribing engine alive
+            const monitorSource = audioContext.createMediaStreamSource(audioDestination.stream);
+            const monitorGain = audioContext.createGain();
+            monitorGain.gain.value = 0.01; 
+            monitorGain.connect(audioContext.destination);
+          }
         }
 
         combinedStream = new MediaStream(finalTracks);
@@ -458,18 +558,24 @@
         recordingOverlay.style.display = "flex";
         resolutionSelect.disabled = true;
 
+        // Fire Speech Engines
+        if (recognition && transcribeToggle.checked) {
+          transcribedText = "";
+          transcriptBox.textContent = "Listening to channels...";
+          transcriptBox.style.display = "block";
+          recognition.start();
+        }
+
         const options = {
           videoBitsPerSecond: resConfig.bitrate,
           audioBitsPerSecond: 320000
         };
 
-        // MP4 Type prioritization force kiya gaya hai line order me
         const preferredTypes = [
           "video/mp4;codecs=h264,aac", 
           "video/mp4;codecs=avc1,mp4a",
           "video/mp4",
-          "video/webm;codecs=vp9,opus", 
-          "video/webm"
+          "video/webm;codecs=vp9,opus"
         ];
         
         for (const type of preferredTypes) {
@@ -485,17 +591,23 @@
         };
 
         mediaRecorder.onstop = () => {
-          // Force file container to read as video/mp4 format safely
           lastBlob = new Blob(recordedChunks, { type: "video/mp4" });
           if (finalBlobUrl) URL.revokeObjectURL(finalBlobUrl);
           finalBlobUrl = URL.createObjectURL(lastBlob);
 
           idleOverlay.style.display = "flex";
           recordingOverlay.style.display = "none";
+          transcriptBox.style.display = "none";
           downloadBtn.disabled = false;
           resolutionSelect.disabled = false;
           setRecordingUI(false);
           startTimer(false);
+
+          // Saves matching session transcript file automatically
+          if (transcribedText.trim().length > 0) {
+            downloadTranscriptText(transcribedText);
+          }
+
           downloadRecording(true);
         };
 
@@ -515,31 +627,12 @@
       }
     }
 
-    async function createMixedAudioTrack(audioTracks) {
-      try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        await audioContext.resume();
-        audioDestination = audioContext.createMediaStreamDestination();
-
-        audioTracks.forEach(track => {
-          const stream = new MediaStream([track]);
-          const source = audioContext.createMediaStreamSource(stream);
-          const gainNode = audioContext.createGain();
-          gainNode.gain.value = 1.0;
-          source.connect(gainNode);
-          gainNode.connect(audioDestination);
-        });
-
-        return audioDestination.stream.getAudioTracks()[0];
-      } catch (e) {
-        console.error("Audio mixing error:", e);
-        return audioTracks[0];
-      }
-    }
-
     function stopRecording() {
       if (mediaRecorder && mediaRecorder.state !== "inactive") {
         mediaRecorder.stop();
+      }
+      if (recognition) {
+        try { recognition.stop(); } catch(e){}
       }
       cleanupAllStreams();
     }
@@ -547,7 +640,6 @@
     function downloadRecording(isAuto) {
       if (!finalBlobUrl) return;
       const now = new Date();
-      // Directly locked to .mp4 wrapper
       const fileName = `recording-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}-${String(now.getHours()).padStart(2,"0")}${String(now.getMinutes()).padStart(2,"0")}.mp4`;
 
       const link = document.createElement("a");
@@ -557,6 +649,21 @@
       link.click();
       document.body.removeChild(link);
       if(!isAuto) showToast("Download started");
+    }
+
+    function downloadTranscriptText(text) {
+      const blob = new Blob([text], { type: "text/plain" });
+      const url = URL.createObjectURL(blob);
+      const now = new Date();
+      const fileName = `transcript-${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}.txt`;
+      
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     }
 
     function setRecordingUI(rec) {
