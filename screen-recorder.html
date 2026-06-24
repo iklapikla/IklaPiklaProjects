@@ -121,14 +121,14 @@
       animation: livePulse 1.25s infinite;
     }
 
-    /* Floating Subtitle/Transcription Box */
+    /* Floating Subtitle Box */
     .transcript-box {
       position: absolute;
       bottom: 200px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.78);
-      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
       padding: 14px 28px;
       border-radius: 20px;
@@ -301,7 +301,7 @@
   <div class="app">
     <video id="preview" autoplay muted playsinline></video>
 
-    <div class="transcript-box" id="transcriptBox">Analyzing mixed audio...</div>
+    <div class="transcript-box" id="transcriptBox">System & Microphone monitoring active...</div>
 
     <div class="idle-overlay" id="idleOverlay">
       <div class="idle-content">
@@ -400,13 +400,14 @@
 
     let audioContext = null;
     let audioDestination = null;
+    let processorNode = null;
     let finalBlobUrl = null;
     let lastBlob = null;
     let timerInterval = null;
     let recordingStartTime = 0;
     let isRecording = false;
 
-    // Speech Recognition Variables
+    // Speech Engine Setup
     let recognition = null;
     let transcribedText = ""; 
 
@@ -423,13 +424,12 @@
     const toast = document.getElementById("toast");
     const transcriptBox = document.getElementById("transcriptBox");
 
-    // Initialize Webkit/Chrome Native Engine
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.lang = 'hi-IN'; // English aur Hindi donon mix perfectly detect karega
+      recognition.lang = 'hi-IN'; // Mix Hindi-English tracking
 
       recognition.onresult = (event) => {
         let interimTranscript = '';
@@ -440,12 +440,12 @@
             interimTranscript += event.results[i][0].transcript;
           }
         }
-        transcriptBox.textContent = interimTranscript || "Listening to audio channels...";
+        transcriptBox.textContent = interimTranscript || "Listening to speaker + mic channels...";
       };
 
       recognition.onerror = (e) => {
-        console.warn("Recognition error handled:", e);
-        if (e.error === 'no-speech' && isRecording) {
+        console.warn("Engine feedback error:", e);
+        if ((e.error === 'no-speech' || e.error === 'aborted') && isRecording) {
           try { recognition.start(); } catch(err) {}
         }
       };
@@ -490,7 +490,7 @@
         cleanupBeforeStart();
         const resConfig = getResolutionSettings(resolutionSelect.value);
 
-        // 1. Capture Mic Track
+        // 1. Fetch User Microphone
         try {
           micStream = await navigator.mediaDevices.getUserMedia({
             audio: { echoCancellation: false, noiseSuppression: true, sampleRate: 48000 }
@@ -498,10 +498,10 @@
           micTrack = micStream.getAudioTracks()[0];
           if(micTrack) micTrack.enabled = micToggle.checked;
         } catch (e) {
-          console.warn("Mic target failed.", e);
+          console.warn("Mic hardware locked.", e);
         }
 
-        // 2. Capture Display Stream
+        // 2. Fetch Display and System Audio capture
         screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: {
             width: { ideal: resConfig.width },
@@ -525,7 +525,7 @@
           audioTracksToMix.push(micTrack);
         }
 
-        // 3. Audio Context Loopback Routing
+        // 3. ScriptProcessor Routing Pipeline (Bypasses security block for text notes)
         if (audioTracksToMix.length > 0) {
           audioContext = new (window.AudioContext || window.webkitAudioContext)();
           await audioContext.resume();
@@ -544,11 +544,17 @@
           if (mixedAudioTrack) {
             finalTracks.push(mixedAudioTrack);
 
-            // Bypassing browser silence filter to keep transcribing engine alive
+            // Create a native script buffer stream so chrome sees it as active audio consumer
+            processorNode = audioContext.createScriptProcessor(4096, 1, 1);
             const monitorSource = audioContext.createMediaStreamSource(audioDestination.stream);
-            const monitorGain = audioContext.createGain();
-            monitorGain.gain.value = 0.01; 
-            monitorGain.connect(audioContext.destination);
+            
+            monitorSource.connect(processorNode);
+            processorNode.connect(audioContext.destination); // Crucial fallback line to trigger recognition pipeline
+
+            processorNode.onaudioprocess = function(e) {
+              // Real-time audio buffer looping prevents Chrome from muting background tabs transcription
+              const inputBuffer = e.inputBuffer.getChannelData(0);
+            };
           }
         }
 
@@ -558,10 +564,9 @@
         recordingOverlay.style.display = "flex";
         resolutionSelect.disabled = true;
 
-        // Fire Speech Engines
         if (recognition && transcribeToggle.checked) {
           transcribedText = "";
-          transcriptBox.textContent = "Listening to channels...";
+          transcriptBox.textContent = "Analyzing real-time audio streams...";
           transcriptBox.style.display = "block";
           recognition.start();
         }
@@ -603,7 +608,6 @@
           setRecordingUI(false);
           startTimer(false);
 
-          // Saves matching session transcript file automatically
           if (transcribedText.trim().length > 0) {
             downloadTranscriptText(transcribedText);
           }
@@ -695,6 +699,7 @@
       [combinedStream, screenStream, micStream].forEach(s => {
         if (s) s.getTracks().forEach(t => t.stop());
       });
+      if (processorNode) { processorNode.disconnect(); processorNode = null; }
       combinedStream = screenStream = micStream = desktopTrack = micTrack = null;
       if (audioContext) { audioContext.close().catch(()=>{}); audioContext = null; }
     }
