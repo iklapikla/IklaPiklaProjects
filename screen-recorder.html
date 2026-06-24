@@ -681,20 +681,10 @@
         const wantDesktopAudio = desktopAudioToggle.checked;
         const wantMic = micToggle.checked;
 
-        showToast("Choose window or screen");
-
-        screenStream = await navigator.mediaDevices.getDisplayMedia({
-          video: {
-            width: { ideal: 3840 },
-            height: { ideal: 2160 },
-            frameRate: { ideal: 60, max: 60 },
-            cursor: "always"
-          },
-          audio: wantDesktopAudio
-        });
-
+        // FIX 1: Ask for microphone first before the display media overlay opens
         if (wantMic) {
           try {
+            showToast("Allow microphone access...");
             micStream = await navigator.mediaDevices.getUserMedia({
               audio: {
                 echoCancellation: false,
@@ -707,9 +697,21 @@
             });
           } catch (micError) {
             console.warn("Microphone permission failed:", micError);
-            showToast("Microphone permission not allowed");
+            showToast("Microphone permission denied");
           }
         }
+
+        showToast("Choose window or screen");
+
+        screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: {
+            width: { ideal: 3840 },
+            height: { ideal: 2160 },
+            frameRate: { ideal: 60, max: 60 },
+            cursor: "always"
+          },
+          audio: wantDesktopAudio
+        });
 
         const finalTracks = [];
         const videoTrack = screenStream.getVideoTracks()[0];
@@ -734,7 +736,6 @@
 
         if (audioTracksToMix.length > 0) {
           const mixedAudioTrack = await createMixedAudioTrack(audioTracksToMix);
-
           if (mixedAudioTrack) {
             finalTracks.push(mixedAudioTrack);
           }
@@ -824,7 +825,11 @@
 
     async function createMixedAudioTrack(audioTracks) {
       try {
-        audioContext = new AudioContext({ sampleRate: 48000 });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
+        
+        // FIX 2: Explicitly resume the context due to browser security flags
+        await audioContext.resume();
+        
         audioDestination = audioContext.createMediaStreamDestination();
 
         audioTracks.forEach(function(track) {
@@ -832,7 +837,7 @@
           const source = audioContext.createMediaStreamSource(stream);
           const gainNode = audioContext.createGain();
 
-          gainNode.gain.value = 1;
+          gainNode.gain.value = 1.0;
           source.connect(gainNode);
           gainNode.connect(audioDestination);
         });
@@ -851,11 +856,6 @@
     }
 
     function getBestRecorderOptions() {
-      /*
-        Chrome/Chromium usually records WebM from MediaRecorder.
-        Some newer Chromium builds may support MP4/H.264. So we try MP4 first,
-        then safely fall back to WebM if MP4 is not supported on that browser.
-      */
       const preferredTypes = [
         "video/mp4;codecs=h264,aac",
         "video/mp4;codecs=avc1.42E01E,mp4a.40.2",
